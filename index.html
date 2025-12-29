@@ -1,125 +1,179 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FTHP</title>
-<style>
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.7;
-    color: #222;
-  }
-  .hero {
-    position: relative;
-    height: 100vh;
-    background: url("images/hero.jpg") center/cover no-repeat;
-  }
-  .hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-  }
-  .hero-text {
-    position: absolute;
-    bottom: 15%;
-    left: 7%;
-    right: 7%;
-    color: #fff;
-  }
-  .hero-text h1 {
-    font-size: 1.8rem;
-    margin-bottom: 0.5em;
-  }
-  .hero-text p {
-    font-size: 1rem;
-  }
-  section {
-    padding: 48px 20px;
-    max-width: 720px;
-    margin: auto;
-  }
-  h2 {
-    font-size: 1.4rem;
-    margin-bottom: 16px;
-  }
-  .card {
-    margin-bottom: 32px;
-  }
-  .card img {
-    width: 100%;
-    border-radius: 8px;
-    margin-bottom: 12px;
-  }
-  footer {
-    background: #f5f5f5;
-    padding: 32px 20px;
-    text-align: center;
-    font-size: 0.9rem;
-  }
-</style>
-</head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>船橋おもちゃの病院</title>
+  <meta name="description" content="障がいのある子どもたちが遊びを楽しめるよう、おもちゃや外部スイッチの貸し出し・相談を行っています。">
+  <style>
+    :root {
+      --main: #2f6fa3;
+      --accent: #f2a65a;
+      --bg: #ffffff;
+      --text: #333333;
+      --sub: #f5f7f9;
+    }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+                   "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    header {
+      background: var(--main);
+      color: #fff;
+      padding: 48px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 12px;
+      font-size: 1.8rem;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    section {
+      padding: 48px 20px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    section.bg {
+      background: var(--sub);
+      max-width: none;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+      color: var(--main);
+    }
+
+    .lead {
+      font-size: 1rem;
+      margin-bottom: 24px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      color: var(--main);
+    }
+
+    .button {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 12px 20px;
+      background: var(--main);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .button.accent {
+      background: var(--accent);
+      color: #333;
+    }
+
+    footer {
+      background: #222;
+      color: #ccc;
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 0.85rem;
+    }
+
+    @media (min-width: 768px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
+
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
 <body>
 
-<!-- ファーストビュー -->
-<div class="hero">
-  <div class="hero-text">
-    <h1>「伝えたい」を、押せるかたちに</h1>
-    <p>
-      重い障害のある子どもたちが、<br>
-      自分の意思を伝えるための支援を行っています
-    </p>
-  </div>
-</div>
+<header>
+  <h1>船橋おもちゃの病院</h1>
+  <p>遊びの可能性を、すべての子どもたちに。</p>
+</header>
 
-<!-- 団体概要 -->
 <section>
-  <h2>FTHPについて</h2>
-  <p>
-    FTHPは、肢体不自由や重度障害のある子どもたちが、<br>
-    スイッチや支援機器を使って「意思表示」できるよう支援する活動です。
+  <h2>私たちについて</h2>
+  <p class="lead">
+    船橋おもちゃの病院は、障がいのある子どもたちが「自分で遊ぶ」体験を持てるよう、
+    おもちゃや外部スイッチの貸し出し、使い方の相談を行っているボランティア団体です。
   </p>
 </section>
 
-<!-- 活動内容 -->
-<section>
-  <h2>どんな支援をしているか</h2>
-
-  <div class="card">
-    <img src="images/activity1.jpg" alt="">
-    <p>
-      子どもの身体の動きに合わせて、<br>
-      押せるスイッチや入力方法を一緒に探します。
-    </p>
-  </div>
-
-  <div class="card">
-    <img src="images/activity2.jpg" alt="">
-    <p>
-      「押せた」「伝わった」という経験を重ねることで、<br>
-      子ども自身の意欲や表情が変わっていきます。
-    </p>
-  </div>
+<section class="bg">
+  <section>
+    <h2>主な活動内容</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>おもちゃの貸し出し</h3>
+        <p>
+          スイッチ操作に対応したおもちゃを中心に、実際に試しながら利用できます。
+          ご家庭や施設での使用についてもご相談ください。
+        </p>
+      </div>
+      <div class="card">
+        <h3>外部スイッチの相談</h3>
+        <p>
+          お子さんの身体状況に合わせたスイッチ選びや使い方について、
+          できる範囲で一緒に考えます。
+        </p>
+      </div>
+    </div>
+  </section>
 </section>
 
-<!-- 意義 -->
 <section>
-  <h2>なぜ必要なのか</h2>
-  <p>
-    言葉や動きで意思を伝えることが難しくても、<br>
-    「伝えたい気持ち」がなくなるわけではありません。
+  <h2>ご利用について</h2>
+  <p class="lead">
+    利用方法や対応可能な内容は、お子さんの状況によって異なります。
+    まずはお気軽にお問い合わせください。
   </p>
-  <p>
-    伝える手段を持つことは、<br>
-    子どもが社会とつながる第一歩になります。
-  </p>
+  <a href="#" class="button">お問い合わせ</a>
 </section>
 
 <footer>
-  © FTHP
+  <p>© 船橋おもちゃの病院</p>
 </footer>
 
 </body>
