@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>船橋おもちゃの病院</title>
   <meta name="description" content="障がいのある子どもたちが遊びを楽しめるよう、おもちゃや外部スイッチの貸し出し・相談を行っています。">
+
   <style>
     :root {
       --main: #2f6fa3;
@@ -33,16 +34,30 @@
       display: block;
     }
 
+    /* ---------- Hero ---------- */
     header {
-      background: var(--main);
+      position: relative;
+      background: url("images/hero.jpg") center / cover no-repeat;
       color: #fff;
-      padding: 48px 20px;
+      padding: 80px 20px;
       text-align: center;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    header .inner {
+      position: relative;
+      z-index: 1;
     }
 
     header h1 {
       margin: 0 0 12px;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
     }
 
     header p {
@@ -51,6 +66,7 @@
       opacity: 0.95;
     }
 
+    /* ---------- Common ---------- */
     section {
       padding: 48px 20px;
       max-width: 960px;
@@ -73,6 +89,7 @@
       margin-bottom: 24px;
     }
 
+    /* ---------- Cards ---------- */
     .cards {
       display: grid;
       grid-template-columns: 1fr;
@@ -81,16 +98,27 @@
 
     .card {
       background: #fff;
-      padding: 24px;
       border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card-body {
+      padding: 20px;
     }
 
     .card h3 {
-      margin-top: 0;
+      margin: 0 0 8px;
       font-size: 1.1rem;
       color: var(--main);
     }
 
+    /* ---------- Button ---------- */
     .button {
       display: inline-block;
       margin-top: 16px;
@@ -102,11 +130,7 @@
       font-weight: 500;
     }
 
-    .button.accent {
-      background: var(--accent);
-      color: #333;
-    }
-
+    /* ---------- Footer ---------- */
     footer {
       background: #222;
       color: #ccc;
@@ -116,8 +140,12 @@
     }
 
     @media (min-width: 768px) {
+      header {
+        padding: 120px 20px;
+      }
+
       header h1 {
-        font-size: 2.2rem;
+        font-size: 2.3rem;
       }
 
       .cards {
@@ -129,8 +157,10 @@
 <body>
 
 <header>
-  <h1>船橋おもちゃの病院</h1>
-  <p>遊びの可能性を、すべての子どもたちに。</p>
+  <div class="inner">
+    <h1>船橋おもちゃの病院</h1>
+    <p>遊びの可能性を、すべての子どもたちに。</p>
+  </div>
 </header>
 
 <section>
@@ -144,22 +174,31 @@
 <section class="bg">
   <section>
     <h2>主な活動内容</h2>
+
     <div class="cards">
       <div class="card">
-        <h3>おもちゃの貸し出し</h3>
-        <p>
-          スイッチ操作に対応したおもちゃを中心に、実際に試しながら利用できます。
-          ご家庭や施設での使用についてもご相談ください。
-        </p>
+        <img src="images/activity1.jpg" alt="おもちゃの貸し出しの様子">
+        <div class="card-body">
+          <h3>おもちゃの貸し出し</h3>
+          <p>
+            スイッチ操作に対応したおもちゃを中心に、実際に試しながら利用できます。
+            ご家庭や施設での使用についてもご相談ください。
+          </p>
+        </div>
       </div>
+
       <div class="card">
-        <h3>外部スイッチの相談</h3>
-        <p>
-          お子さんの身体状況に合わせたスイッチ選びや使い方について、
-          できる範囲で一緒に考えます。
-        </p>
+        <img src="images/activity2.jpg" alt="外部スイッチの相談の様子">
+        <div class="card-body">
+          <h3>外部スイッチの相談</h3>
+          <p>
+            お子さんの身体状況に合わせたスイッチ選びや使い方について、
+            できる範囲で一緒に考えます。
+          </p>
+        </div>
       </div>
     </div>
+
   </section>
 </section>
 
