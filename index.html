@@ -1,224 +1,189 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FTHP｜遊びの支援活動</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FTHP</title>
+
   <style>
-/* ==========
-   全体設定
-   ========== */
+    * {
+      box-sizing: border-box;
+    }
 
-* {
-  box-sizing: border-box;
-}
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      color: #333;
+      line-height: 1.7;
+      background: #fff;
+    }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  color: #333;
-  line-height: 1.7;
-  background: #fff;
-}
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
 
-/* ==========
-   共通余白ルール
-   ========== */
+    section {
+      padding: 0 16px;
+      margin-bottom: 32px;
+    }
 
-section {
-  padding: 0 16px;
-  margin-bottom: 32px;
-}
+    h1 {
+      font-size: 1.6rem;
+      margin: 24px 0 12px;
+      line-height: 1.4;
+    }
 
-p {
-  margin: 0 0 12px;
-}
+    h2 {
+      font-size: 1.3rem;
+      margin: 24px 0 12px;
+    }
 
-p:last-child {
-  margin-bottom: 0;
-}
+    p {
+      margin: 0 0 12px;
+    }
 
-/* ==========
-   見出し
-   ========== */
+    /* ===== ヒーロー ===== */
 
-h1 {
-  font-size: 1.6rem;
-  margin: 24px 0 12px;
-  line-height: 1.4;
-}
+    .hero {
+      text-align: center;
+      padding: 32px 16px;
+    }
 
-h2 {
-  font-size: 1.3rem;
-  margin: 24px 0 12px;
-}
+    .hero img {
+      border-radius: 16px;
+      margin-bottom: 16px;
+    }
 
-h3 {
-  font-size: 1.1rem;
-  margin: 16px 0 8px;
-}
+    .hero p {
+      margin-bottom: 16px;
+    }
 
-/* ==========
-   ヒーローエリア
-   ========== */
+    .button {
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 24px;
+      background: #f4c542;
+      color: #333;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 8px 4px;
+    }
 
-.hero {
-  padding: 32px 16px;
-  text-align: center;
-}
+    /* ===== カード ===== */
 
-.hero p {
-  margin-bottom: 16px;
-}
+    .card {
+      background: #fafafa;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
 
-/* ボタン */
+    .card img {
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
 
-.button,
-button {
-  display: inline-block;
-  padding: 12px 20px;
-  border-radius: 24px;
-  background: #f4c542;
-  color: #333;
-  text-decoration: none;
-  font-weight: 600;
-  margin: 8px 4px;
-}
+    .card p {
+      margin-bottom: 0;
+    }
 
-/* ==========
-   カード（イラスト＋説明）
-   ========== */
+    /* ===== CTA ===== */
 
-.card {
-  background: #fafafa;
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 20px;
-}
-
-.card img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  margin-bottom: 8px;
-}
-
-.card p {
-  margin-bottom: 0;
-}
-
-/* ==========
-   リスト・補助要素
-   ========== */
-
-ul {
-  margin: 0 0 12px;
-  padding-left: 20px;
-}
-
-li {
-  margin-bottom: 6px;
-}
-
-/* ==========
-   最後のCTA
-   ========== */
-
-.cta {
-  text-align: center;
-  padding: 24px 16px 40px;
-}
-
-</style> 
+    .cta {
+      text-align: center;
+      padding: 24px 16px 40px;
+    }
+  </style>
 </head>
+
 <body>
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="container">
-      <h1>障がいのある子どもも<br>自分で「遊べた」を感じられる場をつくる</h1>
-      <p>おもちゃの改造・スイッチ制作を通じた<br>遊びの支援活動</p>
-      <div class="buttons">
-        <a href="#contact" class="btn-primary">相談してみる</a>
-        <a href="#about" class="btn-secondary">活動内容を見る</a>
-      </div>
-    </div>
-  </div>
+  <!-- ヒーロー -->
+  <section class="hero">
+    <img src="images/hero.jpg" alt="支援の様子">
+    <h1>障がいのある子どもも<br>自分で「選べた」経験を<br>重ねられる場をつくる</h1>
+    <p>
+      私たちは、障がいのある子どもたちが<br>
+      日常の中で「自分で選ぶ」「自分で決める」体験を<br>
+      重ねられるよう支援しています。
+    </p>
+    <a href="#contact" class="button">まずは相談する</a>
+  </section>
 
-  <!-- About -->
-  <section id="about">
-    <div class="container">
-      <h2>私たちの活動について</h2>
+  <!-- 私たちについて -->
+  <section>
+    <h2>私たちの活動について</h2>
+    <p>
+      ご家庭でのちょっとした「できた」を増やすため、<br>
+      スイッチを使った遊びやおもちゃの改造を行っています。
+    </p>
+    <p>
+      子ども一人ひとりの特性や興味に合わせ、<br>
+      「自分で操作できる」体験を大切にしています。
+    </p>
+  </section>
+
+  <!-- できること -->
+  <section>
+    <h2>この支援で、何ができるようになる？</h2>
+
+    <div class="card">
+      <img src="images/illustration1.png" alt="">
       <p>
-        電池で動くおもちゃは、小さなスイッチの操作が難しく、<br>
-        遊ぶことをあきらめてしまう子どもも少なくありません。
+        遊びを通して「自分で選ぶ」経験を積めます。
       </p>
+    </div>
+
+    <div class="card">
+      <img src="images/illustration2.png" alt="">
       <p>
-        私たちは、外部スイッチの取り付けや、<br>
-        お子さまの身体の動きに合わせたスイッチ制作を通じて、<br>
-        <strong>「自分でおもちゃを動かして遊ぶ体験」</strong>を支援しています。
+        スイッチ操作を通じて、原因と結果の理解を促します。
+      </p>
+    </div>
+
+    <div class="card">
+      <img src="images/illustration3.png" alt="">
+      <p>
+        ご家庭や施設で無理なく続けられる支援を行います。
       </p>
     </div>
   </section>
 
-  <!-- What -->
+  <!-- 制作・改造 -->
   <section>
-    <div class="container">
-      <h2>この支援で、何ができるようになる？</h2>
-      <div class="cards">
-        <div class="card">
-          <img src="images/illust_playable.png" alt="">
-          <p>遊べなかったおもちゃが、<br>もう一度遊べるようになる</p>
-        </div>
-        <div class="card">
-          <img src="images/illust_switch.png" alt="">
-          <p>お子さまに合ったスイッチで、<br>操作しやすくなる</p>
-        </div>
-        <div class="card">
-          <img src="images/illust_consult.png" alt="">
-          <p>ご家庭の状況に合わせて、<br>相談しながら進められる</p>
-        </div>
-      </div>
+    <h2>スイッチ制作・改造</h2>
+    <div class="card">
+      <img src="images/activity1.jpg" alt="">
+      <p>
+        市販のおもちゃや機器を、<br>
+        子どもに合ったスイッチ操作ができるよう調整します。
+      </p>
     </div>
   </section>
 
-  <!-- Support -->
+  <!-- おもちゃ修理 -->
   <section>
-    <div class="container">
-      <div class="support">
-        <div>
-          <h2>スイッチ制作・改造</h2>
-          <p>
-            市販のおもちゃに外部スイッチを取り付けたり、<br>
-            お子さまの動きに合わせたスイッチを制作することで、<br>
-            操作しやすく、安心して遊べるようにします。
-          </p>
-        </div>
-        <img src="images/illust_make.png" alt="">
-      </div>
-
-      <div class="support">
-        <div>
-          <h2>おもちゃの修理・改造</h2>
-          <p>
-            壊れてしまったおもちゃや、遊びにくくなったおもちゃを、<br>
-            状態を確認したうえで修理・改造します。
-          </p>
-          <p style="font-size:0.9rem;color:#666;">
-            ※おもちゃの状態によっては、対応が難しい場合があります。
-          </p>
-        </div>
-        <img src="images/illust_repair.png" alt="">
-      </div>
+    <h2>おもちゃの修理・改造</h2>
+    <div class="card">
+      <img src="images/activity2.jpg" alt="">
+      <p>
+        壊れてしまったおもちゃの修理や、<br>
+        操作しやすくするための改造にも対応しています。
+      </p>
     </div>
   </section>
 
   <!-- CTA -->
-  <div class="cta" id="contact">
+  <section class="cta" id="contact">
     <h2>まずはお気軽にご相談ください</h2>
-    <p>おもちゃやスイッチについてのご質問・ご相談は、<br>問い合わせフォームより受け付けています。</p>
-    <a href="#">お問い合わせはこちら</a>
-  </div>
+    <p>
+      お子さまの状況やご希望を伺いながら、<br>
+      無理のない形でご提案します。
+    </p>
+    <a href="#" class="button">お問い合わせはこちら</a>
+  </section>
 
 </body>
 </html>
