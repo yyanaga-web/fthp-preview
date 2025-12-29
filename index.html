@@ -2,218 +2,210 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>船橋おもちゃの病院</title>
-  <meta name="description" content="障がいのある子どもたちが遊びを楽しめるよう、おもちゃや外部スイッチの貸し出し・相談を行っています。">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FTHP｜遊びの支援活動</title>
   <style>
-    :root {
-      --main: #2f6fa3;
-      --accent: #f2a65a;
-      --bg: #ffffff;
-      --text: #333333;
-      --sub: #f5f7f9;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
-                   "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
-      color: var(--text);
-      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      color: #333;
+      background: #f7f9fc;
       line-height: 1.7;
     }
-
     img {
       max-width: 100%;
       height: auto;
       display: block;
     }
-
-    /* ---------- Hero ---------- */
-    header {
-      position: relative;
-      background: url("images/hero.jpg") center / cover no-repeat;
-      color: #fff;
-      padding: 80px 20px;
-      text-align: center;
-    }
-
-    header::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.35);
-    }
-
-    header .inner {
-      position: relative;
-      z-index: 1;
-    }
-
-    header h1 {
-      margin: 0 0 12px;
-      font-size: 1.9rem;
-    }
-
-    header p {
-      margin: 0;
-      font-size: 1rem;
-      opacity: 0.95;
-    }
-
-    /* ---------- Common ---------- */
-    section {
-      padding: 48px 20px;
+    .container {
       max-width: 960px;
       margin: 0 auto;
+      padding: 0 16px;
     }
-
-    section.bg {
-      background: var(--sub);
-      max-width: none;
+    .hero {
+      background: url("images/hero.jpg") center/cover no-repeat;
+      color: #fff;
+      padding: 64px 16px 72px;
     }
-
-    h2 {
-      font-size: 1.4rem;
-      margin-bottom: 16px;
-      color: var(--main);
+    .hero h1 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
     }
-
-    .lead {
+    .hero p {
       font-size: 1rem;
       margin-bottom: 24px;
     }
+    .hero .buttons a {
+      display: inline-block;
+      margin-right: 12px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .btn-primary {
+      background: #ffd84d;
+      color: #333;
+    }
+    .btn-secondary {
+      background: #7ec3ff;
+      color: #fff;
+    }
 
-    /* ---------- Cards ---------- */
+    section {
+      padding: 48px 0;
+      background: #fff;
+      margin-bottom: 12px;
+    }
+    section h2 {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+    }
+
     .cards {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
     }
-
     .card {
-      background: #fff;
-      border-radius: 8px;
-      overflow: hidden;
+      background: #f2f6fb;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
     }
-
     .card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
+      margin: 0 auto 12px;
     }
 
-    .card-body {
-      padding: 20px;
+    .support {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+    .support + .support {
+      margin-top: 32px;
     }
 
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 1.1rem;
-      color: var(--main);
+    .cta {
+      background: #eef5ff;
+      text-align: center;
+      padding: 56px 16px;
     }
-
-    /* ---------- Button ---------- */
-    .button {
+    .cta a {
       display: inline-block;
       margin-top: 16px;
-      padding: 12px 20px;
-      background: var(--main);
-      color: #fff;
+      padding: 12px 24px;
+      background: #ffd84d;
+      border-radius: 999px;
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: 500;
+      color: #333;
+      font-weight: bold;
     }
 
-    /* ---------- Footer ---------- */
-    footer {
-      background: #222;
-      color: #ccc;
-      text-align: center;
-      padding: 24px 16px;
-      font-size: 0.85rem;
-    }
-
-    @media (min-width: 768px) {
-      header {
-        padding: 120px 20px;
+    @media (max-width: 600px) {
+      .hero {
+        padding: 48px 16px 56px;
       }
-
-      header h1 {
-        font-size: 2.3rem;
+      .hero h1 {
+        font-size: 1.5rem;
       }
-
-      .cards {
-        grid-template-columns: repeat(2, 1fr);
+      .support {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="inner">
-    <h1>船橋おもちゃの病院</h1>
-    <p>遊びの可能性を、すべての子どもたちに。</p>
-  </div>
-</header>
-
-<section>
-  <h2>私たちについて</h2>
-  <p class="lead">
-    船橋おもちゃの病院は、障がいのある子どもたちが「自分で遊ぶ」体験を持てるよう、
-    おもちゃや外部スイッチの貸し出し、使い方の相談を行っているボランティア団体です。
-  </p>
-</section>
-
-<section class="bg">
-  <section>
-    <h2>主な活動内容</h2>
-
-    <div class="cards">
-      <div class="card">
-        <img src="images/activity1.jpg" alt="おもちゃの貸し出しの様子">
-        <div class="card-body">
-          <h3>おもちゃの貸し出し</h3>
-          <p>
-            スイッチ操作に対応したおもちゃを中心に、実際に試しながら利用できます。
-            ご家庭や施設での使用についてもご相談ください。
-          </p>
-        </div>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <h1>障がいのある子どもも<br>自分で「遊べた」を感じられる場をつくる</h1>
+      <p>おもちゃの改造・スイッチ制作を通じた<br>遊びの支援活動</p>
+      <div class="buttons">
+        <a href="#contact" class="btn-primary">相談してみる</a>
+        <a href="#about" class="btn-secondary">活動内容を見る</a>
       </div>
+    </div>
+  </div>
 
-      <div class="card">
-        <img src="images/activity2.jpg" alt="外部スイッチの相談の様子">
-        <div class="card-body">
-          <h3>外部スイッチの相談</h3>
-          <p>
-            お子さんの身体状況に合わせたスイッチ選びや使い方について、
-            できる範囲で一緒に考えます。
-          </p>
+  <!-- About -->
+  <section id="about">
+    <div class="container">
+      <h2>私たちの活動について</h2>
+      <p>
+        電池で動くおもちゃは、小さなスイッチの操作が難しく、<br>
+        遊ぶことをあきらめてしまう子どもも少なくありません。
+      </p>
+      <p>
+        私たちは、外部スイッチの取り付けや、<br>
+        お子さまの身体の動きに合わせたスイッチ制作を通じて、<br>
+        <strong>「自分でおもちゃを動かして遊ぶ体験」</strong>を支援しています。
+      </p>
+    </div>
+  </section>
+
+  <!-- What -->
+  <section>
+    <div class="container">
+      <h2>この支援で、何ができるようになる？</h2>
+      <div class="cards">
+        <div class="card">
+          <img src="images/illust_playable.png" alt="">
+          <p>遊べなかったおもちゃが、<br>もう一度遊べるようになる</p>
+        </div>
+        <div class="card">
+          <img src="images/illust_switch.png" alt="">
+          <p>お子さまに合ったスイッチで、<br>操作しやすくなる</p>
+        </div>
+        <div class="card">
+          <img src="images/illust_consult.png" alt="">
+          <p>ご家庭の状況に合わせて、<br>相談しながら進められる</p>
         </div>
       </div>
     </div>
-
   </section>
-</section>
 
-<section>
-  <h2>ご利用について</h2>
-  <p class="lead">
-    利用方法や対応可能な内容は、お子さんの状況によって異なります。
-    まずはお気軽にお問い合わせください。
-  </p>
-  <a href="#" class="button">お問い合わせ</a>
-</section>
+  <!-- Support -->
+  <section>
+    <div class="container">
+      <div class="support">
+        <div>
+          <h2>スイッチ制作・改造</h2>
+          <p>
+            市販のおもちゃに外部スイッチを取り付けたり、<br>
+            お子さまの動きに合わせたスイッチを制作することで、<br>
+            操作しやすく、安心して遊べるようにします。
+          </p>
+        </div>
+        <img src="images/illust_make.png" alt="">
+      </div>
 
-<footer>
-  <p>© 船橋おもちゃの病院</p>
-</footer>
+      <div class="support">
+        <div>
+          <h2>おもちゃの修理・改造</h2>
+          <p>
+            壊れてしまったおもちゃや、遊びにくくなったおもちゃを、<br>
+            状態を確認したうえで修理・改造します。
+          </p>
+          <p style="font-size:0.9rem;color:#666;">
+            ※おもちゃの状態によっては、対応が難しい場合があります。
+          </p>
+        </div>
+        <img src="images/illust_repair.png" alt="">
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta" id="contact">
+    <h2>まずはお気軽にご相談ください</h2>
+    <p>おもちゃやスイッチについてのご質問・ご相談は、<br>問い合わせフォームより受け付けています。</p>
+    <a href="#">お問い合わせはこちら</a>
+  </div>
 
 </body>
 </html>
