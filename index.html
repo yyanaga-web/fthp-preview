@@ -11,163 +11,97 @@
                    "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
       color: #333;
       background: #f7f9fc;
-      line-height: 1.7;
+      line-height: 1.65;
     }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: #2b6cb0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
-    img { max-width: 100%; display: block; }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 16px; }
 
-    .container {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-
-    /* Hero image only */
-    .hero-image {
-      height: 320px;
+    /* Hero */
+    .hero {
       background: url("images/hero.jpg") center/cover no-repeat;
+      color: #fff;
+      padding: 64px 16px 72px;
+    }
+    .hero-inner {
+      max-width: 560px;
+      background: rgba(0,0,0,0.45);
+      padding: 24px;
+      border-radius: 16px;
+    }
+    .hero h1 { font-size: 1.8rem; margin-bottom: 12px; }
+    .hero p { font-size: 1rem; margin-bottom: 20px; }
+    .buttons a {
+      display: inline-block;
+      margin-right: 12px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+    }
+    .btn-primary { background: #ffd84d; color: #333; }
+    .btn-secondary { background: #7ec3ff; color: #fff; }
+
+    section { padding: 40px 0; background: #fff; margin-bottom: 12px;}
+    section h2 { font-size: 1.4rem; margin-bottom: 12px; }
+    section p { margin: 0 0 12px; }
+
+    .link-inline {
+      margin-top: 4px;
+      font-size: 0.9rem;
     }
 
-    /* Hero text block */
-    .hero-lead {
-      background: #ffffff;
-      margin-top: -40px;
-      border-radius: 16px 16px 0 0;
-      padding: 28px 0 20px;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
-    }
-
-    .hero-lead h1 {
-      font-size: 1.6rem;
-      margin: 0 0 10px;
-    }
-
-    .hero-lead p {
-      margin: 0 0 16px;
-      max-width: 600px;
-    }
-
-    /* Top links (Google Sites風) */
-    .top-links {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .top-links a {
-      display: block;
-      text-align: center;
-      padding: 14px 12px;
-      background: #eef5ff;
-      border-radius: 12px;
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-    }
-
-    /* Sections */
-    section {
-      background: #fff;
-      padding: 36px 0;
-      margin-top: 12px;
-    }
-
-    h2 {
-      font-size: 1.35rem;
-      margin-bottom: 14px;
-    }
-
-    p {
-      margin-bottom: 12px;
-      max-width: 640px;
-    }
-
-    /* Cards */
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
       margin-top: 20px;
     }
+    .card { background: #f2f6fb; border-radius: 12px; padding: 16px; text-align: center; }
+    .card img { margin: 0 auto 12px; }
 
-    .card {
-      background: #f2f6fb;
-      border-radius: 14px;
-      padding: 16px;
-      text-align: center;
-    }
-
-    .card img {
-      width: 120px;
-      margin: 0 auto 10px;
-    }
-
-    /* Support */
     .support {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 20px;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
       align-items: center;
-      background: #f2f6fb;
-      border-radius: 14px;
-      padding: 22px;
+      margin-bottom: 32px;
     }
 
-    .support + .support {
-      margin-top: 18px;
-    }
-
-    .support img {
-      max-width: 220px;
-      margin-left: auto;
-    }
-
-    .note {
-      font-size: 0.85rem;
-      color: #666;
-    }
-
-    /* CTA */
     .cta {
       background: #eef5ff;
       text-align: center;
-      padding: 44px 16px;
-      margin-top: 16px;
+      padding: 48px 16px;
     }
-
     .cta a {
       display: inline-block;
-      margin-top: 12px;
-      padding: 12px 26px;
+      margin-top: 16px;
+      padding: 12px 24px;
       background: #ffd84d;
       border-radius: 999px;
-      text-decoration: none;
-      color: #333;
       font-weight: bold;
+      color: #333;
     }
 
     @media (max-width: 600px) {
-      .hero-image { height: 240px; }
+      .hero h1 { font-size: 1.5rem; }
       .support { grid-template-columns: 1fr; }
-      .support img { margin: 12px auto 0; }
     }
   </style>
 </head>
 <body>
 
   <!-- Hero -->
-  <div class="hero-image"></div>
-
-  <div class="hero-lead">
+  <div class="hero">
     <div class="container">
-      <h1>障がいのある子どもも<br>自分で「遊べた」を感じられる場をつくる</h1>
-      <p>おもちゃの改造・スイッチ制作を通じた遊びの支援活動</p>
-
-      <div class="top-links">
-        <a href="#about">活動について</a>
-        <a href="#support">支援内容</a>
-        <a href="#contact">相談する</a>
+      <div class="hero-inner">
+        <h1>障がいのある子どもも<br>自分で「遊べた」を感じられる場をつくる</h1>
+        <p>おもちゃの改造・スイッチ制作を通じた<br>遊びの支援活動</p>
+        <div class="buttons">
+          <a href="#contact" class="btn-primary">相談してみる</a>
+          <a href="#about" class="btn-secondary">活動内容を見る</a>
+        </div>
       </div>
     </div>
   </div>
@@ -196,11 +130,19 @@
         <div class="card">
           <img src="images/illust_playable.png" alt="">
           <p>遊べなかったおもちゃが、<br>もう一度遊べるようになる</p>
+          <div class="link-inline">
+            <a href="https://www.city.funabashi.lg.jp/shisetsu/toshokankominkan/0002/0008/0003/p003702.html">地域おもちゃ病院の例を見る（船橋市） →</a> 4
+          </div>
         </div>
+
         <div class="card">
           <img src="images/illust_switch.png" alt="">
           <p>お子さまに合ったスイッチで、<br>操作しやすくなる</p>
+          <div class="link-inline">
+            <a href="https://www.toyhospital.org/gpsyougaiji">おもちゃ病院協会の障がい児支援活動 →</a> 5
+          </div>
         </div>
+
         <div class="card">
           <img src="images/illust_consult.png" alt="">
           <p>ご家庭の状況に合わせて、<br>相談しながら進められる</p>
@@ -210,15 +152,20 @@
   </section>
 
   <!-- Support -->
-  <section id="support">
+  <section>
     <div class="container">
+
       <div class="support">
         <div>
           <h2>スイッチ制作・改造</h2>
           <p>
             市販のおもちゃに外部スイッチを取り付けたり、
-            お子さまの動きに合わせたスイッチを制作します。
+            お子さまの動きに合わせたスイッチを制作して
+            操作しやすく、安心して遊べるようにします。
           </p>
+          <div class="link-inline">
+            <a href="https://www.toyhospital.org/gpsyougaiji">全国おもちゃ病院一覧（日本おもちゃ病院協会） →</a> 6
+          </div>
         </div>
         <img src="images/illust_make.png" alt="">
       </div>
@@ -227,12 +174,29 @@
         <div>
           <h2>おもちゃの修理・改造</h2>
           <p>
-            壊れてしまったおもちゃや、遊びにくくなったおもちゃを
+            壊れてしまったおもちゃや、遊びにくくなったおもちゃを、
             状態を確認したうえで修理・改造します。
           </p>
-          <p class="note">※状態によっては対応が難しい場合があります。</p>
+          <p style="font-size:0.9rem;color:#666;">
+            ※状態によって対応が難しい場合があります。
+          </p>
+          <div class="link-inline">
+            <a href="https://matsudo.toy-hospital.org/">松戸おもちゃの病院 活動例 →</a> 7
+          </div>
         </div>
         <img src="images/illust_repair.png" alt="">
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Media -->
+  <section>
+    <div class="container">
+      <h2>メディア掲載・紹介</h2>
+      <p>活動は地域新聞やSNSでも紹介されています。</p>
+      <div class="link-inline">
+        <a href="https://x.com/chiikishinbun/status/1940289335934501013">地域新聞記事：おもちゃ病院支援活動 →</a> 8
       </div>
     </div>
   </section>
