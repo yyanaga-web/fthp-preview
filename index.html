@@ -5,30 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FTHP｜遊びの支援活動</title>
   <style>
-    :root {
-      --bg-main: #f7f9fc;
-      --bg-section: #ffffff;
-      --bg-soft: #f2f6fb;
-      --bg-accent: #eef5ff;
-      --text-main: #333;
-      --text-sub: #666;
-      --radius: 14px;
-    }
-
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
                    "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
-      color: var(--text-main);
-      background: var(--bg-main);
+      color: #333;
+      background: #f7f9fc;
       line-height: 1.7;
     }
 
-    img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
+    img { max-width: 100%; display: block; }
 
     .container {
       max-width: 920px;
@@ -36,80 +22,64 @@
       padding: 0 16px;
     }
 
-    /* Hero */
-    .hero {
-      position: relative;
+    /* Hero image only */
+    .hero-image {
+      height: 320px;
       background: url("images/hero.jpg") center/cover no-repeat;
-      color: #fff;
-      padding: 96px 0 56px; /* 上を広めにして顔回避 */
     }
 
-    /* 文字可読性用オーバーレイ */
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.15) 0%,
-        rgba(0,0,0,0.35) 55%,
-        rgba(0,0,0,0.55) 100%
-      );
+    /* Hero text block */
+    .hero-lead {
+      background: #ffffff;
+      margin-top: -40px;
+      border-radius: 16px 16px 0 0;
+      padding: 28px 0 20px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
     }
 
-    .hero .container {
-      position: relative;
-      z-index: 1;
+    .hero-lead h1 {
+      font-size: 1.6rem;
+      margin: 0 0 10px;
     }
 
-    .hero h1 {
-      font-size: 1.65rem;
-      margin: 0 0 12px;
-      line-height: 1.45;
-      max-width: 560px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    .hero-lead p {
+      margin: 0 0 16px;
+      max-width: 600px;
     }
 
-    .hero p {
-      font-size: 1rem;
-      margin: 0 0 22px;
-      max-width: 520px;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    /* Top links (Google Sites風) */
+    .top-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
     }
 
-    .buttons a {
-      display: inline-block;
-      margin-right: 10px;
-      padding: 10px 18px;
-      border-radius: 999px;
+    .top-links a {
+      display: block;
+      text-align: center;
+      padding: 14px 12px;
+      background: #eef5ff;
+      border-radius: 12px;
       text-decoration: none;
-      font-size: 0.95rem;
-    }
-    .btn-primary {
-      background: #ffd84d;
       color: #333;
-    }
-    .btn-secondary {
-      background: rgba(255,255,255,0.85);
-      color: #333;
+      font-weight: 500;
     }
 
     /* Sections */
     section {
-      background: var(--bg-section);
-      padding: 40px 0;
-    }
-    section + section {
+      background: #fff;
+      padding: 36px 0;
       margin-top: 12px;
     }
 
     h2 {
       font-size: 1.35rem;
-      margin: 0 0 14px;
+      margin-bottom: 14px;
     }
 
     p {
-      margin: 0 0 12px;
+      margin-bottom: 12px;
       max-width: 640px;
     }
 
@@ -117,22 +87,20 @@
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
+      gap: 16px;
       margin-top: 20px;
     }
+
     .card {
-      background: var(--bg-soft);
-      border-radius: var(--radius);
-      padding: 16px 14px 18px;
+      background: #f2f6fb;
+      border-radius: 14px;
+      padding: 16px;
       text-align: center;
     }
+
     .card img {
       width: 120px;
       margin: 0 auto 10px;
-    }
-    .card p {
-      margin: 0;
-      font-size: 0.95rem;
     }
 
     /* Support */
@@ -141,13 +109,15 @@
       grid-template-columns: 1.1fr 0.9fr;
       gap: 20px;
       align-items: center;
+      background: #f2f6fb;
+      border-radius: 14px;
       padding: 22px;
-      background: var(--bg-soft);
-      border-radius: var(--radius);
     }
+
     .support + .support {
       margin-top: 18px;
     }
+
     .support img {
       max-width: 220px;
       margin-left: auto;
@@ -155,13 +125,12 @@
 
     .note {
       font-size: 0.85rem;
-      color: var(--text-sub);
-      margin-top: 6px;
+      color: #666;
     }
 
     /* CTA */
     .cta {
-      background: var(--bg-accent);
+      background: #eef5ff;
       text-align: center;
       padding: 44px 16px;
       margin-top: 16px;
@@ -169,6 +138,7 @@
 
     .cta a {
       display: inline-block;
+      margin-top: 12px;
       padding: 12px 26px;
       background: #ffd84d;
       border-radius: 999px;
@@ -177,36 +147,102 @@
       font-weight: bold;
     }
 
-    /* Mobile */
     @media (max-width: 600px) {
-      .hero {
-        padding: 72px 0 48px;
-      }
-      .hero h1 {
-        font-size: 1.45rem;
-      }
-      .support {
-        grid-template-columns: 1fr;
-      }
-      .support img {
-        margin: 12px auto 0;
-      }
+      .hero-image { height: 240px; }
+      .support { grid-template-columns: 1fr; }
+      .support img { margin: 12px auto 0; }
     }
   </style>
 </head>
 <body>
 
-  <div class="hero">
+  <!-- Hero -->
+  <div class="hero-image"></div>
+
+  <div class="hero-lead">
     <div class="container">
       <h1>障がいのある子どもも<br>自分で「遊べた」を感じられる場をつくる</h1>
-      <p>おもちゃの改造・スイッチ制作を通じた<br>遊びの支援活動</p>
-      <div class="buttons">
-        <a href="#contact" class="btn-primary">相談してみる</a>
-        <a href="#about" class="btn-secondary">活動内容を見る</a>
+      <p>おもちゃの改造・スイッチ制作を通じた遊びの支援活動</p>
+
+      <div class="top-links">
+        <a href="#about">活動について</a>
+        <a href="#support">支援内容</a>
+        <a href="#contact">相談する</a>
       </div>
     </div>
   </div>
 
-  <!-- 以下は前回と同一 -->
+  <!-- About -->
+  <section id="about">
+    <div class="container">
+      <h2>私たちの活動について</h2>
+      <p>
+        電池で動くおもちゃは、小さなスイッチの操作が難しく、
+        遊ぶことをあきらめてしまう子どもも少なくありません。
+      </p>
+      <p>
+        私たちは、外部スイッチの取り付けや、
+        お子さまの身体の動きに合わせたスイッチ制作を通じて、
+        <strong>「自分でおもちゃを動かして遊ぶ体験」</strong>を支援しています。
+      </p>
+    </div>
+  </section>
+
+  <!-- What -->
+  <section>
+    <div class="container">
+      <h2>この支援で、何ができるようになる？</h2>
+      <div class="cards">
+        <div class="card">
+          <img src="images/illust_playable.png" alt="">
+          <p>遊べなかったおもちゃが、<br>もう一度遊べるようになる</p>
+        </div>
+        <div class="card">
+          <img src="images/illust_switch.png" alt="">
+          <p>お子さまに合ったスイッチで、<br>操作しやすくなる</p>
+        </div>
+        <div class="card">
+          <img src="images/illust_consult.png" alt="">
+          <p>ご家庭の状況に合わせて、<br>相談しながら進められる</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Support -->
+  <section id="support">
+    <div class="container">
+      <div class="support">
+        <div>
+          <h2>スイッチ制作・改造</h2>
+          <p>
+            市販のおもちゃに外部スイッチを取り付けたり、
+            お子さまの動きに合わせたスイッチを制作します。
+          </p>
+        </div>
+        <img src="images/illust_make.png" alt="">
+      </div>
+
+      <div class="support">
+        <div>
+          <h2>おもちゃの修理・改造</h2>
+          <p>
+            壊れてしまったおもちゃや、遊びにくくなったおもちゃを
+            状態を確認したうえで修理・改造します。
+          </p>
+          <p class="note">※状態によっては対応が難しい場合があります。</p>
+        </div>
+        <img src="images/illust_repair.png" alt="">
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta" id="contact">
+    <h2>まずはお気軽にご相談ください</h2>
+    <p>おもちゃやスイッチについてのご質問・ご相談は、フォームより受け付けています。</p>
+    <a href="#">お問い合わせはこちら</a>
+  </div>
+
 </body>
 </html>
