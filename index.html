@@ -4,120 +4,171 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FTHP｜遊びの支援活動</title>
+
   <style>
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+        "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
       color: #333;
       background: #f7f9fc;
-      line-height: 1.65;
+      line-height: 1.75;
     }
-    img { max-width: 100%; height: auto; display: block; }
-    a { color: #2b6cb0; text-decoration: none; }
-    a:hover { text-decoration: underline; }
 
-    .container { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
 
     /* Hero */
     .hero {
-      background: url("images/hero.jpg") center/cover no-repeat;
+      position: relative;
+      background: url("images/hero.jpg") center top / cover no-repeat;
       color: #fff;
-      padding: 64px 16px 72px;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
     }
     .hero-inner {
-      max-width: 560px;
-      background: rgba(0,0,0,0.45);
-      padding: 24px;
-      border-radius: 16px;
+      position: relative;
+      padding: 72px 0 80px;
     }
-    .hero h1 { font-size: 1.8rem; margin-bottom: 12px; }
-    .hero p { font-size: 1rem; margin-bottom: 20px; }
-    .buttons a {
-      display: inline-block;
-      margin-right: 12px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      font-size: 0.95rem;
+    .hero h1 {
+      font-size: 1.9rem;
+      margin-bottom: 16px;
     }
-    .btn-primary { background: #ffd84d; color: #333; }
-    .btn-secondary { background: #7ec3ff; color: #fff; }
-
-    section { padding: 40px 0; background: #fff; margin-bottom: 12px;}
-    section h2 { font-size: 1.4rem; margin-bottom: 12px; }
-    section p { margin: 0 0 12px; }
-
-    .link-inline {
-      margin-top: 4px;
-      font-size: 0.9rem;
+    .hero p {
+      font-size: 1.05rem;
+      max-width: 640px;
     }
 
+    /* Section */
+    section {
+      background: #fff;
+      padding: 56px 0;
+      margin-bottom: 12px;
+    }
+    section h2 {
+      font-size: 1.45rem;
+      margin-bottom: 20px;
+    }
+    section p {
+      margin-bottom: 16px;
+    }
+
+    /* Cards */
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
+      gap: 20px;
+      margin-top: 32px;
     }
-    .card { background: #f2f6fb; border-radius: 12px; padding: 16px; text-align: center; }
-    .card img { margin: 0 auto 12px; }
+    .card {
+      background: #f2f6fb;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+    .card img {
+      margin: 0 auto 14px;
+    }
 
+    /* Support */
     .support {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 32px;
       align-items: center;
-      margin-bottom: 32px;
+    }
+    .support + .support {
+      margin-top: 48px;
     }
 
+    .note {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* CTA */
     .cta {
       background: #eef5ff;
+      padding: 64px 16px;
       text-align: center;
-      padding: 48px 16px;
+    }
+    .cta h2 {
+      margin-bottom: 16px;
     }
     .cta a {
       display: inline-block;
-      margin-top: 16px;
-      padding: 12px 24px;
+      margin-top: 20px;
+      padding: 12px 28px;
       background: #ffd84d;
       border-radius: 999px;
       font-weight: bold;
       color: #333;
     }
 
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 1.5rem; }
-      .support { grid-template-columns: 1fr; }
+    @media (max-width: 640px) {
+      .hero-inner {
+        padding: 56px 0 64px;
+      }
+      .hero h1 {
+        font-size: 1.6rem;
+      }
+      .support {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <!-- Hero -->
   <div class="hero">
-    <div class="container">
-      <div class="hero-inner">
-        <h1>障がいのある子どもも<br>自分で「遊べた」を感じられる場をつくる</h1>
-        <p>おもちゃの改造・スイッチ制作を通じた<br>遊びの支援活動</p>
-        <div class="buttons">
-          <a href="#contact" class="btn-primary">相談してみる</a>
-          <a href="#about" class="btn-secondary">活動内容を見る</a>
-        </div>
-      </div>
+    <div class="container hero-inner">
+      <h1>
+        障がいのある子どもも<br>
+        自分で「遊べた」を感じられる場をつくる
+      </h1>
+      <p>
+        FTHPは、おもちゃの改造やスイッチ制作を通じて、<br>
+        「操作できないから遊べない」を減らすための遊びの支援活動を行っています。
+      </p>
     </div>
   </div>
 
   <!-- About -->
-  <section id="about">
+  <section>
     <div class="container">
       <h2>私たちの活動について</h2>
       <p>
-        電池で動くおもちゃは、小さなスイッチの操作が難しく、
-        遊ぶことをあきらめてしまう子どもも少なくありません。
+        電池で動くおもちゃの多くは、小さなボタンやスイッチ操作が必要です。<br>
+        そのため、身体の動きに制限がある子どもにとっては、
+        「本当は興味があるのに遊べない」という状況が生まれがちです。
       </p>
       <p>
-        私たちは、外部スイッチの取り付けや、
-        お子さまの身体の動きに合わせたスイッチ制作を通じて、
-        <strong>「自分でおもちゃを動かして遊ぶ体験」</strong>を支援しています。
+        FTHPでは、市販のおもちゃに外部スイッチを取り付けたり、
+        お子さまの動きに合わせたスイッチを制作することで、
+        <strong>自分の力でおもちゃを動かして遊ぶ体験</strong>を支援しています。
       </p>
     </div>
   </section>
@@ -125,27 +176,34 @@
   <!-- What -->
   <section>
     <div class="container">
-      <h2>この支援で、何ができるようになる？</h2>
+      <h2>この支援でできるようになること</h2>
+
       <div class="cards">
         <div class="card">
-          <img src="images/illust_playable.png" alt="">
-          <p>遊べなかったおもちゃが、<br>もう一度遊べるようになる</p>
-          <div class="link-inline">
-            <a href="https://www.city.funabashi.lg.jp/shisetsu/toshokankominkan/0002/0008/0003/p003702.html">地域おもちゃ病院の例を見る（船橋市） →</a> 4
-          </div>
+          <img src="images/illust_playable.jpg" alt="">
+          <p>
+            今まで遊べなかったおもちゃが、<br>
+            工夫によって再び遊べるようになります。
+          </p>
         </div>
 
         <div class="card">
-          <img src="images/illust_switch.png" alt="">
-          <p>お子さまに合ったスイッチで、<br>操作しやすくなる</p>
-          <div class="link-inline">
-            <a href="https://www.toyhospital.org/gpsyougaiji">おもちゃ病院協会の障がい児支援活動 →</a> 5
-          </div>
+          <img src="images/illust_multi_switch.jpg" alt="">
+          <p>
+            複数のスイッチを使い分けることで、<br>
+            お子さまに合った操作方法を試せます。
+          </p>
+          <p>
+            <a href="https://sites.google.com/view/fthp/switch">▶ スイッチのサンプルを見る</a>
+          </p>
         </div>
 
         <div class="card">
-          <img src="images/illust_consult.png" alt="">
-          <p>ご家庭の状況に合わせて、<br>相談しながら進められる</p>
+          <img src="images/illust_consult.jpg" alt="">
+          <p>
+            ご家庭の状況やお子さまの様子に合わせて、<br>
+            相談しながら進めることができます。
+          </p>
         </div>
       </div>
     </div>
@@ -157,55 +215,89 @@
 
       <div class="support">
         <div>
-          <h2>スイッチ制作・改造</h2>
+          <h2>スイッチ制作・おもちゃ改造</h2>
           <p>
             市販のおもちゃに外部スイッチを取り付けたり、
-            お子さまの動きに合わせたスイッチを制作して
-            操作しやすく、安心して遊べるようにします。
+            お子さまの身体の動きに合わせたスイッチを制作します。
           </p>
-          <div class="link-inline">
-            <a href="https://www.toyhospital.org/gpsyougaiji">全国おもちゃ病院一覧（日本おもちゃ病院協会） →</a> 6
-          </div>
+          <p>
+            動かしやすさだけでなく、安全性にも配慮し、
+            ご家庭で安心して使える形を一緒に考えます。
+          </p>
+          <p>
+            <a href="https://sites.google.com/view/fthp/toy">▶ 改造・制作の詳細を見る</a>
+          </p>
         </div>
-        <img src="images/illust_make.png" alt="">
+        <img src="images/illust_make.jpg" alt="">
       </div>
 
       <div class="support">
         <div>
-          <h2>おもちゃの修理・改造</h2>
+          <h2>貸し出しおもちゃ</h2>
           <p>
-            壊れてしまったおもちゃや、遊びにくくなったおもちゃを、
-            状態を確認したうえで修理・改造します。
+            スイッチ付きおもちゃを一定期間お貸しし、
+            実際にご家庭で試していただくことができます。
           </p>
-          <p style="font-size:0.9rem;color:#666;">
-            ※状態によって対応が難しい場合があります。
+          <p>
+            「どんなスイッチが合うのか分からない」
+            「まずは反応を見てみたい」
+            という場合に活用されています。
           </p>
-          <div class="link-inline">
-            <a href="https://matsudo.toy-hospital.org/">松戸おもちゃの病院 活動例 →</a> 7
-          </div>
+          <p>
+            <a href="https://sites.google.com/view/fthp/rental">▶ 貸し出しおもちゃについて</a>
+          </p>
         </div>
-        <img src="images/illust_repair.png" alt="">
+        <img src="images/illust_rental.jpg" alt="">
       </div>
 
-    </div>
-  </section>
-
-  <!-- Media -->
-  <section>
-    <div class="container">
-      <h2>メディア掲載・紹介</h2>
-      <p>活動は地域新聞やSNSでも紹介されています。</p>
-      <div class="link-inline">
-        <a href="https://x.com/chiikishinbun/status/1940289335934501013">地域新聞記事：おもちゃ病院支援活動 →</a> 8
+      <div class="support">
+        <div>
+          <h2>おもちゃの修理・おもちゃ病院</h2>
+          <p>
+            壊れてしまったおもちゃや、使いづらくなったおもちゃについても、
+            状態を確認したうえで修理や改造を行います。
+          </p>
+          <p>
+            地域のおもちゃ病院とも連携しながら対応しています。
+          </p>
+          <p>
+            <a href="https://sites.google.com/view/fthp/omochabyoin">
+              ▶ おもちゃ病院の紹介
+            </a>
+          </p>
+          <p class="note">
+            ※おもちゃの状態によっては対応が難しい場合があります。
+          </p>
+        </div>
+        <img src="images/illust_repair.jpg" alt="">
       </div>
+
+      <div class="support">
+        <div>
+          <h2>メディア掲載</h2>
+          <p>
+            FTHPの活動は、新聞などのメディアでも紹介されています。
+          </p>
+          <p>
+            <a href="https://sites.google.com/view/fthp/media">
+              ▶ 新聞・メディア掲載を見る
+            </a>
+          </p>
+        </div>
+        <img src="images/illust_media.jpg" alt="">
+      </div>
+
     </div>
   </section>
 
   <!-- CTA -->
-  <div class="cta" id="contact">
+  <div class="cta">
     <h2>まずはお気軽にご相談ください</h2>
-    <p>おもちゃやスイッチについてのご質問・ご相談は、フォームより受け付けています。</p>
-    <a href="#">お問い合わせはこちら</a>
+    <p>
+      おもちゃやスイッチについてのご質問・ご相談は、<br>
+      問い合わせフォームより受け付けています。
+    </p>
+    <a href="https://sites.google.com/view/fthp/contact">お問い合わせはこちら</a>
   </div>
 
 </body>
