@@ -1,169 +1,316 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FTHP｜遊びの支援活動</title>
+  <meta charset="UTF-8">
+  <title>Fun Toys Helpful Project</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
-  background:#f6f8fb;
-  color:#333;
-  line-height:1.7;
-}
+  <style>
+    :root {
+      --main: #2f6f73;
+      --accent: #f2b705;
+      --bg: #f7f9fa;
+      --text: #333;
+      --subtext: #666;
+    }
 
-img{max-width:100%;display:block}
+    * {
+      box-sizing: border-box;
+    }
 
-.container{
-  max-width:960px;
-  margin:0 auto;
-  padding:0 16px;
-}
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      color: var(--text);
+      background: white;
+      line-height: 1.7;
+    }
 
-/* HERO */
-.hero{
-  background:url("images/hero.jpg") center/cover no-repeat;
-  position:relative;
-  color:#fff;
-}
-.hero::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.35);
-}
-.hero-inner{
-  position:relative;
-  padding:48px 0 56px;
-}
-.hero h1{
-  font-size:1.7rem;
-  margin-bottom:12px;
-}
-.hero p{
-  max-width:640px;
-  font-size:1rem;
-}
+    a {
+      color: var(--main);
+      text-decoration: none;
+      font-weight: 500;
+    }
 
-/* SECTION */
-section{
-  padding:48px 0;
-}
-.section-box{
-  background:#fff;
-  border-radius:16px;
-  padding:40px;
-  box-shadow:0 8px 24px rgba(0,0,0,.04);
-}
-section h2{
-  font-size:1.4rem;
-  margin-bottom:20px;
-}
-section p{margin-bottom:14px}
+    a:hover {
+      text-decoration: underline;
+    }
 
-/* CARDS */
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
-}
-.card{
-  background:#f3f6fb;
-  border-radius:14px;
-  padding:24px;
-  text-align:center;
-}
+    img {
+      max-width: 100%;
+      display: block;
+    }
 
-/* SUPPORT */
-.support{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:32px;
-  align-items:center;
-}
-.support+.support{margin-top:48px}
+    /* ---------- HERO ---------- */
 
-/* CTA */
-.cta{
-  background:#eef3ff;
-  padding:64px 16px;
-  text-align:center;
-}
-.cta a{
-  display:inline-block;
-  margin-top:20px;
-  padding:12px 28px;
-  background:#ffd84d;
-  border-radius:999px;
-  font-weight:bold;
-  color:#333;
-  text-decoration:none;
-}
+    .hero {
+      position: relative;
+      background: #000;
+      color: #fff;
+    }
 
-/* RESPONSIVE */
-@media(max-width:640px){
-  .support{grid-template-columns:1fr}
-  .section-box{padding:28px}
-  .hero h1{font-size:1.5rem}
-}
-</style>
+    .hero img {
+      width: 100%;
+      height: 60vh;
+      object-fit: cover;
+      opacity: 0.75;
+    }
+
+    .hero-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 6%;
+    }
+
+    .hero-text h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.3;
+      margin: 0;
+      max-width: 720px;
+    }
+
+    /* ---------- SECTION COMMON ---------- */
+
+    section {
+      padding: 48px 6%;
+      position: relative;
+    }
+
+    section + section {
+      padding-top: 24px;
+    }
+
+    .bg-word {
+      position: absolute;
+      top: 8px;
+      left: 6%;
+      font-size: 4rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #000;
+      opacity: 0.04;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      margin: 0 0 16px;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--subtext);
+    }
+
+    /* ---------- INTRO ---------- */
+
+    .intro {
+      background: var(--bg);
+    }
+
+    /* ---------- SUPPORT GRID ---------- */
+
+    .support-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .support-item {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    }
+
+    .support-item img {
+      height: 140px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+
+    .support-item h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+
+    .link {
+      margin-top: 6px;
+      display: inline-block;
+      font-size: 0.95rem;
+    }
+
+    /* ---------- CTA ---------- */
+
+    .cta {
+      text-align: center;
+      background: var(--bg);
+      padding: 56px 6%;
+    }
+
+    .cta a {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 600;
+      margin-top: 16px;
+    }
+
+    /* ---------- MEDIA ---------- */
+
+    .media-item {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .media-item img {
+      width: 120px;
+      flex-shrink: 0;
+    }
+
+    /* ---------- FOOTER ---------- */
+
+    footer {
+      padding: 32px 6%;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #888;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="hero">
-  <div class="container hero-inner">
-    <h1>障がいのある子どもも<br>自分で「遊べた」を感じられる場をつくる</h1>
-    <p>おもちゃの改造・スイッチ制作を通じた遊びの支援活動</p>
+  <!-- HERO -->
+  <div class="hero">
+    <img src="images/hero.jpg" alt="">
+    <div class="hero-text">
+      <h1>
+        障がいのある子どもも<br>
+        自分で「遊べた」と感じられる<br>
+        場をつくる
+      </h1>
+    </div>
   </div>
-</div>
 
-<section>
-  <div class="container section-box">
+  <!-- INTRO -->
+  <section class="intro">
+    <div class="bg-word">ABOUT</div>
     <h2>私たちの活動について</h2>
-    <p>電池で動くおもちゃは、操作が難しく遊べない子どもも少なくありません。</p>
-    <p>FTHPでは、外部スイッチの取り付けやスイッチ制作を通じて、「自分で遊ぶ体験」を支援しています。</p>
-  </div>
-</section>
+    <p>
+      病気や障がいなどさまざまな理由で、市販のおもちゃをそのままでは
+      楽しむことが難しい子どもたちがいます。
+    </p>
+    <p>
+      Fun Toys Helpful Project（FTHP）は、スイッチの工夫や改造、
+      おもちゃの貸し出しなどを通して、
+      子どもたちが「自分で遊べた」と感じられる体験を支えています。
+    </p>
+  </section>
 
-<section>
-  <div class="container section-box">
+  <!-- SUPPORT -->
+  <section>
+    <div class="bg-word">SUPPORT</div>
     <h2>この支援でできるようになること</h2>
-    <div class="cards">
-      <div class="card">
+
+    <div class="support-grid">
+      <div class="support-item">
         <img src="images/illust_playable.png" alt="">
-        <p>遊べなかったおもちゃが、もう一度遊べる</p>
+        <h3>遊べなかったおもちゃが遊べるように</h3>
+        <p>
+          押しやすいスイッチや操作方法の工夫によって、
+          子ども自身の動きでおもちゃを動かせるようになります。
+        </p>
       </div>
-      <div class="card">
-        <img src="images/illust_multi_switch.png" alt="">
-        <p>複数スイッチで操作を試せる</p>
-      </div>
-      <div class="card">
-        <img src="images/illust_consult.png" alt="">
-        <p>相談しながら進められる</p>
+
+      <div class="support-item">
+        <img src="images/illust_switch.png" alt="">
+        <h3>身体の動きに合わせた操作方法</h3>
+        <p>
+          一人ひとりの身体の状態に合わせて、
+          複数スイッチや配置の工夫を行います。
+        </p>
+        <a class="link" href="switch.html">スイッチの例を見る →</a>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section>
-  <div class="container section-box">
-    <div class="support">
-      <div>
-        <h2>貸し出しおもちゃ</h2>
-        <p>スイッチ付きおもちゃを一定期間お貸しします。</p>
-      </div>
-      <img src="images/toy_rental.png" alt="">
+  <!-- MAKE -->
+  <section>
+    <div class="bg-word">MAKE</div>
+    <h2>スイッチ制作・おもちゃ改造</h2>
+    <p>
+      市販のおもちゃを分解・加工し、
+      外部スイッチを接続できるようにします。
+    </p>
+    <p>
+      安全性や耐久性にも配慮しながら、
+      実際の使用状況に合わせて調整を行います。
+    </p>
+    <a class="link" href="make.html">制作・改造について詳しく →</a>
+  </section>
+
+  <!-- RENTAL -->
+  <section>
+    <div class="bg-word">RENTAL</div>
+    <h2>貸し出しおもちゃ</h2>
+    <p>
+      複数のスイッチに対応したおもちゃを、
+      実際に使って試すことができます。
+    </p>
+    <p>
+      「どんな操作が合うか分からない」という段階でも
+      気軽に体験していただけます。
+    </p>
+    <img src="images/illust_rental.png" alt="">
+    <a class="link" href="rental.html">貸し出しについて →</a>
+  </section>
+
+  <!-- REPAIR -->
+  <section>
+    <div class="bg-word">REPAIR</div>
+    <h2>おもちゃの修理・おもちゃ病院</h2>
+    <div class="media-item">
+      <img src="images/illust_repair.png" alt="">
+      <p>
+        壊れてしまったおもちゃの修理や、
+        地域のおもちゃ病院の活動にも関わっています。
+      </p>
     </div>
-  </div>
-</section>
+    <a class="link" href="repair.html">おもちゃ病院について →</a>
+  </section>
 
-<div class="cta">
-  <h2>まずはお気軽にご相談ください</h2>
-  <a href="#">お問い合わせはこちら</a>
-</div>
+  <!-- MEDIA -->
+  <section>
+    <div class="bg-word">MEDIA</div>
+    <h2>メディア掲載</h2>
+    <p>
+      新聞などのメディアで、
+      私たちの活動が紹介されています。
+    </p>
+    <a class="link" href="media.html">掲載記事を見る →</a>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>まずはお気軽にご相談ください</h2>
+    <p>
+      「こんなことはできる？」という段階でも構いません。
+    </p>
+    <a href="contact.html">お問い合わせ</a>
+  </div>
+
+  <footer>
+    © Fun Toys Helpful Project
+  </footer>
 
 </body>
 </html>
