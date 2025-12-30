@@ -1,224 +1,210 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>スイッチで広がる あそびの世界</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
-                   "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
-      line-height: 1.8;
-      color: #333;
-      background: #fff;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>活動紹介サイト</title>
+<style>
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+    color: #333;
+    line-height: 1.7;
+    background: #f7f9fc;
+  }
 
-    a {
-      color: #0066aa;
-      text-decoration: underline;
-    }
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
 
-    img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
+  a {
+    color: #2b6cb0;
+    text-decoration: none;
+    font-weight: 500;
+  }
 
-    header.hero {
-      background: #f3f7fa;
-    }
+  a:hover {
+    text-decoration: underline;
+  }
 
-    .hero-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 48px 16px 56px;
-      text-align: center;
-    }
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+  }
 
-    .hero-inner img {
-      border-radius: 12px;
-      margin-bottom: 24px;
-    }
+  .hero img {
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+  }
 
-    .hero h1 {
-      font-size: 1.8rem;
-      margin-bottom: 16px;
-    }
+  .hero-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.85);
+    padding: 16px 18px;
+    border-radius: 12px;
+  }
 
-    section {
-      padding: 40px 16px;
-    }
+  .hero-text h1 {
+    margin: 0 0 6px 0;
+    font-size: 1.25rem;
+  }
 
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-    }
+  .hero-text p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
 
-    h2 {
-      font-size: 1.5rem;
-      margin-bottom: 16px;
-    }
+  /* ---------- Section ---------- */
+  .container {
+    padding: 24px 16px;
+    max-width: 820px;
+    margin: auto;
+  }
 
-    .block {
-      display: grid;
-      grid-template-columns: 1fr 220px;
-      gap: 24px;
-      align-items: start;
-    }
+  section {
+    margin-bottom: 32px;
+  }
 
-    .block + .block {
-      margin-top: 40px;
-    }
+  section h2 {
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+  }
 
-    .block img {
-      border-radius: 8px;
-    }
+  section p {
+    margin: 0 0 10px 0;
+  }
 
-    .link-box {
-      margin-top: 12px;
-    }
+  .link {
+    margin-top: 4px;
+  }
 
-    footer {
-      background: #f3f3f3;
-      padding: 24px 16px;
-      text-align: center;
-      font-size: 0.9rem;
-    }
+  /* ---------- Card ---------- */
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+  }
 
-    @media (max-width: 640px) {
-      .block {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  .card img {
+    margin-bottom: 12px;
+    border-radius: 10px;
+  }
+
+  /* ---------- CTA ---------- */
+  .cta {
+    text-align: center;
+    background: #fff;
+    padding: 28px 16px;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+  }
+
+  .cta a {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 22px;
+    background: #f6c453;
+    color: #000;
+    border-radius: 24px;
+    font-weight: 600;
+  }
+</style>
 </head>
+
 <body>
 
-<header class="hero">
-  <div class="hero-inner">
-    <img src="images/hero.jpg" alt="スイッチで遊ぶ子ども">
-    <h1>スイッチで、あそびはもっと広がる</h1>
-    <p>
-      手や体を思うように動かせなくても、<br>
-      スイッチがあれば「自分で遊ぶ」体験をつくることができます。
-    </p>
+<!-- Hero -->
+<div class="hero">
+  <img src="images/hero.jpg" alt="活動の様子">
+  <div class="hero-text">
+    <h1>障がいのある子どもも、自分で「できた」と感じられる環境をつくる</h1>
+    <p>スイッチ支援・おもちゃ改造・貸し出しを通じた取り組み</p>
   </div>
-</header>
+</div>
 
+<div class="container">
+
+<!-- About -->
 <section>
-  <div class="container">
-    <h2>できなかった「あそび」を、できるように</h2>
-    <div class="block">
-      <div>
-        <p>
-          市販のおもちゃは、押す・つまむ・すばやく操作することを前提に作られています。  
-          そのため、肢体不自由や発達特性のあるお子さんにとっては、
-          「遊びたいのに遊べない」ものになってしまうことがあります。
-        </p>
-        <p>
-          スイッチを使うことで、  
-          <strong>ほんの少しの動きや力</strong>をきっかけに、
-          音が鳴る・光る・動くといった反応を引き出すことができます。
-        </p>
-      </div>
-      <img src="images/illust_playable.jpg" alt="">
-    </div>
+  <h2>私たちの活動について</h2>
+  <p>
+    障がいのある子どもたちが、「自分で操作できた」「自分で遊べた」と感じられる経験は、
+    日々の生活や学びへの意欲につながります。
+  </p>
+  <p>
+    私たちは、スイッチを使った支援機器やおもちゃの改造、貸し出しを通じて、
+    子ども一人ひとりの身体状況や成長段階に合った環境づくりを行っています。
+  </p>
+</section>
+
+<!-- Switch -->
+<section class="card">
+  <img src="images/switch_toy.jpg" alt="スイッチ付きおもちゃ">
+  <h2>スイッチ制作・おもちゃ改造</h2>
+  <p>
+    市販のおもちゃにスイッチを取り付け、少しの力や動きで操作できるように改造します。
+    複数のスイッチを使い分けることで、遊びの幅が広がります。
+  </p>
+  <div class="link">
+    ▶ <a href="https://example.com/switch">スイッチ支援の詳細はこちら</a>
   </div>
 </section>
 
-<section>
-  <div class="container">
-    <h2>複数スイッチ対応のおもちゃ</h2>
-    <div class="block">
-      <div>
-        <p>
-          1つのスイッチだけでなく、  
-          複数のスイッチを使って操作できるおもちゃもあります。
-        </p>
-        <p>
-          たとえば、  
-          「押すと音が鳴る」「別のスイッチで止まる」など、
-          原因と結果の関係を感じやすい構成にすることで、
-          遊びの幅が大きく広がります。
-        </p>
-        <div class="link-box">
-          <a href="https://sites.google.com/view/fthp/rental">▶ スイッチ付きおもちゃのサンプルを見る</a>
-        </div>
-      </div>
-      <img src="images/illust_multi_switch.jpg" alt="">
-    </div>
+<!-- Rental -->
+<section class="card">
+  <img src="images/toy_rental.jpg" alt="おもちゃ貸し出し">
+  <h2>貸し出しおもちゃ</h2>
+  <p>
+    実際に使ってみないと分からないことも多いため、スイッチ対応おもちゃの貸し出しを行っています。
+    家庭や施設で試しながら、最適な方法を一緒に探します。
+  </p>
+  <div class="link">
+    ▶ <a href="https://example.com/rental">貸し出しについて詳しく見る</a>
   </div>
 </section>
 
-<section>
-  <div class="container">
-    <h2>おもちゃの貸し出し</h2>
-    <div class="block">
-      <div>
-        <p>
-          実際に使ってみないと、  
-          お子さんに合うかどうかは分からないことがほとんどです。
-        </p>
-        <p>
-          そのため、スイッチ対応のおもちゃを
-          一定期間ご自宅で試していただける貸し出しを行っています。
-        </p>
-        <div class="link-box">
-          <a href="https://sites.google.com/view/fthp/toy">▶ 貸し出しおもちゃ一覧</a>
-        </div>
-      </div>
-      <img src="images/illust_rental.jpg" alt="">
-    </div>
+<!-- Toy Hospital -->
+<section class="card">
+  <img src="images/toy_hospital.jpg" alt="おもちゃ病院">
+  <h2>おもちゃの修理・おもちゃ病院</h2>
+  <p>
+    動かなくなったおもちゃや、スイッチ調整が必要なおもちゃの修理も行っています。
+    子どもにとって大切な「いつものおもちゃ」を長く使えるよう支援します。
+  </p>
+  <div class="link">
+    ▶ <a href="https://example.com/toyhospital">おもちゃ病院の紹介</a>
   </div>
 </section>
 
-<section>
-  <div class="container">
-    <h2>おもちゃ病院・修理</h2>
-    <div class="block">
-      <div>
-        <p>
-          動かなくなったおもちゃの修理や、
-          スイッチをつなぐための改造相談も受け付けています。
-        </p>
-        <p>
-          市販品をそのまま使うのが難しい場合でも、
-          少しの工夫で遊べるようになることがあります。
-        </p>
-        <div class="link-box">
-          <a href="https://sites.google.com/view/fthp/repair">▶ おもちゃ病院について</a>
-        </div>
-      </div>
-      <img src="images/illust_repair.jpg" alt="">
-    </div>
+<!-- Media -->
+<section class="card">
+  <img src="images/media.jpg" alt="メディア掲載">
+  <h2>メディア掲載</h2>
+  <p>
+    新聞や地域メディアにて、活動の様子を紹介していただいています。
+  </p>
+  <div class="link">
+    ▶ <a href="https://example.com/media">掲載記事を見る</a>
   </div>
 </section>
 
-<section>
-  <div class="container">
-    <h2>メディア掲載・紹介</h2>
-    <div class="block">
-      <div>
-        <p>
-          活動内容は、新聞や地域メディアなどでも紹介されています。
-        </p>
-        <p>
-          スイッチを通じて広がる「あそび」の可能性について、
-          取材・掲載実績があります。
-        </p>
-        <div class="link-box">
-          <a href="https://sites.google.com/view/fthp/media">▶ 新聞・メディア掲載一覧</a>
-        </div>
-      </div>
-      <img src="images/illust_media.jpg" alt="">
-    </div>
-  </div>
+<!-- CTA -->
+<section class="cta">
+  <h2>まずはお気軽にご相談ください</h2>
+  <p>
+    「どんなスイッチが合うか分からない」「まずは試してみたい」
+    といった段階でも問題ありません。
+  </p>
+  <a href="https://example.com/contact">お問い合わせはこちら</a>
 </section>
 
-<footer>
-  © スイッチで広がる あそびの世界
-</footer>
-
+</div>
 </body>
 </html>
