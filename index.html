@@ -15,35 +15,31 @@
 
     body {
       margin: 0;
-      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
     .container {
       max-width: 900px;
       margin: 0 auto;
-      padding: 0 15px;
+      padding: 0 10px; /* 余白を最小限に */
     }
 
-    section { padding: 25px 0; }
+    section { padding: 20px 0; }
     .bg-white { background-color: var(--white); }
 
     /* --- Header --- */
-    header {
-      background: var(--white);
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-    }
-    .logo { font-weight: bold; color: var(--main); font-size: 1.1rem; }
+    header { background: var(--white); padding: 8px 0; border-bottom: 1px solid #eee; }
+    .logo { font-weight: bold; color: var(--main); font-size: 1rem; padding-left: 10px; }
 
-    /* --- Hero (高さを短く調整) --- */
+    /* --- Hero (高さを最小化) --- */
     .hero {
       position: relative;
       background: url("images/hero.jpg") no-repeat 80% center / cover;
-      height: 38vh; /* 縦幅を短縮 */
-      min-height: 250px;
+      height: 30vh;
+      min-height: 200px;
       display: flex;
       align-items: center;
     }
@@ -51,89 +47,98 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(to right, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.3) 60%, rgba(255,255,255,0) 100%);
+      background: linear-gradient(to right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 70%);
     }
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      padding-left: 10px;
-    }
-    .hero h1 { margin: 0; font-size: 1.4rem; color: var(--main); line-height: 1.2; }
-    .hero p { margin: 3px 0 0; font-weight: bold; color: var(--accent); font-size: 0.9rem; }
+    .hero-content { position: relative; z-index: 1; padding-left: 15px; }
+    .hero h1 { margin: 0; font-size: 1.2rem; color: var(--main); }
+    .hero p { margin: 2px 0 0; font-weight: bold; color: var(--accent); font-size: 0.8rem; }
 
     /* --- Intro Text --- */
-    .intro { text-align: center; padding: 20px 15px; }
+    .intro { text-align: center; padding: 15px 10px; }
     .intro .quote { 
       font-weight: bold; 
       font-size: 1.1rem; 
       color: var(--main);
       display: block;
-      margin-bottom: 8px;
+      line-height: 1.4;
+      margin-bottom: 10px;
     }
-    .intro p { margin: 0; font-size: 0.95rem; line-height: 1.7; }
+    .intro p { margin: 0; font-size: 0.85rem; }
 
-    /* --- Grid Cards --- */
+    /* --- Grid Cards (スマホで横並び) --- */
     .feature-grid {
       display: grid;
       gap: 10px;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr); /* 基本2列 */
     }
+    /* 3つ目のカードをスマホで調整（お好みで） */
+    .feature-grid > div:nth-child(3) {
+      grid-column: span 1; 
+    }
+
     .card {
       background: var(--white);
-      padding: 15px;
-      border-radius: 12px;
+      padding: 12px 8px;
+      border-radius: 10px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
-    .card img { width: 60px; height: 60px; margin-bottom: 8px; object-fit: contain; }
-    .card h4 { margin: 0 0 5px; color: var(--main); font-size: 1rem; }
-    .card p { margin: 0; font-size: 0.85rem; }
+    .card img { width: 45px; height: 45px; margin-bottom: 5px; object-fit: contain; }
+    .card h4 { margin: 0 0 3px; color: var(--main); font-size: 0.85rem; }
+    .card p { margin: 0; font-size: 0.75rem; line-height: 1.3; }
 
-    /* --- Diagram Section (表示バグ対策) --- */
-    .diagram-sec { background: var(--white); padding: 25px 0; text-align: center; }
-    .diagram-sec h2 { font-size: 1.1rem; margin-bottom: 12px; color: var(--main); }
+    /* --- Diagram Section --- */
+    .diagram-sec { background: var(--white); padding: 20px 0; text-align: center; }
+    .diagram-sec h2 { font-size: 1rem; margin-bottom: 10px; color: var(--main); }
     .diagram-img {
       width: 100%;
-      max-width: 550px;
+      max-width: 450px;
       height: auto;
       display: block;
       margin: 0 auto;
-      border-radius: 6px;
     }
 
     /* --- Buttons --- */
     .btn-main {
       display: inline-block;
-      padding: 10px 30px;
+      padding: 10px 40px;
       background: var(--accent);
       color: #fff;
       text-decoration: none;
       border-radius: 30px;
       font-weight: bold;
-      margin-top: 12px;
+      margin-top: 10px;
+      font-size: 0.9rem;
     }
     .btn-sub {
       display: inline-block;
-      padding: 5px 12px;
-      border: 1.5px solid var(--main);
+      padding: 5px 0;
+      width: 100%;
+      border: 1px solid var(--main);
       color: var(--main);
       text-decoration: none;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      margin-top: 8px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      margin-top: 5px;
       font-weight: bold;
     }
 
-    footer { padding: 20px 0; text-align: center; font-size: 0.75rem; background: #f4f4f4; border-top: 1px solid #eee; }
+    footer { padding: 15px 0; text-align: center; font-size: 0.7rem; background: #f4f4f4; }
 
-    /* --- Desktop --- */
+    /* --- PC Adjustments --- */
     @media (min-width: 768px) {
-      .hero { height: 45vh; }
-      .hero h1 { font-size: 2.5rem; }
-      .hero p { font-size: 1.2rem; }
+      .hero { height: 40vh; }
+      .hero h1 { font-size: 2.2rem; }
       .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 15px; }
-      section { padding: 35px 0; }
-      .intro .quote { font-size: 1.4rem; }
+      .card img { width: 70px; height: 70px; }
+      .card h4 { font-size: 1rem; }
+      .card p { font-size: 0.85rem; }
+      .btn-sub { width: auto; padding: 5px 15px; }
+      .intro .quote { font-size: 1.5rem; }
     }
   </style>
 </head>
@@ -153,13 +158,13 @@
 </div>
 
 <section class="intro container">
-  <span class="quote">「障害を持ったお子さんにも自分で動かす楽しさを」</span>
+  <span class="quote">
+    「障害を持ったお子さんにも<br>
+    自分で動かす楽しさを」
+  </span>
   <p>
-    私たちは電池式おもちゃの改造や専用スイッチの作成を通じて、子どもたちの「自分でできた！」という喜びを応援しています。
+    電池式おもちゃの改造や専用スイッチの作成を通じて、子どもたちの「自分でできた！」を応援しています。
   </p>
-  <a href="https://www.toyhospital.org/gpsyougaiji" target="_blank" style="font-size: 0.75rem; color: #888; margin-top: 8px; display: inline-block;">
-    日本おもちゃ病院協会 支援活動について →
-  </a>
 </section>
 
 <section class="bg-white">
@@ -167,18 +172,20 @@
     <div class="feature-grid">
       <div class="card">
         <img src="images/icon-toy.png" alt="おもちゃ">
-        <h4>おもちゃの改造</h4>
-        <p>市販のおもちゃを動かしやすく作り変えます。</p>
+        <h4>おもちゃ改造</h4>
+        <p>動かしやすく<br>作り変えます</p>
       </div>
       <div class="card">
         <img src="images/icon-jack.png" alt="ジャック">
         <h4>ジャック増設</h4>
-        <p>外部スイッチが繋げる端子を取り付けます。</p>
+        <p>外部スイッチを<br>接続可能に</p>
       </div>
-      <div class="card">
-        <img src="images/icon-switch.png" alt="スイッチ">
-        <h4>スイッチ作成</h4>
-        <p>お子様の特性に合わせたスイッチを作ります。</p>
+      <div class="card" style="grid-column: span 2; flex-direction: row; gap: 10px; padding: 10px 20px;">
+        <img src="images/icon-switch.png" alt="スイッチ" style="margin:0;">
+        <div style="text-align: left;">
+          <h4>スイッチ作成</h4>
+          <p>特性に合わせた手作り品</p>
+        </div>
       </div>
     </div>
   </div>
@@ -186,37 +193,35 @@
 
 <section class="diagram-sec">
   <div class="container">
-    <h2>ジャック取り付けのイメージ</h2>
-    <img src="images/illustration-jack.jpg" alt="改造の仕組み図解" class="diagram-img">
-    <p style="font-size: 0.8rem; margin-top: 10px; color: #666; padding: 0 10px;">電池式おもちゃに専用ジャックを繋ぎ、外部スイッチで操作可能にします。</p>
+    <h2>取り付けのイメージ</h2>
+    <img src="images/illustration-jack.jpg" alt="改造の仕組み" class="diagram-img">
   </div>
 </section>
 
-<section class="container" style="text-align: center; padding-top: 10px;">
-  <div class="card" style="max-width: 550px; margin: auto; border: 1px solid #eee;">
-    <h3 style="margin: 0 0 10px; color: var(--main); font-size: 1.1rem;">ご相談・お問い合わせ</h3>
-    <p style="font-size: 0.9rem;">改造依頼や、スイッチの適合などのご相談はこちら</p>
+<section class="container" style="text-align: center; padding: 10px 0;">
+  <div class="card" style="max-width: 500px; margin: auto; padding: 20px;">
+    <h3 style="margin: 0 0 5px; font-size: 1rem;">ご相談・お問い合わせ</h3>
     <a href="mailto:seigou.fthp@gmail.com" class="btn-main">メールを送る</a>
-    <p style="font-size: 0.85rem; margin-top: 10px; color: var(--main); font-weight: bold;">📩 seigou.fthp@gmail.com</p>
+    <p style="font-size: 0.8rem; margin-top: 8px; color: var(--main); font-weight: bold;">📩 seigou.fthp@gmail.com</p>
   </div>
 </section>
 
 <section class="container">
   <div class="feature-grid">
     <div class="card">
-      <img src="images/icon-box.png" alt="貸出">
-      <h4>おもちゃの貸出</h4>
-      <a href="https://sites.google.com/view/fthp/toy-list" class="btn-sub">貸出リスト</a>
+      <div style="font-size: 1.5rem;">📦</div>
+      <h4>おもちゃ貸出</h4>
+      <a href="https://sites.google.com/view/fthp/toy-list" class="btn-sub">リストを見る</a>
     </div>
     <div class="card">
-      <div style="font-size: 2rem; margin-bottom: 5px;">🛠️</div>
+      <div style="font-size: 1.5rem;">🛠️</div>
       <h4>スイッチ紹介</h4>
-      <a href="https://sites.google.com/view/fthp/switch-sample" class="btn-sub">サンプルを見る</a>
+      <a href="https://sites.google.com/view/fthp/switch-sample" class="btn-sub">サンプル</a>
     </div>
-    <div class="card">
-      <div style="font-size: 2rem; margin-bottom: 5px;">📰</div>
+    <div class="card" style="grid-column: span 2;">
+      <div style="font-size: 1.5rem;">📰</div>
       <h4>メディア紹介</h4>
-      <a href="https://chiicomi.com/press/2057941/" target="_blank" class="btn-sub">記事を読む</a>
+      <a href="https://chiicomi.com/press/2057941/" target="_blank" class="btn-sub">チイコミの記事を読む</a>
     </div>
   </div>
 </section>
@@ -224,7 +229,6 @@
 <footer>
   <div class="container">
     <p>© 2024 船橋おもちゃの病院</p>
-    <a href="https://sites.google.com/view/fthp/home" style="color: #999;">Googleサイト版へ</a>
   </div>
 </footer>
 
