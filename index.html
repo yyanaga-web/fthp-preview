@@ -11,37 +11,49 @@
       --accent: #f2a65a;
       --bg: #faf7f2;
       --card: #ffffff;
+      --text: #333333;
+      --text-light: #666666;
     }
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", "Meiryo", sans-serif;
       background: var(--bg);
-      color: #333;
-      line-height: 1.7;
+      color: var(--text);
+      line-height: 1.8;
+      word-break: break-all;
     }
 
-    a { color: var(--main); text-decoration: none; }
+    a { color: var(--main); text-decoration: none; transition: 0.3s; }
+    a:hover { opacity: 0.7; }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 16px;
+      padding: 15px 5%;
       background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     header .logo {
-      font-weight: bold;
+      font-weight: 900;
+      font-size: 1.5rem;
       color: var(--main);
+      letter-spacing: 0.05em;
     }
 
     /* --- Hero --- */
     .hero {
       position: relative;
-      background: url("images/hero.jpg") no-repeat right center / cover;
-      min-height: 70vh;
+      /* 画像フォルダ指定に変更 */
+      background: url("images/hero.jpg") no-repeat center center / cover;
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
     }
 
     .hero::before {
@@ -50,101 +62,154 @@
       inset: 0;
       background: linear-gradient(
         to right,
-        rgba(255,255,255,0.9) 0%,
-        rgba(255,255,255,0.7) 40%,
-        rgba(255,255,255,0.0) 70%
+        rgba(255,255,255,0.95) 0%,
+        rgba(255,255,255,0.8) 50%,
+        rgba(255,255,255,0) 100%
       );
     }
 
     .hero-content {
       position: relative;
-      padding: 64px 16px;
-      max-width: 600px;
+      padding: 40px 5%;
+      max-width: 650px;
     }
 
     .hero h1 {
-      font-size: 2rem;
-      margin-bottom: 8px;
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: var(--main);
+      line-height: 1.3;
     }
 
     .hero p {
-      font-size: 1.1rem;
-      color: #555;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--text-light);
     }
 
+    /* --- Sections --- */
     section {
-      padding: 48px 16px;
-      max-width: 1100px;
+      padding: 60px 5%;
+      max-width: 1000px;
       margin: auto;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 40px;
+      font-size: 1.8rem;
+      position: relative;
+      padding-bottom: 15px;
     }
 
+    h2::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    /* --- Cards --- */
     .cards {
       display: grid;
-      gap: 16px;
+      gap: 24px;
+      margin-bottom: 40px;
     }
 
     .card {
       background: var(--card);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
     }
 
     .card img {
-      width: 64px;
-      margin-bottom: 12px;
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin-bottom: 20px;
     }
 
+    /* --- Image Text Layout --- */
     .image-text {
       display: grid;
-      gap: 24px;
+      gap: 40px;
+      align-items: center;
+      background: #fff;
+      padding: 40px;
+      border-radius: 24px;
     }
 
     .image-text img {
       width: 100%;
-      border-radius: 16px;
+      max-width: 500px;
+      height: auto;
+      border-radius: 12px;
+      margin: 0 auto;
     }
 
+    /* --- CTA Section --- */
     .cta {
       background: var(--accent);
       color: #fff;
       text-align: center;
-      border-radius: 20px;
-      padding: 40px 16px;
+      border-radius: 30px;
+      padding: 60px 20px;
+      margin-top: 40px;
+      margin-bottom: 40px;
     }
 
-    .cta a {
+    .cta h2 { color: #fff; }
+    .cta h2::after { background: #fff; }
+
+    .btn-main {
       display: inline-block;
-      margin-top: 16px;
+      margin-top: 24px;
       background: #fff;
       color: var(--accent);
-      padding: 12px 24px;
+      padding: 18px 48px;
       border-radius: 999px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-sub {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 8px 20px;
+      border: 2px solid var(--main);
+      border-radius: 8px;
       font-weight: bold;
     }
 
     footer {
       text-align: center;
-      padding: 32px 16px;
-      font-size: 0.9rem;
-      color: #666;
+      padding: 40px 5%;
+      background: #eee;
+      margin-top: 60px;
     }
 
-    /* --- PC --- */
-    @media (min-width: 768px) {
-      .cards {
-        grid-template-columns: repeat(3, 1fr);
-      }
+    footer p { font-size: 0.8rem; margin-top: 20px; }
 
-      .image-text {
-        grid-template-columns: 1fr 1fr;
-        align-items: center;
-      }
+    @media (min-width: 768px) {
+      .cards { grid-template-columns: repeat(3, 1fr); }
+      .image-text { grid-template-columns: 1.2fr 1fr; }
+      .hero-content { padding-left: 10%; }
     }
   </style>
 </head>
@@ -164,32 +229,34 @@
 
 <section>
   <h2>活動の概要</h2>
-  <p>
-    ふなばしおもちゃの病院では、「障害を持ったお子さんにも自分でおもちゃを動かして遊ぶ楽しさを知ってほしい」として、日本おもちゃ病院協会が取り組んでいる「障がい児の遊び支援活動」に賛同し取り組みをおこなっています。
-  </p>
-  <p>
-    この活動は、行徳おもちゃ病院、鎌ケ谷おもちゃ病院とも連携し取り組んでいます。
-  </p>
-  <p>
-    <a href="https://www.toyhospital.org/gpsyougaiji" target="_blank">
-      おもちゃ病院協会　障がい児の遊び支援活動 ホームページ →
-    </a>
-  </p>
+  <div style="max-width: 800px; margin: auto;">
+    <p>
+      ふなばしおもちゃの病院では、「障害を持ったお子さんにも自分でおもちゃを動かして遊ぶ楽しさを知ってほしい」として、日本おもちゃ病院協会が取り組んでいる「障がい児の遊び支援活動」に賛同し取り組みをおこなっています。
+    </p>
+    <p>
+      この活動は、行徳おもちゃ病院、鎌ケ谷おもちゃ病院とも連携し取り組んでいます。
+    </p>
+    <div style="text-align: right;">
+      <a href="https://www.toyhospital.org/gpsyougaiji" target="_blank" style="font-weight: bold;">
+        おもちゃ病院協会 支援活動サイトへ →
+      </a>
+    </div>
+  </div>
 </section>
 
 <section>
   <div class="cards">
     <div class="card">
-      <img src="images/icon-toy.svg" alt="">
-      <p>電池で動くおもちゃを、障がいを持ったお子さんが自分で操作することが難しい場合があります。</p>
+      <img src="images/icon-toy.png" alt="おもちゃ">
+      <p>電池で動くおもちゃを、障がいを持ったお子さんが自分で操作するのが難しい場合があります。</p>
     </div>
     <div class="card">
-      <img src="images/icon-jack.svg" alt="">
+      <img src="images/icon-jack.png" alt="ジャック">
       <p>ジャックまたは中継ジャックを取り付けることで、簡単に遊べるようになります。</p>
     </div>
     <div class="card">
-      <img src="images/icon-switch.svg" alt="">
-      <p>お子様の症状に応じた外部スイッチを作成します。</p>
+      <img src="images/icon-switch.png" alt="スイッチ">
+      <p>お子様の症状に応じた外部スイッチを一つひとつ丁寧に作成します。</p>
     </div>
   </div>
 </section>
@@ -197,48 +264,46 @@
 <section>
   <h2>ジャック取り付けイメージ</h2>
   <div class="image-text">
-    <img src="images/illustration-jack.svg" alt="">
-    <p>
-      電池で動くおもちゃにジャックを取り付け、外部スイッチを接続することで、障がいを持ったお子さんでも簡単に遊べるようにします。<br>
-      <small>おもちゃ病院協会チラシより</small>
-    </p>
+    <img src="images/illustration-jack.png" alt="仕組み解説">
+    <div class="text-content">
+      <p>
+        電池で動くおもちゃにジャックを取り付け、外部スイッチを接続することで、障がいを持ったお子さんでも小さな力や得意な動きで簡単に遊べるようになります。
+      </p>
+    </div>
   </div>
 </section>
 
-<section>
+<section style="text-align: center;">
   <h2>メディア紹介</h2>
-  <div class="card" style="text-align:center;">
-    <p>地域新聞社「チイコミ」で私たちの活動をご紹介いただきました。</p>
-    <a href="https://chiicomi.com/press/2057941/" target="_blank">記事を読む →</a>
+  <div class="card" style="max-width: 600px; margin: auto;">
+    <p>地域新聞社「チイコミ」にて、私たちの取り組みをご紹介いただきました。</p>
+    <a href="https://chiicomi.com/press/2057941/" target="_blank" class="btn-sub">記事を詳しく読む</a>
   </div>
 </section>
 
 <section class="cta">
-  <h2>ご相談・ご依頼はこちら</h2>
-  <p>ジャック取り付けやスイッチ作成を希望される方はご連絡ください。</p>
-  <a href="#">ご希望受付フォーム</a>
+  <h2>ご相談・お問い合わせ</h2>
+  <p>ジャック取り付けやスイッチ作成についてのご相談は<br>メールにてお気軽にご連絡ください。</p>
+  <a href="mailto:seigou.fthp@gmail.com" class="btn-main">メールを送る</a>
 </section>
 
-<section>
+<section style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
   <div class="card">
-    <img src="images/icon-box.svg" alt="">
-    <p>貸し出し用のおもちゃも準備しています。</p>
-    <a href="toy.html">貸し出しできるおもちゃを見る →</a>
+    <img src="images/icon-box.png" alt="貸出おもちゃ">
+    <h3>貸出おもちゃ一覧</h3>
+    <p>改造済みのおもちゃを実際に試せる貸し出し用も準備しています。</p>
+    <a href="https://sites.google.com/view/fthp/toy-list" class="btn-sub">おもちゃを見る</a>
   </div>
-</section>
-
-<section>
   <div class="card">
-    <p>お子様に合ったスイッチ作成についてもご相談ください。</p>
-    <p>📩 seigou.fthp@gmail.com</p>
-    <a href="switch.html">スイッチのサンプルを見る →</a>
+    <div style="font-size: 3rem; margin-bottom: 10px;">🛠️</div>
+    <h3>スイッチの紹介</h3>
+    <p>お子様に合わせた個別相談も承っております。</p>
+    <a href="https://sites.google.com/view/fthp/switch-sample" class="btn-sub">スイッチを見る</a>
   </div>
 </section>
 
 <footer>
-  <a href="https://www.toyhospital.org/gpsyougaiji" target="_blank">
-    おもちゃ病院協会 障がい児の遊び支援活動
-  </a>
+  <p>© 2024 船橋おもちゃの病院</p>
 </footer>
 
 </body>
