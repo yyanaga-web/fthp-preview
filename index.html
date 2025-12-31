@@ -11,29 +11,26 @@
       --bg: #faf7f2;
       --white: #ffffff;
       --text: #333;
-      /* 余白を一括管理 */
-      --space-m: 40px; 
-      --space-l: 60px;
+      /* 縦の余白を一律管理 */
+      --gap-v: 40px; 
     }
 
     body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
     .container { max-width: 900px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
 
-    /* 全要素の基本下マージンを統一 */
-    .m-bottom { margin-bottom: var(--space-m); }
+    /* 全要素の「次との間隔」をこれ一つで管理 */
+    .spacer { margin-bottom: var(--gap-v); }
 
-    /* --- ヘッダー・ヒーロー --- */
-    header { background: var(--white); padding: 12px 0; border-bottom: 1px solid #eee; margin-bottom: 0; }
+    header { background: var(--white); padding: 10px 0; border-bottom: 1px solid #eee; }
     .logo { font-weight: bold; color: var(--main); font-size: 1.1rem; }
 
+    /* --- ヒーロー --- */
     .hero {
-      position: relative;
       background: url("images/hero.jpg") no-repeat center 40% / cover;
       height: 250px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: var(--space-m); /* ここも一律 */
     }
     .hero-card {
       background: rgba(255, 255, 255, 0.65);
@@ -43,67 +40,69 @@
       border-radius: 12px;
       backdrop-filter: blur(3px);
     }
+    .hero h1 { margin: 0; font-size: 1.4rem; color: var(--main); }
 
     /* --- テキストエリア --- */
     .intro { text-align: center; }
     .intro .quote { font-weight: bold; font-size: 1.2rem; color: var(--main); display: block; margin-bottom: 15px; }
     .sp-br { display: block; }
 
-    .partners { font-size: 0.85rem; color: #666; margin-top: 20px; }
-    .partners a { color: var(--main); margin: 0 5px; text-decoration: underline; white-space: nowrap; }
+    .partners { font-size: 0.85rem; color: #666; margin-top: 20px; line-height: 1.8; }
+    .partners a { color: var(--main); margin: 0 5px; text-decoration: underline; }
 
-    /* --- カードレイアウト --- */
+    /* --- グリッド（カード） --- */
     .feature-grid {
       display: grid;
-      gap: 15px; /* カード同士の隙間を一律に */
+      gap: 12px; /* カード横・縦の隙間 */
       grid-template-columns: repeat(2, 1fr);
     }
     .card {
       background: var(--white);
-      padding: 20px 15px;
+      padding: 15px;
       border-radius: 10px;
       text-align: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      box-sizing: border-box;
     }
-    .card img, .card .icon { font-size: 2.2rem; margin-bottom: 10px; width: 50px; height: 50px; object-fit: contain; margin-left: auto; margin-right: auto; }
-    .card h4 { margin: 0 0 8px; color: var(--main); font-size: 0.95rem; }
-    .card p { margin: 0; font-size: 0.8rem; line-height: 1.4; }
+    .card img, .card .icon { width: 45px; height: 45px; margin: 0 auto 8px; object-fit: contain; font-size: 2rem; }
+    .card h4 { margin: 0 0 5px; color: var(--main); font-size: 0.9rem; }
+    .card p { margin: 0; font-size: 0.75rem; line-height: 1.4; }
     .card-full { grid-column: span 2; }
 
-    /* --- 図解 --- */
+    /* --- 図解（間延び解消） --- */
     .diagram-area { text-align: center; }
-    .diagram-area h2 { font-size: 1.1rem; margin: 0 0 15px; color: var(--main); }
-    .diagram-img { width: 100%; max-width: 450px; border-radius: 8px; }
+    .diagram-area h2 { font-size: 1rem; margin: 0 0 15px; color: var(--main); }
+    .diagram-img { width: 100%; max-width: 400px; border-radius: 8px; }
 
-    /* --- お問い合わせ（独立したカード） --- */
+    /* --- お問い合わせ（独立カード） --- */
     .contact-card {
       background: var(--white);
-      padding: 30px 20px;
+      padding: 25px 20px;
       border-radius: 12px;
-      border: 1px solid #eee;
       text-align: center;
+      border: 1px solid #eee;
     }
 
     /* --- ボタン --- */
-    .btn-main { display: inline-block; padding: 12px 40px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 30px; font-weight: bold; margin-top: 15px; }
+    .btn-main { display: inline-block; padding: 12px 40px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 30px; font-weight: bold; margin-top: 15px; font-size: 0.95rem; }
     .btn-sub { display: inline-block; padding: 8px 15px; border: 1.5px solid var(--main); color: var(--main); text-decoration: none; border-radius: 6px; font-size: 0.8rem; margin-top: 10px; font-weight: bold; }
 
     footer { padding: 40px 0; text-align: center; font-size: 0.8rem; background: #eee; }
 
-    /* --- PC用 --- */
+    /* --- PC --- */
     @media (min-width: 768px) {
-      :root { --space-m: 60px; }
+      :root { --gap-v: 60px; }
       .hero { height: 400px; justify-content: flex-start; }
       .hero-card { width: 480px; text-align: left; margin-left: 10%; padding: 40px; }
       .hero h1 { font-size: 2.8rem; }
       .sp-br { display: none; }
       .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
       .card-full { grid-column: span 1; }
-      .card img { width: 70px; height: 70px; }
+      .card img { width: 65px; height: 65px; }
+      .card h4 { font-size: 1.1rem; }
     }
   </style>
 </head>
@@ -111,14 +110,14 @@
 
 <header><div class="container logo">fthp</div></header>
 
-<div class="hero">
+<div class="hero spacer">
   <div class="hero-card">
     <h1>船橋おもちゃの病院</h1>
     <p>障がい児の遊び支援活動</p>
   </div>
 </div>
 
-<div class="container m-bottom">
+<div class="container spacer">
   <div class="intro">
     <span class="quote">「障害を持ったお子さんにも<br class="sp-br">自分で動かす楽しさを」</span>
     <p>電池式おもちゃの改造や専用スイッチの作成を通じて、子どもたちの「自分でできた！」という喜びを応援しています。</p>
@@ -130,7 +129,7 @@
   </div>
 </div>
 
-<div class="container m-bottom">
+<div class="container spacer">
   <div class="feature-grid">
     <div class="card">
       <img src="images/icon-toy.png" alt="">
@@ -150,21 +149,21 @@
   </div>
 </div>
 
-<div class="container m-bottom diagram-area">
+<div class="container spacer diagram-area">
   <h2>取り付けのイメージ</h2>
-  <img src="images/illustration-jack.png" alt="改造図" class="diagram-img">
+  <img src="images/illustration-jack.png" alt="改造図解" class="diagram-img">
 </div>
 
-<div class="container m-bottom">
+<div class="container spacer">
   <div class="contact-card">
-    <h4 style="margin: 0 0 10px; color: var(--main); font-size: 1.2rem;">お問い合わせ</h4>
-    <p style="font-size: 0.9rem;">改造の依頼やご相談など、お気軽にメールください。</p>
+    <h4 style="margin: 0 0 10px; color: var(--main); font-size: 1.1rem;">お問い合わせ</h4>
+    <p style="font-size: 0.85rem;">改造の依頼やご相談など、お気軽にメールください。</p>
     <a href="mailto:seigou.fthp@gmail.com" class="btn-main">メールを送る</a>
-    <p style="font-size: 0.9rem; margin-top: 15px; font-weight: bold; color: var(--main);">📩 seigou.fthp@gmail.com</p>
+    <p style="font-size: 0.85rem; margin-top: 15px; font-weight: bold; color: var(--main);">📩 seigou.fthp@gmail.com</p>
   </div>
 </div>
 
-<div class="container m-bottom">
+<div class="container spacer">
   <div class="feature-grid">
     <div class="card">
       <div class="icon">📦</div>
@@ -179,7 +178,7 @@
     <div class="card card-full">
       <div class="icon">📰</div>
       <h4>メディア紹介</h4>
-      <p style="font-size: 0.8rem; margin-bottom: 5px;">地域情報サイト「チイコミ」掲載記事</p>
+      <p style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">地域情報サイト「チイコミ」掲載記事</p>
       <a href="https://chiicomi.com/press/2057941/" target="_blank" class="btn-sub">記事を読む</a>
     </div>
   </div>
