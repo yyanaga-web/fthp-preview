@@ -39,14 +39,10 @@
     }
     .hero h1 { margin: 0; font-size: 1.4rem; color: var(--main); }
 
-    /* --- イントロ --- */
-    .intro { text-align: center; }
-    .intro .quote { font-weight: bold; font-size: 1.25rem; color: var(--main); display: block; margin-bottom: 15px; }
-    .intro .description { text-align: left; font-size: 0.95rem; background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    /* --- キャッチコピー --- */
+    .intro-top { text-align: center; }
+    .intro-top .quote { font-weight: bold; font-size: 1.25rem; color: var(--main); display: block; }
     .sp-br { display: block; }
-
-    .partners { font-size: 0.85rem; color: #666; margin-top: 25px; }
-    .partners a { color: var(--main); margin: 0 5px; text-decoration: underline; }
 
     /* --- カードグリッド --- */
     .feature-grid {
@@ -69,6 +65,11 @@
     .card p { margin: 0; font-size: 0.8rem; line-height: 1.5; }
     .card-full { grid-column: span 2; }
 
+    /* --- 活動の概要（文章） --- */
+    .description-box { text-align: left; font-size: 0.95rem; background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .partners { font-size: 0.85rem; color: #666; margin-top: 20px; text-align: center; }
+    .partners a { color: var(--main); margin: 0 5px; text-decoration: underline; }
+
     /* --- 図解 --- */
     .diagram-area { text-align: center; }
     .diagram-area h2 { font-size: 1.1rem; margin: 0 0 15px; color: var(--main); }
@@ -88,10 +89,6 @@
     .contact-card h4 { margin: 0 0 10px; color: var(--main); font-size: 1.3rem; }
     .contact-info { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd; font-size: 0.9rem; }
 
-    /* --- 関連リンク --- */
-    .extra-link { text-align: center; font-size: 0.85rem; border-top: 1px solid #ddd; padding-top: 30px; }
-    .extra-link a { color: var(--main); text-decoration: underline; font-weight: bold; }
-
     /* --- ボタン --- */
     .btn-main { display: inline-block; padding: 12px 35px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 30px; font-weight: bold; margin: 10px 0; font-size: 1rem; }
     .btn-sub { display: inline-block; padding: 8px 15px; border: 1.5px solid var(--main); color: var(--main); text-decoration: none; border-radius: 6px; font-size: 0.85rem; margin-top: 10px; font-weight: bold; }
@@ -105,10 +102,10 @@
       .hero-card { width: 480px; text-align: left; margin-left: 10%; padding: 40px; }
       .hero h1 { font-size: 2.8rem; }
       .sp-br { display: none; }
-      .intro .description { padding: 40px; font-size: 1.1rem; }
       .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 25px; }
       .card-full { grid-column: span 1; }
       .card { padding: 30px 20px; }
+      .description-box { padding: 40px; font-size: 1.1rem; }
       .diagram-flex { display: flex; align-items: center; gap: 40px; text-align: left; }
       .diagram-img { margin: 0; }
       .contact-card { padding: 40px; }
@@ -126,20 +123,8 @@
   </div>
 </div>
 
-<div class="container spacer">
-  <div class="intro">
-    <span class="quote">「障害を持ったお子さんにも<br class="sp-br">自分で動かす楽しさを」</span>
-    <div class="description">
-      電池で動くおもちゃを、障がいを持ったお子さんが自分でスイッチを入れたりボタンを押して遊ぶことが難しい場合があります。
-      ジャックを取り付け、お子さんの症状に合った外部スイッチを使うことによって簡単に遊べるようになります。
-      私たちは、お子様の好きなおもちゃで遊ぶ楽しさを味わってほしいと願っています。
-    </div>
-    <div class="partners">
-      <span>【 提携病院 】</span><br>
-      <a href="https://toydr.blogo.jp/" target="_blank">鎌ケ谷おもちゃ病院</a>
-      <a href="https://gyoutoku-toyhospital.jimdofree.com/" target="_blank">行徳おもちゃ病院</a>
-    </div>
-  </div>
+<div class="container spacer intro-top">
+  <span class="quote">「障害を持ったお子さんにも<br class="sp-br">自分で動かす楽しさを」</span>
 </div>
 
 <div class="container spacer">
@@ -159,6 +144,19 @@
       <h4>スイッチ作成</h4>
       <p>症状や特性に合わせたスイッチを手作りします。</p>
     </div>
+  </div>
+</div>
+
+<div class="container spacer">
+  <div class="description-box">
+    電池で動くおもちゃを、障がいを持ったお子さんが自分でスイッチを入れたりボタンを押して遊ぶことが難しい場合があります。
+    ジャックを取り付け、お子さんの症状に合った外部スイッチを使うことによって簡単に遊べるようになります。
+    私たちは、お子様の好きなおもちゃで遊ぶ楽しさを味わってほしいと願っています。
+  </div>
+  <div class="partners">
+    <span>【 提携病院 】</span><br>
+    <a href="https://toydr.blogo.jp/" target="_blank">鎌ケ谷おもちゃ病院</a>
+    <a href="https://gyoutoku-toyhospital.jimdofree.com/" target="_blank">行徳おもちゃ病院</a>
   </div>
 </div>
 
@@ -206,9 +204,9 @@
   </div>
 </div>
 
-<div class="container spacer extra-link">
+<div class="container spacer" style="text-align: center; border-top: 1px solid #ddd; padding-top: 30px; font-size: 0.85rem;">
   <p>日本おもちゃ病院協会<br>
-  <a href="https://www.toyhospital.org/gpsyougaiji" target="_blank">障がい児の遊び支援活動 ホームページ</a></p>
+  <a href="https://www.toyhospital.org/gpsyougaiji" target="_blank" style="color: var(--main); font-weight: bold; text-decoration: underline;">障がい児の遊び支援活動 ホームページ</a></p>
 </div>
 
 <footer>
