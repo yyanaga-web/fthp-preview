@@ -16,7 +16,6 @@
 
     body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
     .container { max-width: 900px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
-
     .spacer { margin-bottom: var(--gap-v); }
 
     header { background: var(--white); padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -40,7 +39,7 @@
     }
     .hero h1 { margin: 0; font-size: 1.4rem; color: var(--main); }
 
-    /* --- イントロ（活動の概要） --- */
+    /* --- イントロ --- */
     .intro { text-align: center; }
     .intro .quote { font-weight: bold; font-size: 1.25rem; color: var(--main); display: block; margin-bottom: 15px; }
     .intro .description { text-align: left; font-size: 0.95rem; background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
@@ -49,7 +48,7 @@
     .partners { font-size: 0.85rem; color: #666; margin-top: 25px; }
     .partners a { color: var(--main); margin: 0 5px; text-decoration: underline; }
 
-    /* --- カード --- */
+    /* --- カードグリッド --- */
     .feature-grid {
       display: grid;
       gap: 15px;
@@ -61,7 +60,6 @@
       border-radius: 10px;
       text-align: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -77,24 +75,40 @@
     .diagram-img { width: 100%; max-width: 400px; border-radius: 8px; margin-bottom: 15px; }
     .diagram-text { font-size: 0.9rem; text-align: left; background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); }
 
-    /* --- お問い合わせ（PCで最適化） --- */
+    /* --- お問い合わせ（修正：余白の適正化） --- */
     .contact-card {
       background: var(--white);
-      padding: 30px 20px;
+      padding: 25px 20px;
       border-radius: 15px;
       text-align: center;
       border: 1px solid #eee;
-      max-width: 100%; /* スマホは全幅 */
+      max-width: 700px;
+      margin: 0 auto;
     }
+    .contact-card h4 { margin: 0 0 10px; color: var(--main); font-size: 1.3rem; }
+    .contact-info { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd; font-size: 0.9rem; }
 
-    .btn-main { display: inline-block; padding: 15px 50px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 40px; font-weight: bold; margin: 20px 0; font-size: 1.05rem; box-shadow: 0 4px 10px rgba(242,166,90,0.3); }
+    /* --- ボタン --- */
+    .btn-main { 
+      display: inline-block; 
+      padding: 12px 35px; 
+      background: var(--accent); 
+      color: #fff; 
+      text-decoration: none; 
+      border-radius: 30px; 
+      font-weight: bold; 
+      margin: 10px 0; 
+      font-size: 1rem; 
+      transition: opacity 0.2s;
+    }
+    .btn-main:hover { opacity: 0.8; }
     .btn-sub { display: inline-block; padding: 8px 15px; border: 1.5px solid var(--main); color: var(--main); text-decoration: none; border-radius: 6px; font-size: 0.85rem; margin-top: 10px; font-weight: bold; }
 
     footer { padding: 40px 0; text-align: center; font-size: 0.8rem; background: #eee; }
 
     /* --- PC設定 --- */
     @media (min-width: 768px) {
-      :root { --gap-v: 70px; }
+      :root { --gap-v: 60px; }
       .hero { height: 400px; justify-content: flex-start; }
       .hero-card { width: 480px; text-align: left; margin-left: 10%; padding: 40px; }
       .hero h1 { font-size: 2.8rem; }
@@ -104,13 +118,11 @@
       .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 25px; }
       .card-full { grid-column: span 1; }
       .card { padding: 30px 20px; }
-      .card img { width: 60px; height: 60px; }
 
       .diagram-flex { display: flex; align-items: center; gap: 40px; text-align: left; }
       .diagram-img { margin: 0; }
 
-      .contact-card { max-width: 750px; margin: 0 auto; padding: 50px 40px; } /* お問い合わせをゆったり */
-      .contact-card h4 { font-size: 1.8rem; }
+      .contact-card { padding: 40px; } /* PCでの余白を適正に抑える */
     }
   </style>
 </head>
@@ -130,7 +142,7 @@
     <span class="quote">「障害を持ったお子さんにも<br class="sp-br">自分で動かす楽しさを」</span>
     <div class="description">
       電池で動くおもちゃを、障がいを持ったお子さんが自分でスイッチを入れたりボタンを押して遊ぶことが難しい場合があります。
-      ジャックまたは中継ジャックを取り付け、お子さんの症状に合った外部スイッチを使うことによって簡単に遊べるようになります。
+      ジャックを取り付け、お子さんの症状に合った外部スイッチを使うことによって簡単に遊べるようになります。
       私たちは、お子様の好きなおもちゃで遊ぶ楽しさを味わってほしいと願っています。
     </div>
     <div class="partners">
@@ -173,10 +185,12 @@
 
 <div class="container spacer">
   <div class="contact-card">
-    <h4 style="margin: 0 0 10px; color: var(--main);">お問い合わせ・ご相談</h4>
-    <p style="font-size: 1rem; color: #555;">おもちゃの改造依頼、スイッチの適合、使い方の相談など、お気軽にメールをお送りください。</p>
-    <a href="mailto:seigou.fthp@gmail.com" class="btn-main">メールでお問い合わせ</a>
-    <p style="font-size: 1rem; font-weight: bold; color: var(--main);">📩 seigou.fthp@gmail.com</p>
+    <h4>お問い合わせ・ご相談</h4>
+    <p style="font-size: 0.95rem; color: #555;">改造依頼や適合相談など、専用フォームより受け付けております。</p>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfS-rO-nC56xR8vD9fFzXzX-rO-nC56xR8vD9fFzXzX-rO/viewform" target="_blank" class="btn-main">お問い合わせフォームを開く</a>
+    <div class="contact-info">
+      メールでも承ります：<strong>seigou.fthp@gmail.com</strong>
+    </div>
   </div>
 </div>
 
@@ -185,20 +199,20 @@
     <div class="card">
       <div class="icon">📦</div>
       <h4>おもちゃ貸出</h4>
-      <p>改造済みおもちゃを試せます</p>
-      <a href="https://sites.google.com/view/fthp/toy-list" class="btn-sub">貸出リストを見る</a>
+      <p>改造済みを試せます</p>
+      <a href="https://sites.google.com/view/fthp/toy-list" class="btn-sub">貸出リスト</a>
     </div>
     <div class="card">
       <div class="icon">🛠️</div>
       <h4>スイッチ紹介</h4>
-      <p>自作スイッチのサンプルです</p>
+      <p>自作サンプルの紹介</p>
       <a href="https://sites.google.com/view/fthp/switch-sample" class="btn-sub">サンプルを見る</a>
     </div>
     <div class="card card-full">
       <div class="icon">📰</div>
       <h4>メディア紹介</h4>
-      <p style="font-size: 0.85rem; color: #666; margin-bottom: 5px;">地域情報サイト「チイコミ」掲載記事</p>
-      <a href="https://chiicomi.com/press/2057941/" target="_blank" class="btn-sub">記事を詳しく読む</a>
+      <p style="font-size: 0.85rem; color: #666; margin-bottom: 5px;">「チイコミ」掲載記事</p>
+      <a href="https://chiicomi.com/press/2057941/" target="_blank" class="btn-sub">記事を読む</a>
     </div>
   </div>
 </div>
