@@ -42,8 +42,7 @@
     /* --- キャッチコピーエリア --- */
     .intro-top { text-align: center; }
     .intro-top .quote { font-weight: bold; font-size: 1.25rem; color: var(--main); display: block; margin-bottom: 10px; }
-    /* 小さいフォントの補足文 */
-    .intro-top .sub-text { font-size: 0.8rem; color: #666; display: block; line-height: 1.6; max-width: 600px; margin: 0 auto; }
+    .intro-top .sub-text { font-size: 0.8rem; color: #666; display: block; line-height: 1.6; }
     .sp-br { display: block; }
 
     /* --- カードグリッド --- */
@@ -78,15 +77,15 @@
     .diagram-img { width: 100%; max-width: 400px; border-radius: 8px; margin-bottom: 15px; }
     .diagram-text { font-size: 0.9rem; text-align: left; background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); }
 
-    /* --- お問い合わせ --- */
+    /* --- お問い合わせ（PC幅を他と統一） --- */
     .contact-card {
       background: var(--white);
       padding: 25px 20px;
       border-radius: 15px;
       text-align: center;
       border: 1px solid #eee;
-      max-width: 700px;
-      margin: 0 auto;
+      width: 100%; /* container一杯に広げる */
+      box-sizing: border-box;
     }
     .contact-card h4 { margin: 0 0 10px; color: var(--main); font-size: 1.3rem; }
     .contact-info { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd; font-size: 0.9rem; }
@@ -112,7 +111,7 @@
       .description-box { padding: 40px; font-size: 1.1rem; }
       .diagram-flex { display: flex; align-items: center; gap: 40px; text-align: left; }
       .diagram-img { margin: 0; }
-      .contact-card { padding: 40px; }
+      .contact-card { padding: 40px; } /* 上下のカードと幅が揃います */
     }
   </style>
 </head>
@@ -130,7 +129,7 @@
 <div class="container spacer intro-top">
   <span class="quote">「障害を持ったお子さんにも<br class="sp-br">自分で動かす楽しさを」</span>
   <span class="sub-text">
-    ふなばしおもちゃの病院では、日本おもちゃ病院協会が取り組んでいる<br class="sp-br">「障がい児の遊び支援活動」に賛同し取り組みをおこなっています。
+    ふなばしおもちゃの病院では、日本おもちゃ病院協会が取り組んでいる「障がい児の遊び支援活動」に賛同し取り組みをおこなっています。
   </span>
 </div>
 
