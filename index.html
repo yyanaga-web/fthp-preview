@@ -75,7 +75,7 @@
     .diagram-img { width: 100%; max-width: 400px; border-radius: 8px; margin-bottom: 15px; }
     .diagram-text { font-size: 0.9rem; text-align: left; background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); }
 
-    /* --- お問い合わせ（修正：余白の適正化） --- */
+    /* --- お問い合わせ --- */
     .contact-card {
       background: var(--white);
       padding: 25px 20px;
@@ -88,20 +88,12 @@
     .contact-card h4 { margin: 0 0 10px; color: var(--main); font-size: 1.3rem; }
     .contact-info { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd; font-size: 0.9rem; }
 
+    /* --- 関連リンク --- */
+    .extra-link { text-align: center; font-size: 0.85rem; border-top: 1px solid #ddd; padding-top: 30px; }
+    .extra-link a { color: var(--main); text-decoration: underline; font-weight: bold; }
+
     /* --- ボタン --- */
-    .btn-main { 
-      display: inline-block; 
-      padding: 12px 35px; 
-      background: var(--accent); 
-      color: #fff; 
-      text-decoration: none; 
-      border-radius: 30px; 
-      font-weight: bold; 
-      margin: 10px 0; 
-      font-size: 1rem; 
-      transition: opacity 0.2s;
-    }
-    .btn-main:hover { opacity: 0.8; }
+    .btn-main { display: inline-block; padding: 12px 35px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 30px; font-weight: bold; margin: 10px 0; font-size: 1rem; }
     .btn-sub { display: inline-block; padding: 8px 15px; border: 1.5px solid var(--main); color: var(--main); text-decoration: none; border-radius: 6px; font-size: 0.85rem; margin-top: 10px; font-weight: bold; }
 
     footer { padding: 40px 0; text-align: center; font-size: 0.8rem; background: #eee; }
@@ -113,16 +105,13 @@
       .hero-card { width: 480px; text-align: left; margin-left: 10%; padding: 40px; }
       .hero h1 { font-size: 2.8rem; }
       .sp-br { display: none; }
-      
       .intro .description { padding: 40px; font-size: 1.1rem; }
       .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 25px; }
       .card-full { grid-column: span 1; }
       .card { padding: 30px 20px; }
-
       .diagram-flex { display: flex; align-items: center; gap: 40px; text-align: left; }
       .diagram-img { margin: 0; }
-
-      .contact-card { padding: 40px; } /* PCでの余白を適正に抑える */
+      .contact-card { padding: 40px; }
     }
   </style>
 </head>
@@ -147,8 +136,8 @@
     </div>
     <div class="partners">
       <span>【 提携病院 】</span><br>
-      <a href="https://kamagaya-toy-h.jimdofree.com/" target="_blank">鎌ケ谷おもちゃ病院</a>
-      <a href="https://gyotoku-toy.jimdofree.com/" target="_blank">行徳おもちゃ病院</a>
+      <a href="https://toydr.blogo.jp/" target="_blank">鎌ケ谷おもちゃ病院</a>
+      <a href="https://gyoutoku-toyhospital.jimdofree.com/" target="_blank">行徳おもちゃ病院</a>
     </div>
   </div>
 </div>
@@ -189,7 +178,7 @@
     <p style="font-size: 0.95rem; color: #555;">改造依頼や適合相談など、専用フォームより受け付けております。</p>
     <a href="https://docs.google.com/forms/d/e/1FAIpQLSfS-rO-nC56xR8vD9fFzXzX-rO-nC56xR8vD9fFzXzX-rO/viewform" target="_blank" class="btn-main">お問い合わせフォームを開く</a>
     <div class="contact-info">
-      メールでも承ります：<strong>seigou.fthp@gmail.com</strong>
+      メール：<strong>seigou.fthp@gmail.com</strong>
     </div>
   </div>
 </div>
@@ -200,13 +189,13 @@
       <div class="icon">📦</div>
       <h4>おもちゃ貸出</h4>
       <p>改造済みを試せます</p>
-      <a href="https://sites.google.com/view/fthp/toy-list" class="btn-sub">貸出リスト</a>
+      <a href="https://sites.google.com/view/fthp/kashidasi" class="btn-sub">貸出リストを見る</a>
     </div>
     <div class="card">
       <div class="icon">🛠️</div>
       <h4>スイッチ紹介</h4>
       <p>自作サンプルの紹介</p>
-      <a href="https://sites.google.com/view/fthp/switch-sample" class="btn-sub">サンプルを見る</a>
+      <a href="https://sites.google.com/view/fthp/switch" class="btn-sub">サンプルを見る</a>
     </div>
     <div class="card card-full">
       <div class="icon">📰</div>
@@ -215,6 +204,11 @@
       <a href="https://chiicomi.com/press/2057941/" target="_blank" class="btn-sub">記事を読む</a>
     </div>
   </div>
+</div>
+
+<div class="container spacer extra-link">
+  <p>日本おもちゃ病院協会<br>
+  <a href="https://sites.google.com/view/fthp/home#h.5nlb2jog9gmp" target="_blank">障がい児の遊び支援活動 ホームページ</a></p>
 </div>
 
 <footer>
