@@ -39,9 +39,11 @@
     }
     .hero h1 { margin: 0; font-size: 1.4rem; color: var(--main); }
 
-    /* --- キャッチコピー --- */
+    /* --- キャッチコピーエリア --- */
     .intro-top { text-align: center; }
-    .intro-top .quote { font-weight: bold; font-size: 1.25rem; color: var(--main); display: block; }
+    .intro-top .quote { font-weight: bold; font-size: 1.25rem; color: var(--main); display: block; margin-bottom: 10px; }
+    /* 小さいフォントの補足文 */
+    .intro-top .sub-text { font-size: 0.8rem; color: #666; display: block; line-height: 1.6; max-width: 600px; margin: 0 auto; }
     .sp-br { display: block; }
 
     /* --- カードグリッド --- */
@@ -102,6 +104,8 @@
       .hero-card { width: 480px; text-align: left; margin-left: 10%; padding: 40px; }
       .hero h1 { font-size: 2.8rem; }
       .sp-br { display: none; }
+      .intro-top .quote { font-size: 1.6rem; }
+      .intro-top .sub-text { font-size: 0.95rem; }
       .feature-grid { grid-template-columns: repeat(3, 1fr); gap: 25px; }
       .card-full { grid-column: span 1; }
       .card { padding: 30px 20px; }
@@ -125,6 +129,9 @@
 
 <div class="container spacer intro-top">
   <span class="quote">「障害を持ったお子さんにも<br class="sp-br">自分で動かす楽しさを」</span>
+  <span class="sub-text">
+    ふなばしおもちゃの病院では、日本おもちゃ病院協会が取り組んでいる<br class="sp-br">「障がい児の遊び支援活動」に賛同し取り組みをおこなっています。
+  </span>
 </div>
 
 <div class="container spacer">
