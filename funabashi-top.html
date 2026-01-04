@@ -3,94 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ふなばしおもちゃ病院</title>
+    <title>ふなばしおもちゃ病院 - 大切なおもちゃ、あきらめないで</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* 前回の最強デザインを継承しつつ、画像表示を最適化 */
         :root {
-            --primary: #ff8c00; --secondary: #4db8ff; --bg: #fffaf5; --text: #443322;
+            --primary-color: #ff8c00; /* 温かいオレンジ */
+            --secondary-color: #4db8ff; /* 誠実なブルー */
+            --accent-color: #ff4d4d; /* 救急のレッド */
+            --bg-color: #fff9f0; /* 柔らかなクリーム色 */
+            --text-color: #443322;
+            --card-bg: #ffffff;
+            --border-radius: 16px;
         }
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.6; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        
-        /* ヘッダー・ヒーロー */
-        header { background: #fff; text-align: center; padding: 20px 0; border-bottom: 4px solid var(--primary); }
-        .hero-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        .hero-img { width: 100%; height: auto; display: block; background: #eee; }
-        
-        /* コンテンツ */
-        h2 { color: var(--primary); border-left: 5px solid var(--primary); padding-left: 15px; margin: 30px 0 15px; }
-        .card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        
-        /* アコーディオン */
-        details { background: #fff; border: 1px solid #eee; border-radius: 10px; margin-bottom: 10px; }
-        summary { padding: 15px; cursor: pointer; font-weight: bold; outline: none; display: flex; justify-content: space-between; }
-        .details-inner { padding: 0 15px 15px; font-size: 0.95rem; border-top: 1px solid #fafafa; }
+
+        /* 全体設定 */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        a { color: var(--secondary-color); text-decoration: none; transition: 0.3s; }
+        a:hover { opacity: 0.7; }
+
+        .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+        /* ヘッダー */
+        header {
+            background: var(--card-bg);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .header-logo { font-weight: 700; font-size: 1.4rem; color: var(--primary-color); display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* メインビジュアル */
+        .hero {
+            padding: 30px 0;
+            text-align: center;
+        }
+        .hero-img-container {
+            width: 100%;
+            height: 250px;
+            background: #ddd;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .hero-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-text h1 { font-size: 1.8rem; margin-bottom: 10px; line-height: 1.3; }
+
+        /* クイックナビ */
+        .quick-nav {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .nav-btn {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #e6d7c3;
+            border: 2px solid #eee;
+        }
+
+        /* セクション・カード */
+        section { margin-bottom: 40px; }
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2::before {
+            content: ""; display: inline-block; width: 8px; height: 28px;
+            background: var(--primary-color); border-radius: 4px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+        }
+
+        /* アコーディオン（詳細表示） */
+        details {
+            background: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #f0e0d0;
+            overflow: hidden;
+        }
+        summary {
+            padding: 15px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+        }
+        summary::-webkit-details-marker { display: none; }
+        summary::after { content: "+"; color: var(--primary-color); font-size: 1.5rem; }
+        details[open] summary::after { content: "-"; }
+        .details-content { padding: 15px 20px; border-top: 1px solid #f0e0d0; background: #fffaf5; }
+
+        /* 重要ニュースエリア */
+        .news-box {
+            border: 3px solid var(--accent-color);
+            background: #fff5f5;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+        }
+        .news-title { color: var(--accent-color); font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+        /* 特徴的なリスト */
+        .rule-list { list-style: none; }
+        .rule-list li { position: relative; padding-left: 25px; margin-bottom: 10px; }
+        .rule-list li::before {
+            content: "✔"; position: absolute; left: 0; color: var(--secondary-color); font-weight: bold;
+        }
+
+        /* イラスト (DataURI) */
+        .illust-icon { width: 60px; height: 60px; margin: 0 auto 10px; }
 
         /* ボタン */
-        .btn { display: block; background: var(--primary); color: #fff; text-align: center; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold; margin: 20px 0; }
-        
-        /* PC用調整 */
-        @media (min-width: 768px) {
-            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .cta-button {
+            display: block;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 18px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #cc7000;
+            margin: 20px 0;
+            transition: 0.2s;
         }
+        .cta-button:active { transform: translateY(4px); box-shadow: 0 2px 0 #cc7000; }
+
+        /* PCレイアウト調整 */
+        @media (min-width: 768px) {
+            .quick-nav { grid-template-columns: repeat(4, 1fr); }
+            .hero-img-container { height: 450px; }
+            .hero-text h1 { font-size: 2.5rem; }
+            .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        }
+
+        footer {
+            background: #6d4c41;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .footer-links { margin-bottom: 20px; }
+        .footer-links a { color: #ffccbc; margin: 0 10px; font-size: 0.9rem; }
+        .copyright { font-size: 0.8rem; opacity: 0.8; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>ふなばしおもちゃ病院</h1>
+    <div class="container">
+        <div class="header-logo">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff8c00'><path d='M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12zM11 10h2v3h3v2h-3v3h-2v-3H8v-2h3z'/></svg>" width="30" alt="logo">
+            ふなばしおもちゃ病院
+        </div>
+    </div>
 </header>
 
 <div class="container">
-    <div class="hero-card">
-        <img src="https://funabashtoyhospital.web.fc2.com/121202_1423~0001.jpg" alt="メイン写真" class="hero-img">
-        <div style="padding: 20px; text-align: center;">
-            <p><strong>「ものを大切にする心」を次の世代へ。</strong></p>
-            <a href="https://funabashtoyhospital.web.fc2.com/newpage2.html" class="btn">最新の開院カレンダーを見る</a>
+    <section class="hero">
+        <div class="hero-img-container">
+            <img src="/images/main_visual.jpg" alt="活動の様子">
         </div>
+        <div class="hero-text">
+            <h1>大切なおもちゃを、<br>心を込めて直します。</h1>
+            <p>壊れて動かなくなった、音が出なくなった…。<br>あきらめる前に、私たちドクターに相談してください。</p>
+        </div>
+        <a href="https://funabashtoyhospital.web.fc2.com/newpage2.html" class="cta-button">最新の開院スケジュールを確認する</a>
+    </section>
+
+    <div class="quick-nav">
+        <a href="#about" class="nav-btn">病院紹介</a>
+        <a href="#rules" class="nav-btn">修理のルール</a>
+        <a href="#location" class="nav-btn">場所・アクセス</a>
+        <a href="https://funabashtoyhospital.web.fc2.com/newpage6.html" class="nav-btn">スタッフ募集</a>
     </div>
 
+    <section class="news-box">
+        <div class="news-title">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4d4d'><path d='M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z'/></svg>" width="20" alt="alert">
+            重要なお知らせ
+        </div>
+        <p>開院日時や会場が変更になる場合があります。お出かけ前に必ず「開院カレンダー」をご確認ください。</p>
+    </section>
+
     <section id="about">
-        <h2>当院の紹介</h2>
+        <h2>ふなばしおもちゃ病院について</h2>
         <div class="card">
-            <p>私たちは、壊れてしまったおもちゃを修理し、子どもたちの笑顔を取り戻すボランティア団体です。</p>
+            <p>私たちは、こども達が「ものを大切にする心」を育む手助けをし、おもちゃの修理を通じてシニア世代の技術継承や多世代交流を図るボランティア団体です。</p>
+            <p style="margin-top:15px;">船橋市社会福祉協議会ボランティアセンターに登録し、船橋市内の公民館を拠点に活動しています。</p>
+        </div>
+        <div class="grid-2">
+            <div class="card">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234db8ff'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/></svg>" class="illust-icon" alt="info">
+                <h3 style="text-align:center; margin-bottom:10px;">修理の基本</h3>
+                <p style="font-size:0.9rem;">原則として<strong style="color:var(--accent-color);">無料</strong>で修理いたします（部品代が必要な場合を除く）。ボランティアのドクターが真摯に対応します。</p>
+            </div>
+            <div class="card">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff8c00'><path d='M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z'/></svg>" class="illust-icon" alt="check">
+                <h3 style="text-align:center; margin-bottom:10px;">受付方法</h3>
+                <p style="font-size:0.9rem;">当日、会場までおもちゃをお持ちください。その場で直らない場合は「入院」としてお預かりし、次回以降に返却します。</p>
+            </div>
         </div>
     </section>
 
     <section id="rules">
-        <h2>修理のご案内（すべて網羅）</h2>
+        <h2>修理に関するお約束</h2>
+        <p style="margin-bottom:15px; font-size:0.9rem;">※元サイトに掲載されている内容をすべて網羅しています。</p>
+        
         <details>
-            <summary>修理費用について</summary>
-            <div class="details-inner">
-                原則無料です。ただし、部品代（モーターやIC等）の実費を頂く場合があります。
+            <summary>修理できるもの・できないもの</summary>
+            <div class="details-content">
+                <h4 style="color:var(--secondary-color);">【修理できるおもちゃ】</h4>
+                <p>一般的に市販されているおもちゃ全般（電子おもちゃ、ぬいぐるみ、木製、プラスチック製など）。</p>
+                
+                <h4 style="color:var(--accent-color); margin-top:15px;">【修理をお引き受けできないもの】</h4>
+                <ul class="rule-list">
+                    <li>法的に規制のあるもの（エアガン、ガスガンなど）</li>
+                    <li>直接人体に触れるもの（浮き輪、電動歯ブラシなど）</li>
+                    <li>AC100Vに直結する家電製品</li>
+                    <li>骨董的価値のあるもの、高価なもの</li>
+                    <li>テレビゲーム機、パソコン、スマートフォンなど</li>
+                    <li>その他、ドクターが修理困難と判断したもの</li>
+                </ul>
             </div>
         </details>
+
         <details>
-            <summary>修理できないもの</summary>
-            <div class="details-inner">
-                エアガン、AC100V直結の家電、浮き輪、骨董品、ゲーム機などは対象外となります。
+            <summary>修理費用・部品代について</summary>
+            <div class="details-content">
+                <p>修理の手数料（工賃）は<strong style="color:var(--accent-color);">無料</strong>です。</p>
+                <p>ただし、以下のような場合は実費をいただきます：</p>
+                <ul class="rule-list">
+                    <li>特殊な部品（IC、モーター、特殊スイッチ、ギア等）を交換した場合</li>
+                    <li>電池切れの場合の電池代（100円〜数百円程度）</li>
+                </ul>
+                <p>※高額になる場合は、必ず事前にご相談いたします。</p>
             </div>
         </details>
-        </section>
+
+        <details>
+            <summary>持ち込み時のお願い・注意事項</summary>
+            <div class="details-content">
+                <ul class="rule-list">
+                    <li>取扱説明書や外箱があれば一緒にお持ちください。</li>
+                    <li>取れてしまった部品、破片などもすべてお持ちください。</li>
+                    <li>使用している電池も一緒にお持ちください。</li>
+                    <li>修理の過程で分解や加工が必要になり、完全に元の状態に戻らない場合があります。</li>
+                    <li>修理が困難で「修理不能」と判断し、お返しする場合もありますのでご了承ください。</li>
+                </ul>
+            </div>
+        </details>
+    </section>
 
     <section id="location">
-        <h2>開院場所</h2>
-        <div class="grid">
-            <div class="card">
-                <h3>北部公民館</h3>
-                <p>第1日曜日 10:00〜15:00</p>
+        <h2>活動場所とスケジュール</h2>
+        <div class="card">
+            <h3 style="color:var(--secondary-color); border-bottom:2px solid #eee; margin-bottom:15px; padding-bottom:5px;">主な定期開院場所</h3>
+            
+            <div style="margin-bottom:20px;">
+                <h4 style="margin-bottom:5px;">● 北部公民館</h4>
+                <p style="font-size:0.95rem;">原則として 毎月 <strong>第１日曜日</strong></p>
+                <p style="font-size:0.9rem; color:#666;">受付時間：10:00 〜 15:00</p>
             </div>
-            <div class="card">
-                <h3>中央公民館</h3>
-                <p>第3日曜日 10:00〜15:00</p>
+
+            <div>
+                <h4 style="margin-bottom:5px;">● 中央公民館</h4>
+                <p style="font-size:0.95rem;">原則として 毎月 <strong>第３日曜日</strong></p>
+                <p style="font-size:0.9rem; color:#666;">受付時間：10:00 〜 15:00</p>
             </div>
+            <p style="margin-top:20px; font-size:0.85rem; background:#eee; padding:10px; border-radius:8px;">
+                ※上記以外にも、イベント等で臨時開院する場合があります。詳細はカレンダーをご覧ください。
+            </p>
         </div>
     </section>
 
-    <footer style="text-align: center; padding: 40px 0; font-size: 0.8rem; color: #888;">
-        © ふなばしおもちゃ病院
-    </footer>
+    <section style="text-align:center;">
+        <div class="card" style="background:var(--secondary-color); color:white;">
+            <h3>ドクター・スタッフ募集中！</h3>
+            <p style="margin:10px 0;">おもちゃの修理に興味がある方、ボランティアとして一緒に活動しませんか？技術がなくても、受付などのお手伝いも大歓迎です。</p>
+            <a href="https://funabashtoyhospital.web.fc2.com/newpage6.html" style="color:white; text-decoration:underline; font-weight:bold;">募集案内の詳細を見る</a>
+        </div>
+    </section>
 </div>
+
+<footer>
+    <div class="container">
+        <div class="footer-links">
+            <a href="https://funabashtoyhospital.web.fc2.com/index.html">ホーム</a>
+            <a href="https://funabashtoyhospital.web.fc2.com/newpage2.html">開院予定</a>
+            <a href="https://funabashtoyhospital.web.fc2.com/newpage3.html">修理規定</a>
+            <a href="https://funabashtoyhospital.web.fc2.com/newpage5.html">活動の記録</a>
+            <a href="https://funabashtoyhospital.web.fc2.com/newpage6.html">スタッフ募集</a>
+        </div>
+        <p>事務局：船橋市社会福祉協議会 ボランティアセンター内</p>
+        <p class="copyright">© ふなばしおもちゃ病院 All Rights Reserved.</p>
+        <p style="margin-top:10px;"><a href="http://toyhospital.org/" target="_blank" style="font-size:0.8rem; color:#fff; opacity:0.6;">日本おもちゃ病院協会 会員</a></p>
+    </div>
+</footer>
+
+<script>
+    // ページ内スムーススクロール
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>
 
 </body>
 </html>
