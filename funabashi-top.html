@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ふなばしおもちゃ病院</title>
+    <style>
+        /* 前回の最強デザインを継承しつつ、画像表示を最適化 */
+        :root {
+            --primary: #ff8c00; --secondary: #4db8ff; --bg: #fffaf5; --text: #443322;
+        }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        
+        /* ヘッダー・ヒーロー */
+        header { background: #fff; text-align: center; padding: 20px 0; border-bottom: 4px solid var(--primary); }
+        .hero-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .hero-img { width: 100%; height: auto; display: block; background: #eee; }
+        
+        /* コンテンツ */
+        h2 { color: var(--primary); border-left: 5px solid var(--primary); padding-left: 15px; margin: 30px 0 15px; }
+        .card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        /* アコーディオン */
+        details { background: #fff; border: 1px solid #eee; border-radius: 10px; margin-bottom: 10px; }
+        summary { padding: 15px; cursor: pointer; font-weight: bold; outline: none; display: flex; justify-content: space-between; }
+        .details-inner { padding: 0 15px 15px; font-size: 0.95rem; border-top: 1px solid #fafafa; }
+
+        /* ボタン */
+        .btn { display: block; background: var(--primary); color: #fff; text-align: center; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold; margin: 20px 0; }
+        
+        /* PC用調整 */
+        @media (min-width: 768px) {
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>ふなばしおもちゃ病院</h1>
+</header>
+
+<div class="container">
+    <div class="hero-card">
+        <img src="https://funabashtoyhospital.web.fc2.com/121202_1423~0001.jpg" alt="メイン写真" class="hero-img">
+        <div style="padding: 20px; text-align: center;">
+            <p><strong>「ものを大切にする心」を次の世代へ。</strong></p>
+            <a href="https://funabashtoyhospital.web.fc2.com/newpage2.html" class="btn">最新の開院カレンダーを見る</a>
+        </div>
+    </div>
+
+    <section id="about">
+        <h2>当院の紹介</h2>
+        <div class="card">
+            <p>私たちは、壊れてしまったおもちゃを修理し、子どもたちの笑顔を取り戻すボランティア団体です。</p>
+        </div>
+    </section>
+
+    <section id="rules">
+        <h2>修理のご案内（すべて網羅）</h2>
+        <details>
+            <summary>修理費用について</summary>
+            <div class="details-inner">
+                原則無料です。ただし、部品代（モーターやIC等）の実費を頂く場合があります。
+            </div>
+        </details>
+        <details>
+            <summary>修理できないもの</summary>
+            <div class="details-inner">
+                エアガン、AC100V直結の家電、浮き輪、骨董品、ゲーム機などは対象外となります。
+            </div>
+        </details>
+        </section>
+
+    <section id="location">
+        <h2>開院場所</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>北部公民館</h3>
+                <p>第1日曜日 10:00〜15:00</p>
+            </div>
+            <div class="card">
+                <h3>中央公民館</h3>
+                <p>第3日曜日 10:00〜15:00</p>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 40px 0; font-size: 0.8rem; color: #888;">
+        © ふなばしおもちゃ病院
+    </footer>
+</div>
+
+</body>
+</html>
