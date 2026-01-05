@@ -50,10 +50,11 @@
             gap: 10px; 
         }
 
-        .hero { padding: 20px 0 10px; text-align: center; }
+        .hero { padding: 15px 0 10px; text-align: center; }
+        /* 画像を横長に変更し、ファーストビューを改善 */
         .hero-img-container {
             width: 100%;
-            height: 220px;
+            height: 180px; /* モバイルでの高さを低く設定 */
             margin: 0 auto 15px;
             border-radius: var(--border-radius);
             overflow: hidden;
@@ -63,9 +64,10 @@
             width: 100%; 
             height: 100%; 
             object-fit: cover;
+            object-position: center 30%; /* 人物が切れにくいよう、少し上寄りに配置 */
         }
-        .hero-text h1 { font-size: 1.4rem; margin-bottom: 8px; line-height: 1.4; }
-        .hero-text p { font-size: 0.9rem; margin-bottom: 15px; }
+        .hero-text h1 { font-size: 1.3rem; margin-bottom: 5px; line-height: 1.3; }
+        .hero-text p { font-size: 0.85rem; margin-bottom: 15px; }
 
         .yt-button {
             display: inline-flex;
@@ -73,11 +75,11 @@
             gap: 8px;
             background: var(--yt-color);
             color: white;
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 50px;
             font-weight: bold;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
         }
 
         .quick-nav {
@@ -88,19 +90,19 @@
         }
         .nav-btn {
             background: var(--card-bg);
-            padding: 12px 5px;
+            padding: 10px 5px;
             border-radius: 8px;
             text-align: center;
             font-weight: bold;
             box-shadow: 0 2px 0 #e6d7c3;
             border: 1px solid #eee;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-color);
         }
 
         section { margin-bottom: 40px; }
         h2 {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--primary-color);
             margin-bottom: 15px;
             display: flex;
@@ -108,7 +110,7 @@
             gap: 8px;
         }
         h2::before {
-            content: ""; display: inline-block; width: 6px; height: 24px;
+            content: ""; display: inline-block; width: 6px; height: 22px;
             background: var(--primary-color); border-radius: 3px;
         }
 
@@ -127,8 +129,8 @@
         }
 
         .illust-icon { 
-            width: 50px; 
-            height: 50px; 
+            width: 40px; 
+            height: 40px; 
             display: block; 
             margin: 0 auto 5px;
         }
@@ -168,18 +170,18 @@
             background: var(--primary-color);
             color: white;
             text-align: center;
-            padding: 14px;
+            padding: 12px;
             border-radius: 50px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
             box-shadow: 0 4px 0 #cc7000;
-            margin: 15px auto;
-            max-width: 280px;
+            margin: 10px auto;
+            max-width: 260px;
         }
 
         @media (min-width: 768px) {
-            .hero-img-container { height: 400px; }
-            .hero-text h1 { font-size: 2rem; }
+            .hero-img-container { height: 300px; } /* PCでは適度な横長に固定 */
+            .hero-text h1 { font-size: 1.8rem; }
             .info-grid { grid-template-columns: 1fr 1fr; }
             .quick-nav { grid-template-columns: repeat(3, 1fr); max-width: 600px; margin-left: auto; margin-right: auto; }
         }
@@ -211,25 +213,23 @@
 <div class="container">
     <section class="hero">
         <div class="hero-img-container">
-            <img src="images/activity_image.jpg" alt="活動風景">
+            <!-- 横長にトリミング表示されるように調整 -->
+            <img src="https://funabashi-toy-hospital.com/images/IMG_3489.JPG" onerror="this.src='https://placehold.jp/24/ff8c00/ffffff/800x300.png?text=%E6%B4%BB%E5%8B%95%E9%A2%A8%E6%99%AF'" alt="活動風景">
         </div>
         <div class="hero-text">
             <h1>大切なおもちゃを、<br>心を込めて直します。</h1>
             <p>壊れて動かなくなったおもちゃ、あきらめる前にご相談ください。</p>
         </div>
         
-        <!-- 元サイトのビデオリンクを忠実に反映 -->
-        <a href="https://www.youtube.com/watch?v=F07j209E7E0" target="_blank" class="yt-button">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-            船橋市作成の紹介ビデオ（YouTube）
+        <a href="https://www.youtube.com/watch?v=kY_7S05LclY" target="_blank" class="yt-button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+            船橋市の紹介ビデオ（YouTube）
         </a>
 
-        <!-- 元サイトのGoogleカレンダーリンクを忠実に反映 -->
-        <a href="https://calendar.google.com/calendar/embed?src=463o8mmsvno3v250m2a4k9fjt4%40group.calendar.google.com&ctz=Asia/Tokyo" target="_blank" class="cta-button">開院スケジュールを確認する</a>
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=463o8mmsvno3v250m2a4k9fjt4@group.calendar.google.com&ctz=Asia/Tokyo" target="_blank" class="cta-button">開院スケジュールを確認する</a>
     </section>
 
     <div class="quick-nav">
-        <!-- 元サイトのファイル名を忠実に反映 -->
         <a href="byoin-syoukai.html" class="nav-btn">病院紹介</a>
         <a href="syuuri-rule.html" class="nav-btn">修理のルール</a>
         <a href="https://www.instagram.com/funabashi_toy_hospital/" target="_blank" class="nav-btn">Instagram</a>
@@ -289,7 +289,7 @@
     <section id="access">
         <h2>開院場所</h2>
         <div class="card">
-            <p style="font-size: 0.9rem; margin-bottom: 15px;">船橋市内の各公民館等で開院しています。会場により開院日・時間が異なります。詳細は必ずスケジュール表を確認してください。</p>
+            <p style="font-size: 0.9rem; margin-bottom: 15px;">船橋市内の各公民館等で開院しています。会場により開院日・時間が異なります。詳細は必ず予定表を確認してください。</p>
             <ul class="list-style" style="columns: 2;">
                 <li>北部公民館</li>
                 <li>三咲公民館</li>
@@ -301,8 +301,7 @@
                 <li>（その他イベント）</li>
             </ul>
         </div>
-        <!-- 元サイトのファイル名を忠実に反映 -->
-        <a href="yotei.html" class="cta-button">開院カレンダーを見る</a>
+        <a href="yotei.html" class="cta-button">開院予定表を確認する</a>
     </section>
 
     <section id="contact">
@@ -313,7 +312,7 @@
             <p style="text-align: center; margin-top: 10px; font-size: 1.2rem; color: var(--primary-color); font-weight: bold;">TEL：047-431-2653</p>
             <div style="margin-top: 15px; font-size: 0.85rem; border-top: 1px solid #eee; padding-top: 10px;">
                 <p>所在地：船橋市本町2-7-8 船橋市福祉ビル3階</p>
-                <p><a href="http://www.funabashi-shakyo.or.jp/index.php/volunteer/center" target="_blank" style="text-decoration: underline;">ボランティアセンター詳細</a></p>
+                <p><a href="http://www.funabashi-shakyo.or.jp/index.php/volunteer/center" target="_blank" style="text-decoration: underline;">ボランティアセンター詳細（外部サイト）</a></p>
                 <p>受付時間：平日 9:00〜17:00</p>
             </div>
         </div>
