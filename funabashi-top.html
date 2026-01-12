@@ -3,347 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ふなばしおもちゃ病院 - 船橋市ボランティア団体</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <title>ふなばし「おもちゃの病院」</title>
     <style>
         :root {
-            --primary-color: #ff8c00;
-            --secondary-color: #4db8ff;
-            --accent-color: #ff4d4d;
-            --yt-color: #FF0000;
-            --bg-color: #fff9f0;
-            --text-color: #443322;
-            --card-bg: #ffffff;
-            --border-radius: 12px;
+            --bg-color: #ffefd5; /* papayawhip */
+            --primary-color: #008080; /* teal */
+            --accent-color: #ff00ff; /* fuchsia */
+            --text-color: #333;
+            --link-color: #0000cd; /* mediumblue */
+            --white: #ffffff;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Zen Maru Gothic', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
             line-height: 1.6;
-            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
         }
 
-        a { color: var(--secondary-color); text-decoration: none; transition: 0.3s; }
-        .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 0 15px; }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+        }
 
         header {
-            background: var(--card-bg);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 20px 10px;
             text-align: center;
-        }
-        .header-logo { 
-            font-weight: 700; 
-            font-size: 1.25rem; 
-            color: var(--primary-color); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
+            border-bottom: 5px solid var(--accent-color);
+            margin-bottom: 20px;
         }
 
-        .hero { padding: 15px 0 10px; text-align: center; }
-        /* 画像を横長に変更し、ファーストビューを改善 */
-        .hero-img-container {
-            width: 100%;
-            height: 180px; /* モバイルでの高さを低く設定 */
-            margin: 0 auto 15px;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .hero-img-container img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover;
-            object-position: center 30%; /* 人物が切れにくいよう、少し上寄りに配置 */
-        }
-        .hero-text h1 { font-size: 1.3rem; margin-bottom: 5px; line-height: 1.3; }
-        .hero-text p { font-size: 0.85rem; margin-bottom: 15px; }
-
-        .yt-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--yt-color);
-            color: white;
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 0.8rem;
+        h1 {
+            font-size: 1.8em;
+            margin: 0;
         }
 
-        .quick-nav {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 30px;
-        }
-        .nav-btn {
-            background: var(--card-bg);
-            padding: 10px 5px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            box-shadow: 0 2px 0 #e6d7c3;
-            border: 1px solid #eee;
-            font-size: 0.75rem;
-            color: var(--text-color);
-        }
-
-        section { margin-bottom: 40px; }
         h2 {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: normal;
+            margin: 10px 0 0;
+        }
+
+        nav {
+            background: #e0ffff; /* lightcyan */
+            border: 1px solid #ccc;
+            padding: 10px;
             display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        h2::before {
-            content: ""; display: inline-block; width: 6px; height: 22px;
-            background: var(--primary-color); border-radius: 3px;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
         }
 
-        .card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            margin-bottom: 15px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .illust-icon { 
-            width: 40px; 
-            height: 40px; 
-            display: block; 
-            margin: 0 auto 5px;
-        }
-        .card-title {
-            text-align: center;
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-        }
-
-        details {
-            background: var(--card-bg);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border: 1px solid #f0e0d0;
-        }
-        summary {
-            padding: 12px 15px;
-            font-weight: bold;
+        nav a, .link-style {
+            background: var(--white);
+            border: 1px solid var(--primary-color);
+            padding: 5px 10px;
+            text-decoration: none;
+            color: var(--link-color);
+            font-size: 0.9em;
+            border-radius: 4px;
             cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        summary::after { content: "+"; color: var(--primary-color); }
-        details[open] summary::after { content: "-"; }
-        .details-content { padding: 15px; border-top: 1px solid #f0e0d0; background: #fffaf5; font-size: 0.9rem; }
-
-        .list-style { list-style: none; }
-        .list-style li { position: relative; padding-left: 20px; margin-bottom: 5px; }
-        .list-style li::before {
-            content: "・"; position: absolute; left: 0; color: var(--primary-color); font-weight: bold;
         }
 
-        .cta-button {
-            display: block;
-            background: var(--primary-color);
-            color: white;
+        .content-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            border: 3px solid var(--accent-color);
+            padding: 15px;
+            margin: 15px 0;
+            background: #fff5ff;
+        }
+
+        .schedule {
+            background: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 10px 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .stats-box {
+            background: #f0fdfa;
+            border: 1px dashed var(--primary-color);
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .footer-info {
+            font-size: 0.85em;
+            text-align: right;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            margin-top: 20px;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: underline;
+        }
+
+        .illustration {
             text-align: center;
-            padding: 12px;
-            border-radius: 50px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            box-shadow: 0 4px 0 #cc7000;
-            margin: 10px auto;
-            max-width: 260px;
+            margin: 20px 0;
         }
 
-        @media (min-width: 768px) {
-            .hero-img-container { height: 300px; } /* PCでは適度な横長に固定 */
-            .hero-text h1 { font-size: 1.8rem; }
-            .info-grid { grid-template-columns: 1fr 1fr; }
-            .quick-nav { grid-template-columns: repeat(3, 1fr); max-width: 600px; margin-left: auto; margin-right: auto; }
+        /* SVG Icon for friendly feel */
+        .icon-toy {
+            width: 50px;
+            height: 50px;
+            fill: var(--primary-color);
         }
-
-        footer {
-            background: #5d4037;
-            color: #eceff1;
-            padding: 40px 0;
-            text-align: center;
-            margin-top: 60px;
-            font-size: 0.85rem;
-        }
-        .footer-links { margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-        .footer-links a { color: #d7ccc8; border-bottom: 1px solid #d7ccc8; }
-        .copyright { opacity: 0.7; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="container">
-        <div class="header-logo">
-            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff8c00'><path d='M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12zM11 10h2v3h3v2h-3v3h-2v-3H8v-2h3z'/></svg>" width="24" alt="logo">
-            ふなばしおもちゃ病院
-        </div>
-    </div>
+    <h1>ふなばし　「おもちゃの病院」</h1>
+    <h2>---　治して、そして、また遊ぼう(*^-^*)!　---</h2>
 </header>
 
 <div class="container">
-    <section class="hero">
-        <div class="hero-img-container">
-            <!-- 横長にトリミング表示されるように調整 -->
-            <img src="images/activity_image.jpg" alt="活動風景">
+    <div class="illustration">
+        <svg class="icon-toy" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z M12,15.27L8.1,17.05L12,7.55L15.9,17.05L12,15.27Z"/>
+        </svg>
+    </div>
+
+    <nav>
+        <a href="syoukai.html">スタッフ</a>
+        <a href="shindan.html">診断、修理</a>
+        <a href="yotei.html">予定日</a>
+        <a href="toiawase.html">問い合せ</a>
+        <a href="link.html">リンク</a>
+        <a href="houkoku.html">H25/6～H29/11 活動報告</a>
+        <a href="29-12houkoku.html">H29/12～H31/4 活動報告</a>
+        <a href="R2-houkoku.html">R元/5～R4/12 活動報告</a>
+        <a href="R5-houkoku.html">R5/1～R/ 活動報告</a>
+    </nav>
+
+    <div class="footer-info">
+        更新日 2026-1-11<br>
+        <a href="http://www.rays-counter.com/">アクセスカウンター</a>
+    </div>
+
+    <div class="content-card">
+        <strong>==御案内及び更新情報==</strong><br>
+        お知らせ<br>
+        <div class="info-box">
+            当病院活動はYou Tubeで公開されてます。 <a href="https://www.bing.com/videos/search?q=%e8%88%b9%e6%a9%8b%e3%81%8a%e3%82%82%e3%81%a1%e3%82%83%e7%97%85%e9%99%a2You+tube&docid=603504172827021857&mid=45D5816FF8EE0C67F22445D5816FF8EE0C67F224&view=detail&FORM=VIRE">船橋おもちゃ病院youtube</a> で<br>
+            2025.6.診断・修理に受付できないおもちゃを追記<br>
+            2026/1/31ふなばし市民活動フェアーに参加します（船橋FACSにて）
         </div>
-        <div class="hero-text">
-            <h1>大切なおもちゃを、<br>心を込めて直します。</h1>
-            <p>壊れて動かなくなったおもちゃ、あきらめる前にご相談ください。</p>
-        </div>
+
+        <strong>1月の 開催予定</strong>
+        <div class="schedule">
+****1月17日（土) 9時30分～12時..船橋市西部公民館。
+****1月17日（土) 9時30分～12時..、坪井公民館。
+****1月18日（日) 9時30分～12時..、小室公民館
+****1月24日（土) 13時30分～15時30分..、ウェルシア藤原店
+****2月1日（日) 10時～15時..、八千代緑が丘イオンモール（,開催場所がローズ広場から4階のエスカレータ脇に変わります)
+****2月14日（土) 9時30分～12時..、金杉台児童ホーム
+****2月14日（土) 9時30分～12時..、三咲公民館</div>
         
-        <a href="https://www.youtube.com/watch?v=kY_7S05LclY" target="_blank" class="yt-button">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-            船橋市の紹介ビデオ（YouTube）
-        </a>
-
-        <a href="https://calendar.google.com/calendar/u/0/embed?src=463o8mmsvno3v250m2a4k9fjt4@group.calendar.google.com&ctz=Asia/Tokyo" target="_blank" class="cta-button">開院スケジュールを確認する</a>
-    </section>
-
-    <div class="quick-nav">
-        <a href="byoin-syoukai.html" class="nav-btn">病院紹介</a>
-        <a href="syuuri-rule.html" class="nav-btn">修理のルール</a>
-        <a href="https://www.instagram.com/funabashi_toy_hospital/" target="_blank" class="nav-btn">Instagram</a>
+        開催場所に来ること出来ない修理の相談は当ホームページの「問い合わせ」<a href="mailto:funabasi.omocha.hospital@gmail.com"></a> <a href="toiawase.html">メール</a>をご利用ください、個別対応いたします。問い合わせには、おもちゃ名、住所、氏名、電話番号をお願いします<br>
+        -- -- --
     </div>
 
-    <section id="about">
-        <h2>ふなばしおもちゃ病院とは</h2>
-        <div class="card">
-            <p>私たちは、こども達が「ものを大切にする心」を育む手助けをし、おもちゃの修理を通じてシニア世代の技術継承や多世代交流を図るボランティア団体です。</p>
-            <p style="margin-top:10px;">船橋市社会福祉協議会ボランティアセンターに登録し、市内の公民館を拠点に活動しています。</p>
-        </div>
+    <div class="content-card">
+        <p>高価なおもちゃが多い中、壊れてたり故障などであきらめているもの有りませんか？</p>
+        <p>物を大切にする気持ちを子供たちに教え、感じてもらうために、復旧して再び動く喜びを味わってみようではありませんか。</p>
+        <p>ふなばし「おもちゃの病院」は ♯壊れたおもちゃを修理 復元する活動を行っているボランティアグループです。</p>
+        <p>お父さん、お母さんが使っていた懐かしのおもちゃ、メモリアル的なおもちゃ、プレゼントされたり、買い与えたが壊れてしまい困っているおもちゃ等、押入れ、 タンス、段ボール箱に有りませんか？</p>
+        <p>ベテランドクターが原則無料（修理に要した部品代100～200円程度は実費で戴く場合もあります）で修理いたします。</p>
+        <p>再び動かし感動を味わいましょう。</p>
+        <p>船橋市内各所（<a href="yotei.html">開催予定</a>をご覧ください）で、定期的に、おもちゃの修理（活動報告をご覧ください）を行っています。お持ちください。</p>
+        <p>購入後使用期間が数か月でメーカー、購入先の保証のあるもは、ご自身でメーカー等に問い合わせください。当院では修理できなくて困っているおもちゃに限って承ります。</p>
+        <p>その他,おもちゃに関してお困りの事、相談したい事が有りましたら御気軽に <a href="toiawase.html">メール、電話</a> で問い合わせください。</p>
+    </div>
 
-        <div class="info-grid">
-            <div class="card">
-                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234db8ff'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/></svg>" class="illust-icon" alt="診療">
-                <h3 class="card-title">診療について</h3>
-                <p style="font-size:0.85rem;">ボランティアのドクターが修理を承ります。修理代（工賃）は無料ですが、部品交換が必要な場合は、部品代の実費をいただく場合があります。</p>
-            </div>
-            <div class="card">
-                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff8c00'><path d='M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z'/></svg>" class="illust-icon" alt="受付">
-                <h3 class="card-title">受付と返却</h3>
-                <p style="font-size:0.85rem;">当日直接お持ちください。重症の場合は「入院」としてお預かりし、次回の開院日に同会場での引き渡しとなります。</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="rules">
-        <h2>修理のルール</h2>
-        <details>
-            <summary>修理できるおもちゃ</summary>
-            <div class="details-content">
-                <p>一般の市販おもちゃ（電子玩具、プラスチック玩具、木製、ぬいぐるみなど）。</p>
-                <p style="margin-top:10px; font-weight:bold;">【お願い】</p>
-                <ul class="list-style">
-                    <li>取扱説明書や外箱があれば一緒にお持ちください。</li>
-                    <li>外れた部品や破片、使っている電池も忘れずにお持ちください。</li>
-                    <li>ぬいぐるみは、中の機械（鳴く・動くなど）が故障しているものが対象です。</li>
-                </ul>
-            </div>
-        </details>
-
-        <details>
-            <summary>修理をお引き受けできないもの</summary>
-            <div class="details-content">
-                <ul class="list-style">
-                    <li>AC100V（コンセント）に直接つなぐおもちゃ（家庭用電化製品）</li>
-                    <li>エアガン、ガスガン等の危険物（法規制のあるもの）</li>
-                    <li>浮き輪、プール、電動歯ブラシ等、直接人体に触れるもの</li>
-                    <li>テレビゲーム、パソコン、スマートフォンなどの精密機器</li>
-                    <li>骨董的価値のあるものや、非常に高価なもの</li>
-                    <li>その他、ドクターが修理困難・不適切と判断したもの</li>
-                </ul>
-            </div>
-        </details>
-    </section>
-
-    <section id="access">
-        <h2>開院場所</h2>
-        <div class="card">
-            <p style="font-size: 0.9rem; margin-bottom: 15px;">船橋市内の各公民館等で開院しています。会場により開院日・時間が異なります。詳細は必ず予定表を確認してください。</p>
-            <ul class="list-style" style="columns: 2;">
-                <li>北部公民館</li>
-                <li>三咲公民館</li>
-                <li>二和公民館</li>
-                <li>東部公民館</li>
-                <li>新高根公民館</li>
-                <li>高根台公民館</li>
-                <li>中央公民館</li>
-                <li>（その他イベント）</li>
-            </ul>
-        </div>
-        <a href="yotei.html" class="cta-button">開院予定表を確認する</a>
-    </section>
-
-    <section id="contact">
-        <h2>お問い合わせ</h2>
-        <div class="card">
-            <p style="text-align: center; font-weight: bold;">ふなばしおもちゃ病院 事務局</p>
-            <p style="font-size: 0.85rem; margin-top: 5px; text-align: center;">船橋市社会福祉協議会 ボランティアセンター内</p>
-            <p style="text-align: center; margin-top: 10px; font-size: 1.2rem; color: var(--primary-color); font-weight: bold;">TEL：047-431-2653</p>
-            <div style="margin-top: 15px; font-size: 0.85rem; border-top: 1px solid #eee; padding-top: 10px;">
-                <p>所在地：船橋市本町2-7-8 船橋市福祉ビル3階</p>
-                <p><a href="http://www.funabashi-shakyo.or.jp/index.php/volunteer/center" target="_blank" style="text-decoration: underline;">ボランティアセンター詳細（外部サイト）</a></p>
-                <p>受付時間：平日 9:00〜17:00</p>
-            </div>
-        </div>
-    </section>
+    <div class="content-card">
+        <h3 style="background: var(--accent-color); color: white; padding: 5px 10px;">組織の紹介</h3>
+        <p>船橋市内の公民館、児童ホーム等6公共施設、2商業施設、および幼稚園にて2023年,開催実績85回、延べ参加ドクター人数671人、依頼実績1890件 、修理不可能件数40件、完治率97.8%、壊れたおもちゃの修理の為に、2006年から病院を開院しております船橋のボランティアグループです。 所定の講習修了者（おもちゃドクター21名内女医3名)、で活動し、高い完治率を達成してます</p>
+        
+        <p>当グループは全国組織の,『日本おもちゃ病院協会』,近隣の、『鎌ケ谷おもちゃ病院』、『行徳おもちゃの病院』、別の活動とて『障害児に遊ぶ楽しさを支援する活動』 とリンクしてます。 <a href="link.html">リンク</a> からご覧ください。</p>
+        
+        <p>運営に当たってはボランティア活動の為、原則無料ですが修理に要した部品は実費を戴く場合もあります</p>
+        
+        <p>活動場所については <a href="yotei.html">開催予定</a> をごらんください。</p>
+    </div>
 </div>
-
-<footer>
-    <div class="container">
-        <div class="footer-links">
-            <a href="index.html">ホーム</a>
-            <a href="yotei.html">開院予定表</a>
-            <a href="byoin-syoukai.html">病院紹介</a>
-            <a href="R5-houkoku-all.html">活動報告(R5〜)</a>
-            <a href="R2-houkoku-all.html">活動報告(R1〜R4)</a>
-        </div>
-        <p class="copyright">© ふなばしおもちゃ病院 All Rights Reserved.</p>
-        <p style="margin-top:10px;"><a href="http://toyhospital.org/" target="_blank" style="color:#fff; opacity:0.6; font-size:0.75rem; border-bottom: none;">日本おもちゃ病院協会 会員</a></p>
-    </div>
-</footer>
-
-<script>
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if(target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-    });
-</script>
 
 </body>
 </html>
