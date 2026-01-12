@@ -6,298 +6,248 @@
     <title>ふなばし「おもちゃの病院」公式サイト</title>
     <style>
         :root {
-            --primary-color: #008080;
-            --secondary-color: #d81b60;
-            --accent-color: #ef6c00;
-            --bg-color: #fdfaf5;
-            --text-color: #2c3e50;
-            --card-bg: #ffffff;
-            --border-radius: 12px;
+            --primary: #00796b;
+            --secondary: #e91e63;
+            --accent: #ff9800;
+            --bg: #f5f7f9;
+            --text: #37474f;
+            --card: #ffffff;
+            --radius: 16px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.8;
-            padding-bottom: 60px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
         }
 
-        .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 12px; }
 
-        /* ヘッダー */
+        /* ヘッダー：コンパクト化 */
         header {
-            text-align: center;
-            padding: 50px 20px;
-            background: linear-gradient(135deg, #008080 0%, #004d40 100%);
+            background: var(--primary);
             color: white;
-            border-radius: 0 0 30px 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 24px 16px;
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        header h1 { font-size: 1.8rem; margin-bottom: 10px; letter-spacing: 0.05em; }
-        header p { font-size: 1.1rem; opacity: 0.9; font-weight: bold; }
+        header h1 { font-size: 1.4rem; margin-bottom: 4px; letter-spacing: 0.02em; }
+        header p { font-size: 0.85rem; opacity: 0.9; }
 
-        /* ナビゲーション */
-        nav.main-nav {
+        /* クイックナビ：タイルUI */
+        .quick-nav {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
         }
-        nav.main-nav a {
-            background: var(--card-bg);
-            padding: 15px 10px;
+        .quick-nav a {
+            background: var(--card);
+            padding: 12px 4px;
             text-align: center;
             text-decoration: none;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            border-radius: var(--border-radius);
+            color: var(--primary);
+            border-radius: 12px;
+            font-size: 0.8rem;
             font-weight: bold;
-            transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        nav.main-nav a:hover { background: #e0f2f1; }
 
         /* セクション共通 */
         section {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: var(--border-radius);
-            margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
+            background: var(--card);
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         h2 {
-            font-size: 1.4rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #e0f2f1;
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
+            gap: 8px;
+        }
+        h2::before {
+            content: "";
+            width: 4px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* お知らせ：密度アップ */
+        .update-info {
+            font-size: 0.8rem;
+            color: #78909c;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .notice-list { list-style: none; font-size: 0.9rem; }
+        .notice-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            gap: 8px;
+        }
+        .notice-list li:last-child { border-bottom: none; }
+
+        /* 開催予定：1行に凝縮 */
+        .schedule-card {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
             gap: 10px;
         }
-
-        /* アイコン */
-        .icon { width: 28px; height: 28px; fill: var(--primary-color); }
-
-        /* お知らせボックス */
-        .notice-card {
-            background: #fff9f0;
-            border-left: 5px solid var(--accent-color);
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 4px;
-        }
-        .update-date { font-size: 0.9rem; color: #666; font-weight: bold; }
-
-        /* スケジュール */
-        .schedule-grid { display: flex; flex-direction: column; gap: 15px; }
-        .schedule-item {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 15px;
-            background: #f8f9fa;
+        .date-box {
+            min-width: 60px;
+            text-align: center;
+            background: #e0f2f1;
+            padding: 4px;
             border-radius: 8px;
-            align-items: center;
-        }
-        .date-badge {
-            background: var(--primary-color);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-right: 15px;
+            font-size: 0.75rem;
+            color: var(--primary);
             font-weight: bold;
         }
-        .place-name { font-weight: bold; font-size: 1.1rem; flex-grow: 1; }
+        .place-info { font-size: 0.95rem; font-weight: 600; flex: 1; }
 
-        /* 実績数値 */
-        .stats-container {
+        /* 実績：ミニカード */
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
+            gap: 8px;
         }
-        .stat-box {
-            background: #f0f7f7;
-            padding: 20px;
-            text-align: center;
-            border-radius: 10px;
-        }
-        .stat-num { display: block; font-size: 1.6rem; font-weight: bold; color: var(--primary-color); }
-        .stat-label { font-size: 0.85rem; color: #555; }
-
-        /* アーカイブリンク */
-        .archive-nav {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .archive-nav a {
-            background: #fdf0f5;
-            color: var(--secondary-color);
+        .stat-item {
+            background: #f8f9fa;
             padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-val { font-size: 1.2rem; font-weight: bold; color: var(--primary); display: block; }
+        .stat-lbl { font-size: 0.7rem; color: #78909c; }
+
+        /* アーカイブ：横並び */
+        .archive-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .archive-flex a {
+            flex: 1 1 48%;
+            background: #fff0f5;
+            color: var(--secondary-color);
+            padding: 8px;
             text-align: center;
             border-radius: 8px;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             font-weight: bold;
-            border: 1px solid #f8bbd0;
+            color: #c2185b;
         }
 
         /* フッター */
         footer {
             text-align: center;
-            padding: 40px 20px;
-            background: #eceff1;
-            color: #546e7a;
-            border-radius: 30px 30px 0 0;
+            padding: 24px 16px;
+            font-size: 0.8rem;
+            color: #90a4ae;
         }
-        footer a { color: var(--primary-color); font-weight: bold; }
+        .contact-btn {
+            display: block;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 30px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
 
-        @media (max-width: 600px) {
-            .stats-container { grid-template-columns: 1fr; }
-            header h1 { font-size: 1.5rem; }
-            section { padding: 20px; }
-        }
+        a[href] { color: var(--primary); font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <svg class="icon" style="fill:white; width:50px; height:50px; margin-bottom:10px;" viewBox="0 0 24 24">
-            <path d="M20,6H4V4H20V6M20,18H4V20H20V18M20,10H4V12H20V10M20,14H4V16H20V14Z" />
-        </svg>
-        <h1>ふなばし　「おもちゃの病院」</h1>
-        <p>治して、そして、また遊ぼう(*^-^*)!</p>
+        <h1>ふなばし おもちゃの病院</h1>
+        <p>治して、また遊ぼう。想いをつなぐ修理活動</p>
     </header>
 
-    <nav class="main-nav">
+    <div class="quick-nav">
         <a href="https://funabashtoyhospital.web.fc2.com/syoukai.html">スタッフ</a>
-        <a href="https://funabashtoyhospital.web.fc2.com/shindan.html">診断、修理</a>
+        <a href="https://funabashtoyhospital.web.fc2.com/shindan.html">診断修理</a>
         <a href="https://funabashtoyhospital.web.fc2.com/yotei.html">予定日</a>
         <a href="https://funabashtoyhospital.web.fc2.com/toiawase.html">問い合せ</a>
         <a href="https://funabashtoyhospital.web.fc2.com/link.html">リンク</a>
-    </nav>
+        <a href="https://www.bing.com/videos/search?q=%e8%88%b9%e6%a9%8b%e3%81%8a%e3%82%82%e3%81%a1%e3%82%83%e7%97%85%e9%99%a2You+tube&docid=603504172827021857&mid=45D5816FF8EE0C67F22445D5816FF8EE0C67F224&view=detail&FORM=VIRE">YouTube</a>
+    </div>
 
     <section>
-        <h2>
-            <svg class="icon" viewBox="0 0 24 24"><path d="M11,9H13V7H11M11,17H13V11H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
-            御案内及び更新情報
-        </h2>
-        <p class="update-date">最終更新：2026-1-11</p>
-        
-        <div class="notice-card">
-            <p><strong>トピックス：</strong></p>
-            <ul style="margin-left: 20px;">
-                <li>活動の様子は <a href="https://www.bing.com/videos/search?q=%e8%88%b9%e6%a9%8b%e3%81%8a%e3%82%82%e3%81%a1%e3%82%83%e7%97%85%e9%99%a2You+tube&docid=603504172827021857&mid=45D5816FF8EE0C67F22445D5816FF8EE0C67F224&view=detail&FORM=VIRE">船橋おもちゃ病院youtube</a> で公開中</li>
-                <li>2025.6. 受付できないおもちゃのリストを更新しました</li>
-                <li>2026/1/31 ふなばし市民活動フェアーに参加（船橋FACS）</li>
-            </ul>
+        <h2>お知らせ</h2>
+        <span class="update-info">更新：2026.1.11</span>
+        <ul class="notice-list">
+            <li><span>📢</span> 1/31 市民活動フェアー参加（船橋FACS）</li>
+            <li><span>✅</span> 診断・修理不可リストを追記（2025.6）</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>1月の開催予定</h2>
+        <div class="schedule-card">
+            <div class="date-box">1/17(土)</div>
+            <div class="place-info">西部公民館 / 坪井公民館 <small>(9:30-12:00)</small></div>
         </div>
-    </section>
-
-    <section>
-        <h2>
-            <svg class="icon" viewBox="0 0 24 24"><path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.11,3 19,3H18V1M17,12H12V17H17V12Z"/></svg>
-            1月の開催予定
-        </h2>
-        <div class="schedule-grid">
-            <div class="schedule-item">
-                <span class="date-badge">1月17日(土) 9:30-12:00</span>
-                <span class="place-name">船橋市西部公民館</span>
-            </div>
-            <div class="schedule-item">
-                <span class="date-badge">1月17日(土) 9:30-12:00</span>
-                <span class="place-name">坪井公民館</span>
-            </div>
-            <div class="schedule-item">
-                <span class="date-badge">1月18日(日) 9:30-12:00</span>
-                <span class="place-name">小室公民館</span>
-            </div>
-            <div class="schedule-item">
-                <span class="date-badge">1月24日(土) 13:30-15:30</span>
-                <span class="place-name">ウェルシア藤原店</span>
-            </div>
-            <div class="schedule-item">
-                <span class="date-badge" style="background:var(--accent-color)">2月1日(日) 10:00-15:00</span>
-                <span class="place-name">八千代緑が丘イオンモール</span>
-                <p style="width:100%; font-size:0.85rem; margin-top:5px; color:#666;">※4階エスカレータ脇に場所が変更になります</p>
-            </div>
-            <div class="schedule-item">
-                <span class="date-badge">2月14日(土) 9:30-12:00</span>
-                <span class="place-name">金杉台児童ホーム / 三咲公民館</span>
-            </div>
+        <div class="schedule-card">
+            <div class="date-box">1/18(日)</div>
+            <div class="place-info">小室公民館 <small>(9:30-12:00)</small></div>
         </div>
-        <p style="margin-top:20px; font-size:0.95rem; border-top:1px solid #eee; padding-top:15px;">
-            直接のご来場が難しい場合は、<a href="https://funabashtoyhospital.web.fc2.com/toiawase.html">メール</a> での個別相談も承ります。
-        </p>
-    </section>
-
-    <section>
-        <h2>
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/></svg>
-            私たちの活動
-        </h2>
-        <p>
-            壊れてしまった大切なおもちゃを、ベテランドクターが原則無料（部品代実費100〜200円程度のみ頂く場合あり）で修理します。
-            「物を大切にする心」を次世代に伝えるボランティア活動です。
-        </p>
-        <p style="margin-top:10px; font-size:0.9rem; color:#d32f2f;">
-            ※メーカー保証期間内の製品は、まずメーカーへお問い合わせください。
-        </p>
-    </section>
-
-    <section>
-        <h2>
-            <svg class="icon" viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.2 19.33,13 16,13M8,13C4.67,13 1,14.2 1,16.5V19H15V16.5C15,14.2 11.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg>
-            組織・実績
-        </h2>
-        <p>2006年開院。21名のドクターが船橋市内の各公共施設で定期的に活動しています。</p>
-        
-        <div class="stats-container">
-            <div class="stat-box">
-                <span class="stat-num">97.8%</span>
-                <span class="stat-label">完治率(2023年)</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-num">1,890件</span>
-                <span class="stat-label">年間依頼実績</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-num">85回</span>
-                <span class="stat-label">年間開催回数</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-num">21名</span>
-                <span class="stat-label">在籍ドクター</span>
-            </div>
+        <div class="schedule-card">
+            <div class="date-box">1/24(土)</div>
+            <div class="place-info">ウェルシア藤原店 <small>(13:30-15:30)</small></div>
         </div>
-        <p style="font-size:0.9rem;">
-            詳細は <a href="https://funabashtoyhospital.web.fc2.com/link.html">リンク</a> より提携組織の情報をご確認いただけます。
-        </p>
+        <div class="schedule-card" style="border-left: 4px solid var(--accent); padding-left: 8px;">
+            <div class="date-box" style="background:#fff3e0; color:var(--accent);">2/1(日)</div>
+            <div class="place-info">八千代緑が丘イオンモール <br><small>※4Fエスカレータ脇へ場所変更</small></div>
+        </div>
+        <div class="schedule-card">
+            <div class="date-box">2/14(土)</div>
+            <div class="place-info">金杉台児童ホーム / 三咲公民館</div>
+        </div>
+        <p style="font-size:0.8rem; margin-top:10px; color:#666;">来られない方は <a href="https://funabashtoyhospital.web.fc2.com/toiawase.html">メール</a> で個別相談承ります。</p>
     </section>
 
-    <section style="border-top: 5px solid var(--secondary-color);">
-        <h2 style="color:var(--secondary-color); border-bottom-color:#fce4ec;">これまでの活動報告</h2>
-        <div class="archive-nav">
-            <a href="https://funabashtoyhospital.web.fc2.com/houkoku.html">H25/6 ～ H29/11</a>
-            <a href="https://funabashtoyhospital.web.fc2.com/29-12houkoku.html">H29/12 ～ H31/4</a>
-            <a href="https://funabashtoyhospital.web.fc2.com/R2-houkoku.html">R元/5 ～ R4/12</a>
-            <a href="https://funabashtoyhospital.web.fc2.com/R5-houkoku.html">R5/1 ～ 現在</a>
+    <section>
+        <h2>活動について</h2>
+        <p style="font-size:0.9rem;">2006年開院。ベテランドクター21名が「物を大切にする心」を伝えます。</p>
+        <div class="stats-grid" style="margin-top:12px;">
+            <div class="stat-item"><span class="stat-val">97.8%</span><span class="stat-lbl">完治率</span></div>
+            <div class="stat-item"><span class="stat-val">1,890件</span><span class="stat-lbl">年間実績</span></div>
+        </div>
+        <p style="font-size:0.75rem; color:#d32f2f; margin-top:10px;">※原則無料（部品代実費のみ）。メーカー保証期間内はメーカーへ。</p>
+    </section>
+
+    <section>
+        <h2>活動報告</h2>
+        <div class="archive-flex">
+            <a href="https://funabashtoyhospital.web.fc2.com/houkoku.html">H25.6~H29.11</a>
+            <a href="https://funabashtoyhospital.web.fc2.com/29-12houkoku.html">H29.12~H31.4</a>
+            <a href="https://funabashtoyhospital.web.fc2.com/R2-houkoku.html">R1.5~R4.12</a>
+            <a href="https://funabashtoyhospital.web.fc2.com/R5-houkoku.html">R5.1~現在</a>
         </div>
     </section>
 
     <footer>
+        <a href="https://funabashtoyhospital.web.fc2.com/toiawase.html" class="contact-btn">メール・電話で問い合わせ</a>
         <p>ふなばし「おもちゃの病院」</p>
-        <p>お問い合わせ：<a href="https://funabashtoyhospital.web.fc2.com/toiawase.html">メール・電話はこちら</a></p>
-        <div style="margin-top:20px;">
-            <a href="http://www.rays-counter.com/">アクセスカウンター</a>
-        </div>
+        <p style="margin-top:8px;"><a href="http://www.rays-counter.com/">アクセスカウンター</a></p>
     </footer>
 </div>
 
