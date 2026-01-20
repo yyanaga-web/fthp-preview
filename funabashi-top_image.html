@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ふなばし「おもちゃの病院」</title>
+
+  <style>
+    :root {
+      --bg: #fafafa;
+      --card: #ffffff;
+      --primary: #006666;
+      --secondary: #f06292;
+      --text: #222;
+      --muted: #555;
+      --border: #ddd;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                   "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 16px;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:focus {
+      outline: 3px solid #ffbf47;
+      outline-offset: 2px;
+    }
+
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 10px 16px;
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      margin: 0;
+    }
+
+    header p {
+      margin: 2px 0 0;
+      font-size: 0.9rem;
+      opacity: 0.95;
+    }
+
+    .hero {
+      width: 100%;
+      max-height: 240px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .hero img {
+      width: 100%;
+      height: 100%;
+      max-height: 240px;
+      object-fit: cover;
+      display: block;
+    }
+
+    main {
+      padding: 12px 16px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    section {
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin: 0 0 12px;
+      padding-left: 10px;
+      border-left: 6px solid var(--secondary);
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .nav-grid a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      background: var(--card);
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .notice-list p,
+    .schedule-list p {
+      margin: 0 0 10px;
+    }
+
+    .feature {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feature img {
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .footer-links {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .footer-links a {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eee;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      background: #eee;
+      padding: 16px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>ふなばし「おもちゃの病院」</h1>
+  <p>捨てるの??? なおそうよ！！</p>
+</header>
+
+<div class="hero">
+  <img src="images/hero_banner.png" alt="おもちゃを修理する人と子どもたちのイメージ">
+</div>
+
+<main>
+
+  <section>
+    <div class="nav-grid">
+      <a href="https://funabashtoyhospital.web.fc2.com/syoukai.html">スタッフ</a>
+      <a href="https://funabashtoyhospital.web.fc2.com/shindan.html">診断・修理</a>
+      <a href="https://funabashtoyhospital.web.fc2.com/yotei.html">予定日</a>
+      <a href="https://funabashtoyhospital.web.fc2.com/toiawase.html">問い合せ</a>
+    </div>
+  </section>
+
+  <section>
+    <h2>お知らせ・更新情報</h2>
+    <div class="card notice-list">
+      <p><strong>更新日：</strong>2026-1-17</p>
+      <p>2026年2月以降は <a href="https://funabasi-toyhospital.jimdofree.com/">（後編）ふなばしおもちゃの病院</a> をご覧ください。</p>
+      <p>当病院の活動は <a href="https://www.bing.com/videos/search?q=%e8%88%b9%e6%a9%8b%e3%81%8a%e3%82%82%e3%81%a1%e3%82%83%e7%97%85%e9%99%a2You+tube&docid=603504172827021857&mid=45D5816FF8EE0C67F22445D5816FF8EE0C67F224&view=detail&FORM=VIRE">YouTube</a> でも公開されています。</p>
+      <p>2025.6 診断・修理に受付できないおもちゃを追記</p>
+      <p>2026/1/31 ふなばし市民活動フェアーに参加します（船橋FACS）</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>2月の開催予定</h2>
+    <div class="card schedule-list">
+      <p>1/24（土）13:30～15:30　ウェルシア船橋藤原店</p>
+      <p>2/1（日）10:00～15:00　八千代緑が丘イオンモール</p>
+      <p>2/14（土）9:30～12:00　金杉台児童ホーム</p>
+      <p>2/14（土）9:30～12:00　三咲公民館</p>
+      <p>2/21（土）9:30～12:00　船橋市西部公民館</p>
+      <p>2/22（日）10:00～12:00　小室公民館</p>
+      <p>2/28（土）9:30～12:00　坪井公民館</p>
+      <p>2/28（土）13:30～15:30　ウェルシア船橋藤原店</p>
+    </div>
+  </section>
+
+  <section class="feature">
+    <h2>どんな活動？</h2>
+    <img src="images/feature_illust.png" alt="おもちゃ修理を表すイラスト">
+    <div class="card">
+      <p>ふなばし「おもちゃの病院」は、壊れたおもちゃを修理・復元するボランティアグループです。</p>
+      <p>原則無料で、部品代（100～200円程度）のみ実費をお願いする場合があります。</p>
+      <p>物を大切にする心を、子どもたちに伝える活動を続けています。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>組織の紹介</h2>
+    <div class="card">
+      <p>2006年開院。2023年は開催実績85回、依頼実績1890件、完治率97.8%。</p>
+      <p>所定講習を修了したおもちゃドクター21名（女医3名）が活動しています。</p>
+      <p>全国組織「日本おもちゃ病院協会」などとも連携しています。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>関連ページ</h2>
+    <div class="footer-links">
+      <a href="https://funabashtoyhospital.web.fc2.com/houkoku.html">活動報告①</a>
+      <a href="https://funabashtoyhospital.web.fc2.com/29-12houkoku.html">活動報告②</a>
+      <a href="https://funabashtoyhospital.web.fc2.com/R2-houkoku.html">活動報告③</a>
+      <a href="https://funabashtoyhospital.web.fc2.com/R5-houkoku.html">活動報告④</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>
+    修理のご相談は
+    <a href="mailto:funabasi.omocha.hospital@gmail.com">メール</a> または
+    <a href="https://funabashtoyhospital.web.fc2.com/toiawase.html">問い合わせページ</a> からどうぞ。
+  </p>
+</footer>
+
+</body>
+</html>
