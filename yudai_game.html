@@ -71,10 +71,15 @@ header p{font-size:0.7rem;color:#888;margin-top:2px;}
 .cal-day.today.done{background:#f1c40f;color:#0a0a1a;border:1px solid #f1c40f;}
 
 /* ===== REVIEW BANNER ===== */
-.review-banner{background:#1a0a00;border:2px solid #e67e22;border-radius:12px;padding:12px 14px;margin-bottom:12px;display:none;cursor:pointer;}
-.review-banner:active{background:#2a1000;}
-.review-banner-title{font-size:0.9rem;font-weight:900;color:#e67e22;margin-bottom:3px;}
-.review-banner-sub{font-size:0.75rem;color:#c07040;}
+.review-banner{background:linear-gradient(135deg,#2a0a00,#1a0500);border:2px solid #e67e22;border-radius:14px;padding:14px 16px;margin-bottom:12px;display:none;cursor:pointer;position:relative;overflow:hidden;animation:pulseBorder 2s ease infinite;}
+@keyframes pulseBorder{0%,100%{border-color:#e67e22;box-shadow:0 0 0 0 rgba(230,126,34,0.4);}50%{border-color:#f39c12;box-shadow:0 0 0 6px rgba(230,126,34,0);}}
+.review-banner:active{background:#3a1000;}
+.review-banner-title{font-size:1rem;font-weight:900;color:#f39c12;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.review-banner-bonus{display:inline-block;background:#f1c40f;color:#0a0a1a;font-size:0.65rem;font-weight:900;padding:2px 8px;border-radius:20px;animation:popBounce 0.6s ease infinite alternate;}
+@keyframes popBounce{from{transform:scale(1);}to{transform:scale(1.1);}}
+.review-banner-sub{font-size:0.78rem;color:#e67e22;margin-bottom:6px;}
+.review-banner-tip{font-size:0.7rem;color:#c07040;line-height:1.4;}
+.review-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1.4rem;color:#e67e22;}
 
 /* ===== MODE BUTTONS ===== */
 .mode-btn{display:block;background:#0d1b4b;border:1px solid #333;border-radius:12px;padding:16px;margin-bottom:10px;text-align:center;cursor:pointer;}
@@ -230,8 +235,10 @@ header p{font-size:0.7rem;color:#888;margin-top:2px;}
   </div>
 
   <div class="review-banner" id="review-banner" onclick="startReview()">
-    <div class="review-banner-title">🔁 復習問題あり！</div>
-    <div class="review-banner-sub" id="review-banner-sub">昨日間違えた問題を優先出題します</div>
+    <div class="review-banner-title">🔁 復習問題あり！<span class="review-banner-bonus">+15 EXP ボーナス</span></div>
+    <div class="review-banner-sub" id="review-banner-sub">昨日まちがえた問題が出るよ！</div>
+    <div class="review-banner-tip">⚡ 復習問題は通常より<strong style="color:#f1c40f">1.5倍のEXP</strong>がもらえる！<br>🏆 先にやるとモンスターが早く育つぞ！</div>
+    <div class="review-arrow">▶</div>
   </div>
 
   <div class="mode-btn" onclick="selectMode('kanji')">
@@ -251,6 +258,10 @@ header p{font-size:0.7rem;color:#888;margin-top:2px;}
     <h2>ミックスクイズ</h2>
     <p>漢字とことわざ・慣用句を混ぜて出題</p>
     <span class="badge">全問 MIX</span>
+  </div>
+
+  <div class="rules-btn" onclick="show('s-rules')">
+    ❓ あそびかた・ルール説明
   </div>
 </div>
 
@@ -346,6 +357,59 @@ header p{font-size:0.7rem;color:#888;margin-top:2px;}
 </div>
 
 <!-- CONFIRM -->
+<!-- RULES -->
+<div class="screen" id="s-rules">
+  <div class="rules-title">📖 あそびかた・ルール</div>
+
+  <div class="rules-section">
+    <div class="rules-section-title">🎮 基本のルール</div>
+    <div class="rules-item">① モードと問題数をえらぶ</div>
+    <div class="rules-item">② 問題が出たら<strong>4つの選択肢</strong>から正解をタップ！</div>
+    <div class="rules-item">③ わからないときは <strong>「❓ わからない」</strong> ボタンを押すと正解がわかるよ</div>
+    <div class="rules-item">④ まちがえたら<strong>声に出して読む</strong>まで次に進めないよ。しっかり覚えよう！</div>
+  </div>
+
+  <div class="rules-section">
+    <div class="rules-section-title">⚡ EXPとレベルアップ</div>
+    <table class="rules-exp-table">
+      <tr><td>正解</td><td>+10 EXP</td></tr>
+      <tr><td>復習問題の正解</td><td>+15 EXP（ボーナス！）</td></tr>
+      <tr><td>毎日続けるボーナス</td><td>連続日数×2 EXP</td></tr>
+    </table>
+    <div class="rules-item" style="margin-top:8px;">EXPがたまると<strong>モンスターがレベルアップ</strong>するよ！<br>Lv.20で<strong>しんか</strong>、Lv.50で<strong>さいしゅうしんか</strong>！</div>
+  </div>
+
+  <div class="rules-section">
+    <div class="rules-section-title">🔁 復習問題って何？</div>
+    <div class="rules-item">まちがえた問題は<strong>翌日・翌々日</strong>に自動で復習問題になるよ。</div>
+    <div class="rules-item">ホーム画面にオレンジのバナーが出たら<strong>復習問題あり</strong>のサイン！</div>
+    <div class="rules-item">復習問題は<strong>+15 EXP</strong>もらえるからお得！先にやろう！</div>
+  </div>
+
+  <div class="rules-section">
+    <div class="rules-section-title">🐾 モンスターをあつめよう！</div>
+    <div class="rules-item">最初は<strong>ホノオン（炎）</strong>からスタート！</div>
+    <div class="rules-mon-unlock">
+      正解50問 → アクアン（水）が仲間に！<br>
+      正解120問 → クサラン（草）が仲間に！<br>
+      正解200問 → カミナリン（電）が仲間に！<br>
+      正解300問 → コオリン（氷）が仲間に！<br>
+      正解420問 → カゲロン（闇）が仲間に！<br>
+      正解560問 → ヒカリン（光）が仲間に！<br>
+      正解700問 → イワラン（岩）が仲間に！
+    </div>
+  </div>
+
+  <div class="rules-section">
+    <div class="rules-section-title">🔥 れんぞく記録</div>
+    <div class="rules-item">毎日クイズをやると<strong>連続日数</strong>が増えるよ！</div>
+    <div class="rules-item">7日→🎖️、14日→🏅、30日→🏆 の特別メッセージが出るぞ！</div>
+    <div class="rules-item">連続日数が増えると<strong>ボーナスEXP</strong>ももらえる！</div>
+  </div>
+
+  <button class="home-btn" onclick="show('s-home')" style="margin-top:4px;">🏠 ホームに戻る</button>
+</div>
+
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
     <h3>⚠️ 中断しますか？</h3>
@@ -387,280 +451,30 @@ var C = {
 
 // 12x12 pixel art definitions
 var ARTS = {
-  fire1:[
-    '','','',C.fy,C.fy,'','','','','','','',
-    '','',C.fy,C.fo,C.fo,C.fy,'','','','','','',
-    '',C.fy,C.fo,C.fr,C.fr,C.fo,C.fy,'','','','','',
-    C.fy,C.fo,C.fr,C.fr,C.fr,C.fr,C.fo,C.fy,'','','','',
-    C.fo,C.fr,C.fr,C.fw,C.fr,C.fr,C.fr,C.fo,'','','','',
-    C.fo,C.fr,C.fr,C.fr,C.fr,C.fw,C.fr,C.fo,'','','','',
-    '',C.fo,C.fr,C.fr,C.fr,C.fr,C.fo,'','','','','',
-    '',C.fk,C.fo,C.fo,C.fo,C.fo,C.fk,'','','','','',
-    '','',C.fk,C.fk,C.fk,C.fk,'','','','','','',
-    '','','','','','','','','','','',''
-  ],
-  fire2:[
-    '','',C.fy,C.fy,'',C.fy,C.fy,'','','','','',
-    '',C.fy,C.fo,C.fo,C.fy,C.fo,C.fo,C.fy,'','','','',
-    C.fy,C.fo,C.fr,C.fr,C.fo,C.fr,C.fr,C.fo,C.fy,'','','',
-    C.fo,C.fr,C.fr,C.fw,C.fr,C.fw,C.fr,C.fr,C.fo,'','','',
-    C.fo,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fo,'','','',
-    C.fo,C.fr,C.fw,C.fr,C.fr,C.fr,C.fw,C.fr,C.fo,'','','',
-    '',C.fo,C.fr,C.fr,C.fr,C.fr,C.fr,C.fo,'','','','',
-    '',C.fk,C.fo,C.fr,C.fo,C.fr,C.fo,C.fk,'','','','',
-    '','',C.fk,C.fo,C.fo,C.fo,C.fk,'','','','','',
-    '','','',C.fk,C.fk,C.fk,'','','','','',''
-  ],
-  fire3:[
-    C.fy,'',C.fy,'',C.fy,'',C.fy,'',C.fy,'',C.fy,'',
-    C.fy,C.fo,C.fy,C.fo,C.fy,C.fo,C.fy,C.fo,C.fy,C.fo,C.fy,C.fo,
-    C.fo,C.fr,C.fr,C.fr,C.fo,C.fr,C.fr,C.fr,C.fo,C.fr,C.fr,C.fo,
-    C.fo,C.fr,C.fw,C.fr,C.fr,C.fw,C.fr,C.fr,C.fw,C.fr,C.fr,C.fo,
-    C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,
-    C.fr,C.fw,C.fr,C.fr,C.fw,C.fr,C.fr,C.fw,C.fr,C.fr,C.fw,C.fr,
-    C.fo,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fr,C.fo,
-    '',C.fo,C.fr,C.fr,C.fo,C.fr,C.fr,C.fo,C.fr,C.fr,C.fo,'',
-    '','',C.fk,C.fo,C.fo,C.fo,C.fo,C.fo,C.fo,C.fk,'','',
-    '','','',C.fk,C.fk,C.fk,C.fk,C.fk,C.fk,'','',''
-  ],
-  water1:[
-    '','',C.wl,C.wl,'','','','','','','','',
-    '',C.wl,C.wb,C.wb,C.wl,'','','','','','','',
-    C.wl,C.wb,C.ww,C.wb,C.wb,C.wl,'','','','','','',
-    C.wb,C.wb,C.wb,C.wc,C.wb,C.wb,C.wb,'','','','','',
-    C.wb,C.ww,C.wb,C.wb,C.wb,C.ww,C.wb,'','','','','',
-    C.wb,C.wb,C.wb,C.wb,C.wb,C.wb,C.wb,'','','','','',
-    '',C.wl,C.wb,C.wb,C.wb,C.wb,C.wl,'','','','','',
-    '',C.wk,C.wl,C.wl,C.wl,C.wl,C.wk,'','','','','',
-    '','',C.wk,C.wk,C.wk,C.wk,'','','','','','',
-    '','','','','','','','','','','',''
-  ],
-  water2:[
-    '',C.wl,C.wl,'',C.wc,'',C.wl,C.wl,'','','','',
-    C.wl,C.wb,C.wb,C.wl,C.wc,C.wl,C.wb,C.wb,C.wl,'','','',
-    C.wb,C.ww,C.wb,C.wb,C.wc,C.wb,C.wb,C.ww,C.wb,'','','',
-    C.wb,C.wb,C.wc,C.wb,C.wb,C.wb,C.wc,C.wb,C.wb,'','','',
-    C.wb,C.wb,C.wb,C.wb,C.ww,C.wb,C.wb,C.wb,C.wb,'','','',
-    C.wb,C.ww,C.wb,C.wb,C.wb,C.wb,C.wb,C.ww,C.wb,'','','',
-    '',C.wl,C.wb,C.wc,C.wb,C.wc,C.wb,C.wl,'','','','',
-    '','',C.wk,C.wl,C.wl,C.wl,C.wk,'','','','','',
-    '','','',C.wk,C.wk,C.wk,'','','','','',''
-  ],
-  water3:[
-    C.wc,C.wl,'',C.wl,C.wc,C.wl,'',C.wl,C.wc,C.wl,'',C.wl,
-    C.wl,C.wb,C.wl,C.wb,C.wl,C.wb,C.wl,C.wb,C.wl,C.wb,C.wl,C.wb,
-    C.wb,C.ww,C.wb,C.wc,C.wb,C.ww,C.wb,C.wc,C.wb,C.ww,C.wb,C.wb,
-    C.wb,C.wb,C.wb,C.wb,C.ww,C.wb,C.wb,C.ww,C.wb,C.wb,C.wb,C.wb,
-    C.wb,C.wc,C.wb,C.wb,C.wb,C.wb,C.wb,C.wb,C.wb,C.wb,C.wc,C.wb,
-    C.wb,C.wb,C.ww,C.wb,C.wc,C.wb,C.wc,C.wb,C.ww,C.wb,C.wb,C.wb,
-    '',C.wl,C.wb,C.wb,C.wb,C.wb,C.wb,C.wb,C.wb,C.wb,C.wl,'',
-    '','',C.wk,C.wl,C.wc,C.wl,C.wl,C.wc,C.wl,C.wk,'','',
-    '','','','',C.wk,C.wk,C.wk,C.wk,'','','',''
-  ],
-  grass1:[
-    '','',C.gl,C.gl,'','','','','','','','',
-    '',C.gl,C.gg,C.gg,C.gl,'','','','','','','',
-    C.gl,C.gg,C.gy,C.gg,C.gg,C.gl,'','','','','','',
-    C.gg,C.gg,C.gg,C.gl,C.gg,C.gg,C.gg,'','','','','',
-    C.gg,C.gl,C.gg,C.gg,C.gg,C.gl,C.gg,'','','','','',
-    C.gg,C.gg,C.gg,C.gy,C.gg,C.gg,C.gg,'','','','','',
-    '',C.gl,C.gg,C.gg,C.gg,C.gg,C.gl,'','','','','',
-    '',C.gk,C.gb,C.gb,C.gb,C.gb,C.gk,'','','','','',
-    '','',C.gk,C.gk,C.gk,C.gk,'','','','','','',
-    '','','','','','','','','','','',''
-  ],
-  grass2:[
-    '',C.gl,C.gy,C.gl,'',C.gl,C.gy,C.gl,'','','','',
-    C.gl,C.gg,C.gg,C.gg,C.gl,C.gg,C.gg,C.gg,C.gl,'','','',
-    C.gg,C.gl,C.gy,C.gg,C.gg,C.gy,C.gl,C.gg,C.gg,'','','',
-    C.gg,C.gg,C.gg,C.gl,C.gg,C.gl,C.gg,C.gg,C.gg,'','','',
-    C.gg,C.gy,C.gg,C.gg,C.gl,C.gg,C.gg,C.gy,C.gg,'','','',
-    C.gg,C.gg,C.gl,C.gg,C.gg,C.gg,C.gl,C.gg,C.gg,'','','',
-    '',C.gl,C.gg,C.gy,C.gg,C.gy,C.gg,C.gl,'','','','',
-    '','',C.gk,C.gb,C.gb,C.gb,C.gk,'','','','','',
-    '','','',C.gk,C.gk,C.gk,'','','','','',''
-  ],
-  grass3:[
-    C.gy,C.gl,C.gy,'',C.gl,C.gy,C.gl,'',C.gy,C.gl,C.gy,'',
-    C.gl,C.gg,C.gl,C.gy,C.gg,C.gl,C.gg,C.gy,C.gl,C.gg,C.gl,C.gy,
-    C.gg,C.gy,C.gg,C.gg,C.gl,C.gg,C.gg,C.gl,C.gg,C.gg,C.gy,C.gg,
-    C.gg,C.gg,C.gl,C.gg,C.gg,C.gy,C.gg,C.gg,C.gl,C.gg,C.gg,C.gg,
-    C.gg,C.gl,C.gg,C.gy,C.gg,C.gg,C.gg,C.gy,C.gg,C.gl,C.gg,C.gg,
-    C.gy,C.gg,C.gg,C.gg,C.gl,C.gg,C.gg,C.gl,C.gg,C.gg,C.gg,C.gy,
-    '',C.gl,C.gg,C.gg,C.gg,C.gy,C.gg,C.gg,C.gg,C.gg,C.gl,'',
-    '','',C.gk,C.gb,C.gg,C.gg,C.gg,C.gb,C.gk,'','','',
-    '','','','',C.gk,C.gk,C.gk,C.gk,'','','',''
-  ],
-  elec1:[
-    '','',C.ey,C.ey,'','','','','','','','',
-    '',C.ey,C.eo,C.eo,C.ey,'','','','','','','',
-    C.ey,C.eo,C.ew,C.ey,C.eo,C.ey,'','','','','','',
-    C.eo,C.ey,C.ey,C.eo,C.ey,C.ey,C.eo,'','','','','',
-    C.eo,C.ew,C.eo,C.ey,C.eo,C.ew,C.eo,'','','','','',
-    C.ey,C.eo,C.ey,C.eo,C.ey,C.eo,C.ey,'','','','','',
-    '',C.ey,C.eo,C.ey,C.eo,C.ey,C.ey,'','','','','',
-    '',C.ek,C.ey,C.ey,C.ey,C.ey,C.ek,'','','','','',
-    '','',C.ek,C.ek,C.ek,C.ek,'','','','','','',
-    '','','','','','','','','','','',''
-  ],
-  elec2:[
-    C.ey,'',C.ew,C.ey,'',C.ey,C.ew,'',C.ey,'','','',
-    C.ey,C.eo,C.ey,C.eo,C.ey,C.eo,C.ey,C.eo,C.ey,'','','',
-    C.eo,C.ey,C.ew,C.ey,C.eo,C.ey,C.ew,C.ey,C.eo,'','','',
-    C.eo,C.ey,C.ey,C.eo,C.ey,C.eo,C.ey,C.ey,C.eo,'','','',
-    C.ey,C.eo,C.ey,C.ey,C.ew,C.ey,C.ey,C.eo,C.ey,'','','',
-    C.ey,C.ey,C.eo,C.ey,C.ey,C.ey,C.eo,C.ey,C.ey,'','','',
-    '',C.ey,C.ey,C.eo,C.ey,C.eo,C.ey,C.ey,'','','','',
-    '','',C.ek,C.ey,C.ey,C.ey,C.ek,'','','','','',
-    '','','',C.ek,C.ek,C.ek,'','','','','',''
-  ],
-  elec3:[
-    C.ew,C.ey,C.ew,C.ey,C.ew,C.ey,C.ew,C.ey,C.ew,C.ey,C.ew,C.ey,
-    C.ey,C.eo,C.ey,C.eo,C.ey,C.eo,C.ey,C.eo,C.ey,C.eo,C.ey,C.eo,
-    C.eo,C.ey,C.ew,C.ey,C.eo,C.ey,C.ew,C.ey,C.eo,C.ey,C.ew,C.eo,
-    C.eo,C.ey,C.ey,C.eo,C.ew,C.eo,C.ey,C.ew,C.eo,C.ey,C.ey,C.eo,
-    C.ey,C.eo,C.ey,C.ey,C.eo,C.ey,C.ey,C.eo,C.ey,C.ey,C.eo,C.ey,
-    C.ey,C.ey,C.eo,C.ey,C.ey,C.ew,C.ey,C.ey,C.ew,C.eo,C.ey,C.ey,
-    '',C.ey,C.ey,C.eo,C.ey,C.ey,C.ey,C.ey,C.eo,C.ey,C.ey,'',
-    '','',C.ek,C.ey,C.eo,C.ey,C.ey,C.eo,C.ey,C.ek,'','',
-    '','','','',C.ek,C.ek,C.ek,C.ek,'','','',''
-  ],
-  ice1:[
-    '','',C.il,C.ib,'','','','','','','','',
-    '',C.il,C.ib,C.ip,C.il,'','','','','','','',
-    C.il,C.ib,C.iw,C.ib,C.ip,C.il,'','','','','','',
-    C.ib,C.ib,C.ip,C.iw,C.ib,C.ib,C.ib,'','','','','',
-    C.ib,C.iw,C.ib,C.ib,C.ip,C.iw,C.ib,'','','','','',
-    C.ib,C.ib,C.ip,C.ib,C.ib,C.ib,C.ib,'','','','','',
-    '',C.il,C.ib,C.ib,C.ip,C.ib,C.il,'','','','','',
-    '',C.ik,C.il,C.il,C.il,C.il,C.ik,'','','','','',
-    '','',C.ik,C.ik,C.ik,C.ik,'','','','','','',
-    '','','','','','','','','','','',''
-  ],
-  ice2:[
-    C.ip,C.il,'',C.iw,C.ip,C.iw,'',C.il,C.ip,'','','',
-    C.il,C.ib,C.il,C.ip,C.ib,C.ip,C.il,C.ip,C.il,'','','',
-    C.ib,C.iw,C.ib,C.ib,C.ip,C.ib,C.ib,C.iw,C.ib,'','','',
-    C.ib,C.ip,C.ib,C.iw,C.ib,C.iw,C.ib,C.ip,C.ib,'','','',
-    C.ib,C.ib,C.iw,C.ib,C.ib,C.ib,C.iw,C.ib,C.ib,'','','',
-    C.ip,C.ib,C.ib,C.ip,C.iw,C.ip,C.ib,C.ib,C.ip,'','','',
-    '',C.il,C.ip,C.ib,C.ip,C.ib,C.ip,C.il,'','','','',
-    '','',C.ik,C.il,C.il,C.il,C.ik,'','','','','',
-    '','','',C.ik,C.ik,C.ik,'','','','','',''
-  ],
-  ice3:[
-    C.ip,C.il,C.iw,C.il,C.ip,C.iw,C.ip,C.il,C.iw,C.il,C.ip,C.il,
-    C.il,C.ib,C.ip,C.ib,C.iw,C.ib,C.ip,C.ib,C.iw,C.ib,C.il,C.ib,
-    C.ib,C.iw,C.ib,C.ip,C.ib,C.iw,C.ib,C.ip,C.ib,C.iw,C.ib,C.ib,
-    C.ib,C.ip,C.ib,C.ib,C.iw,C.ib,C.ib,C.iw,C.ib,C.ib,C.ip,C.ib,
-    C.ib,C.ib,C.iw,C.ib,C.ip,C.ib,C.ib,C.ip,C.ib,C.iw,C.ib,C.ib,
-    C.ip,C.ib,C.ib,C.iw,C.ib,C.ip,C.ip,C.ib,C.iw,C.ib,C.ib,C.ip,
-    '',C.il,C.ib,C.ib,C.ip,C.ib,C.ib,C.ip,C.ib,C.ib,C.il,'',
-    '','',C.ik,C.il,C.ip,C.il,C.il,C.ip,C.il,C.ik,'','',
-    '','','','',C.ik,C.ik,C.ik,C.ik,'','','',''
-  ],
-  dark1:[
-    '','',C.dp,C.dv,'','','','','','','','',
-    '',C.dp,C.dv,C.dv,C.dp,'','','','','','','',
-    C.dp,C.dv,C.dw,C.dv,C.dv,C.dp,'','','','','','',
-    C.dv,C.dv,C.dp,C.dy,C.dv,C.dp,C.dv,'','','','','',
-    C.dv,C.dy,C.dv,C.dv,C.dv,C.dy,C.dv,'','','','','',
-    C.dv,C.dv,C.dv,C.dp,C.dv,C.dv,C.dv,'','','','','',
-    '',C.dp,C.dv,C.dv,C.dp,C.dv,C.dp,'','','','','',
-    '',C.dk,C.dp,C.dp,C.dp,C.dp,C.dk,'','','','','',
-    '','',C.dk,C.dk,C.dk,C.dk,'','','','','','',
-    '','','','','','','','','','','',''
-  ],
-  dark2:[
-    C.dy,C.dp,'',C.dw,C.dy,C.dw,'',C.dp,C.dy,'','','',
-    C.dp,C.dv,C.dp,C.dv,C.dy,C.dv,C.dp,C.dv,C.dp,'','','',
-    C.dv,C.dw,C.dv,C.dp,C.dv,C.dp,C.dv,C.dw,C.dv,'','','',
-    C.dv,C.dp,C.dv,C.dy,C.dv,C.dy,C.dv,C.dp,C.dv,'','','',
-    C.dv,C.dv,C.dy,C.dv,C.dw,C.dv,C.dy,C.dv,C.dv,'','','',
-    C.dp,C.dv,C.dv,C.dp,C.dv,C.dp,C.dv,C.dv,C.dp,'','','',
-    '',C.dp,C.dv,C.dy,C.dv,C.dy,C.dv,C.dp,'','','','',
-    '','',C.dk,C.dp,C.dp,C.dp,C.dk,'','','','','',
-    '','','',C.dk,C.dk,C.dk,'','','','','',''
-  ],
-  dark3:[
-    C.dy,C.dp,C.dw,C.dp,C.dy,C.dw,C.dy,C.dp,C.dw,C.dp,C.dy,C.dp,
-    C.dp,C.dv,C.dp,C.dv,C.dw,C.dv,C.dp,C.dv,C.dw,C.dv,C.dp,C.dv,
-    C.dv,C.dw,C.dv,C.dy,C.dv,C.dw,C.dv,C.dy,C.dv,C.dw,C.dv,C.dv,
-    C.dv,C.dy,C.dv,C.dv,C.dw,C.dv,C.dv,C.dw,C.dv,C.dv,C.dy,C.dv,
-    C.dv,C.dv,C.dw,C.dv,C.dv,C.dy,C.dv,C.dv,C.dy,C.dw,C.dv,C.dv,
-    C.dp,C.dv,C.dv,C.dw,C.dv,C.dv,C.dv,C.dv,C.dw,C.dv,C.dv,C.dp,
-    '',C.dp,C.dv,C.dv,C.dy,C.dv,C.dv,C.dy,C.dv,C.dv,C.dp,'',
-    '','',C.dk,C.dp,C.dv,C.dp,C.dp,C.dv,C.dp,C.dk,'','',
-    '','','','',C.dk,C.dk,C.dk,C.dk,'','','',''
-  ],
-  light1:[
-    '','',C.lw,C.ly,'','','','','','','','',
-    '',C.lw,C.ly,C.lb,C.lw,'','','','','','','',
-    C.lw,C.ly,C.lw,C.ly,C.lb,C.lw,'','','','','','',
-    C.ly,C.lb,C.ly,C.lw,C.ly,C.ly,C.lb,'','','','','',
-    C.lb,C.lw,C.lb,C.ly,C.lb,C.lw,C.lb,'','','','','',
-    C.ly,C.ly,C.lw,C.lb,C.ly,C.ly,C.ly,'','','','','',
-    '',C.lw,C.ly,C.ly,C.lb,C.ly,C.lw,'','','','','',
-    '',C.lk,C.lw,C.lw,C.lw,C.lw,C.lk,'','','','','',
-    '','',C.lk,C.lk,C.lk,C.lk,'','','','','','',
-    '','','','','','','','','','','',''
-  ],
-  light2:[
-    C.lw,C.ly,'',C.lw,C.lo,C.lw,'',C.ly,C.lw,'','','',
-    C.ly,C.lb,C.ly,C.lo,C.lw,C.lo,C.ly,C.lb,C.ly,'','','',
-    C.lb,C.lw,C.lb,C.ly,C.lo,C.ly,C.lb,C.lw,C.lb,'','','',
-    C.lb,C.ly,C.lo,C.lw,C.lb,C.lw,C.lo,C.ly,C.lb,'','','',
-    C.ly,C.lb,C.lw,C.lo,C.ly,C.lo,C.lw,C.lb,C.ly,'','','',
-    C.lw,C.ly,C.lb,C.lw,C.lo,C.lw,C.lb,C.ly,C.lw,'','','',
-    '',C.lw,C.ly,C.lb,C.lw,C.lb,C.ly,C.lw,'','','','',
-    '','',C.lk,C.lw,C.lw,C.lw,C.lk,'','','','','',
-    '','','',C.lk,C.lk,C.lk,'','','','','',''
-  ],
-  light3:[
-    C.lw,C.ly,C.lo,C.ly,C.lw,C.lo,C.lw,C.ly,C.lo,C.ly,C.lw,C.ly,
-    C.ly,C.lb,C.ly,C.lo,C.lw,C.ly,C.lo,C.lw,C.ly,C.lb,C.ly,C.lb,
-    C.lb,C.lw,C.lb,C.ly,C.lo,C.lw,C.lb,C.lo,C.ly,C.lw,C.lb,C.lb,
-    C.lb,C.lo,C.lw,C.lb,C.lw,C.lo,C.lb,C.lw,C.lo,C.lb,C.lo,C.lb,
-    C.ly,C.lb,C.lo,C.lw,C.ly,C.lb,C.lw,C.ly,C.lb,C.lo,C.lb,C.ly,
-    C.lw,C.ly,C.lb,C.lo,C.lw,C.ly,C.lo,C.lw,C.lo,C.lb,C.ly,C.lw,
-    '',C.lw,C.ly,C.lb,C.lo,C.lw,C.lw,C.lo,C.lb,C.ly,C.lw,'',
-    '','',C.lk,C.lw,C.lb,C.lw,C.lw,C.lb,C.lw,C.lk,'','',
-    '','','','',C.lk,C.lk,C.lk,C.lk,'','','',''
-  ],
-  rock1:[
-    '','',C.rg,C.rd,'','','','','','','','',
-    '',C.rg,C.rd,C.rg,C.rg,'','','','','','','',
-    C.rg,C.rd,C.rw,C.rd,C.rg,C.rg,'','','','','','',
-    C.rd,C.rg,C.rd,C.rw,C.rd,C.rg,C.rd,'','','','','',
-    C.rd,C.rw,C.rg,C.rd,C.rg,C.rw,C.rd,'','','','','',
-    C.rg,C.rd,C.rg,C.rw,C.rg,C.rd,C.rg,'','','','','',
-    '',C.rg,C.rd,C.rg,C.rg,C.rd,C.rg,'','','','','',
-    '',C.rk,C.rg,C.rg,C.rg,C.rg,C.rk,'','','','','',
-    '','',C.rk,C.rk,C.rk,C.rk,'','','','','','',
-    '','','','','','','','','','','',''
-  ],
-  rock2:[
-    C.ry,C.rg,'',C.rw,C.ry,C.rw,'',C.rg,C.ry,'','','',
-    C.rg,C.rd,C.rg,C.ry,C.rw,C.ry,C.rg,C.rd,C.rg,'','','',
-    C.rd,C.rw,C.rd,C.rg,C.ry,C.rg,C.rd,C.rw,C.rd,'','','',
-    C.rd,C.rg,C.ry,C.rw,C.rg,C.rw,C.ry,C.rg,C.rd,'','','',
-    C.rg,C.ry,C.rg,C.rg,C.rw,C.rg,C.rg,C.ry,C.rg,'','','',
-    C.rw,C.rg,C.rd,C.ry,C.rg,C.ry,C.rd,C.rg,C.rw,'','','',
-    '',C.rg,C.rd,C.rg,C.ry,C.rg,C.rd,C.rg,'','','','',
-    '','',C.rk,C.rg,C.rg,C.rg,C.rk,'','','','','',
-    '','','',C.rk,C.rk,C.rk,'','','','','',''
-  ],
-  rock3:[
-    C.ry,C.rg,C.rw,C.rg,C.ry,C.rw,C.ry,C.rg,C.rw,C.rg,C.ry,C.rg,
-    C.rg,C.rd,C.rg,C.ry,C.rw,C.rg,C.ry,C.rw,C.rg,C.rd,C.rg,C.rd,
-    C.rd,C.rw,C.rd,C.rg,C.ry,C.rw,C.rd,C.ry,C.rg,C.rw,C.rd,C.rd,
-    C.rd,C.ry,C.rw,C.rd,C.rw,C.ry,C.rd,C.rw,C.ry,C.rd,C.ry,C.rd,
-    C.rg,C.rd,C.ry,C.rw,C.rg,C.rd,C.rw,C.rg,C.rd,C.ry,C.rd,C.rg,
-    C.rw,C.rg,C.rd,C.ry,C.rw,C.rg,C.ry,C.rw,C.ry,C.rd,C.rg,C.rw,
-    '',C.rg,C.rd,C.rg,C.ry,C.rw,C.rw,C.ry,C.rg,C.rd,C.rg,'',
-    '','',C.rk,C.rg,C.rd,C.rg,C.rg,C.rd,C.rg,C.rk,'','',
-    '','','','',C.rk,C.rk,C.rk,C.rk,'','','',''
-  ]
+  fire1: ['','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','','','','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','','','','','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','','','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','','','#e67e22','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#111111','#111111','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e67e22','','','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e67e22','','','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#f1c40f','','','','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e67e22','#f1c40f','','','','','','#f1c40f','#e67e22','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#f1c40f','','','','','','','','#f1c40f','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','#f1c40f','','','','','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','',''],
+  fire2: ['','','#f1c40f','#f1c40f','','','','','','','','','#f1c40f','#f1c40f','','','','#f1c40f','#e67e22','#e67e22','#f1c40f','','','','','','','#f1c40f','#e67e22','#e67e22','#f1c40f','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e67e22','#f1c40f','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e67e22','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e67e22','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#f1c40f','#e74c3c','#e74c3c','#f1c40f','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#e74c3c','#ffffff','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e74c3c','#111111','#111111','#111111','#111111','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e67e22','#8b0000','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#8b0000','#8b0000','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#8b0000','','#8b0000','#e67e22','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#8b0000','','','','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','',''],
+  fire3: ['','#d4a017','','#d4a017','','#d4a017','#d4a017','#d4a017','#d4a017','#d4a017','','#d4a017','','#d4a017','','','#d4a017','#f1c40f','#d4a017','#f1c40f','#d4a017','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#d4a017','#f1c40f','#d4a017','#f1c40f','#d4a017','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e67e22','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#f1c40f','#f1c40f','#e74c3c','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#f1c40f','#e74c3c','#e74c3c','#f1c40f','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#e74c3c','#ffffff','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e74c3c','#111111','#111111','#111111','#111111','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#8b0000','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#8b0000','#8b0000','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#8b0000','#e67e22','#8b0000','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#8b0000','#e67e22','','#e67e22','#8b0000','#e67e22','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#8b0000','#e67e22','','','','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','',''],
+  water1: ['','','','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','','','','','','','','','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','','','','','','','#74b9ff','#2980b9','#a8e6ff','#a8e6ff','#2980b9','#2980b9','#2980b9','#2980b9','#a8e6ff','#a8e6ff','#2980b9','#74b9ff','','','','#74b9ff','#2980b9','#a8e6ff','#ffffff','#ffffff','#a8e6ff','#2980b9','#2980b9','#a8e6ff','#ffffff','#ffffff','#a8e6ff','#2980b9','#74b9ff','','','#2980b9','#ffffff','#ffffff','#111111','#111111','#ffffff','#2980b9','#2980b9','#ffffff','#111111','#111111','#ffffff','#ffffff','#2980b9','#74b9ff','','#2980b9','#ffffff','#111111','#ffffff','#ffffff','#2980b9','#2980b9','#2980b9','#2980b9','#ffffff','#ffffff','#ffffff','#2980b9','#2980b9','#2980b9','','#2980b9','#ffffff','#ffffff','#ffffff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#ffffff','#ffffff','#2980b9','#2980b9','#2980b9','','#2980b9','#2980b9','#a8e6ff','#2980b9','#2980b9','#00cec9','#2980b9','#2980b9','#00cec9','#2980b9','#2980b9','#a8e6ff','#2980b9','#2980b9','#2980b9','','#2980b9','#2980b9','#2980b9','#2980b9','#111111','#2980b9','#2980b9','#2980b9','#2980b9','#111111','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#111111','#111111','#2980b9','#111111','#111111','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','','','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','','','','','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','','','','','','','#74b9ff','#2980b9','#2980b9','#00cec9','#2980b9','#2980b9','#00cec9','#2980b9','#74b9ff','','','','','','','','','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','','','','','','','','','','','#74b9ff','#74b9ff','#00cec9','#00cec9','#74b9ff','#74b9ff','','','','','','','','','','','','#74b9ff','#74b9ff','#74b9ff','#74b9ff','','','','','',''],
+  water2: ['','#74b9ff','#74b9ff','','','#00cec9','#00cec9','#00cec9','#00cec9','','','#74b9ff','#74b9ff','','','','#74b9ff','#2980b9','#2980b9','#74b9ff','#00cec9','#2980b9','#2980b9','#2980b9','#2980b9','#00cec9','#74b9ff','#2980b9','#2980b9','#74b9ff','','','#2980b9','#a8e6ff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#a8e6ff','#2980b9','#74b9ff','','#2980b9','#a8e6ff','#ffffff','#ffffff','#a8e6ff','#2980b9','#2980b9','#2980b9','#2980b9','#a8e6ff','#ffffff','#ffffff','#a8e6ff','#2980b9','#2980b9','','#2980b9','#ffffff','#111111','#111111','#ffffff','#2980b9','#2980b9','#2980b9','#2980b9','#ffffff','#111111','#111111','#ffffff','#2980b9','#2980b9','','#2980b9','#ffffff','#111111','#ffffff','#ffffff','#2980b9','#00cec9','#2980b9','#00cec9','#ffffff','#ffffff','#ffffff','#2980b9','#2980b9','#2980b9','','#2980b9','#ffffff','#ffffff','#ffffff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#ffffff','#ffffff','#2980b9','#2980b9','#2980b9','','#2980b9','#2980b9','#a8e6ff','#2980b9','#2980b9','#111111','#2980b9','#2980b9','#2980b9','#111111','#2980b9','#a8e6ff','#2980b9','#2980b9','#2980b9','','#2980b9','#2980b9','#2980b9','#2980b9','#111111','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#111111','#2980b9','#2980b9','#2980b9','#2980b9','','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#111111','#111111','#2980b9','#111111','#111111','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','','#00cec9','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','#00cec9','','','#00cec9','#74b9ff','#2980b9','#2980b9','#2980b9','#00cec9','#2980b9','#00cec9','#2980b9','#2980b9','#2980b9','#74b9ff','#00cec9','','','','','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','','','','','','','#74b9ff','#00cec9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#00cec9','#74b9ff','','','','','','','','','#74b9ff','#74b9ff','#00cec9','#00cec9','#00cec9','#00cec9','#74b9ff','#74b9ff','','','','','','','','','','','#74b9ff','#74b9ff','#74b9ff','#74b9ff','','','','','',''],
+  water3: ['#00cec9','#74b9ff','#00cec9','#74b9ff','','#2980b9','#2980b9','#2980b9','#2980b9','','#74b9ff','#00cec9','#74b9ff','#00cec9','','','#74b9ff','#2980b9','#74b9ff','#2980b9','#00cec9','#2980b9','#a8e6ff','#a8e6ff','#2980b9','#00cec9','#2980b9','#74b9ff','#2980b9','#74b9ff','','','#2980b9','#00cec9','#2980b9','#2980b9','#2980b9','#a8e6ff','#ffffff','#ffffff','#a8e6ff','#2980b9','#2980b9','#2980b9','#00cec9','#2980b9','#74b9ff','','#2980b9','#2980b9','#a8e6ff','#ffffff','#ffffff','#ffffff','#111111','#111111','#ffffff','#ffffff','#ffffff','#a8e6ff','#2980b9','#2980b9','#2980b9','','#2980b9','#a8e6ff','#ffffff','#111111','#111111','#ffffff','#111111','#ffffff','#111111','#ffffff','#111111','#111111','#ffffff','#a8e6ff','#2980b9','','#2980b9','#ffffff','#111111','#ffffff','#ffffff','#2980b9','#00cec9','#2980b9','#00cec9','#2980b9','#ffffff','#ffffff','#111111','#ffffff','#2980b9','','#2980b9','#ffffff','#ffffff','#ffffff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#ffffff','#ffffff','#2980b9','#2980b9','','#2980b9','#2980b9','#a8e6ff','#2980b9','#2980b9','#111111','#111111','#2980b9','#111111','#111111','#2980b9','#2980b9','#a8e6ff','#2980b9','#2980b9','','#00cec9','#2980b9','#2980b9','#2980b9','#111111','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#111111','#2980b9','#2980b9','#2980b9','#00cec9','','#74b9ff','#00cec9','#2980b9','#2980b9','#2980b9','#111111','#111111','#111111','#111111','#111111','#2980b9','#2980b9','#2980b9','#00cec9','#74b9ff','','','#74b9ff','#00cec9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#00cec9','#74b9ff','','','','','#74b9ff','#00cec9','#2980b9','#00cec9','#2980b9','#2980b9','#2980b9','#00cec9','#2980b9','#00cec9','#74b9ff','','','','','','','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','','','','','','','','','#00cec9','#74b9ff','#2980b9','#2980b9','#2980b9','#2980b9','#74b9ff','#00cec9','','','','','','','','','','#74b9ff','#00cec9','#00cec9','#00cec9','#00cec9','#74b9ff','','','','','','','','','','','','#74b9ff','#74b9ff','#74b9ff','#74b9ff','','','','','',''],
+  grass1: ['','','#f1c40f','#f1c40f','','','','','','','','#f1c40f','#f1c40f','','','','','#f1c40f','#2ecc71','#2ecc71','#f1c40f','','','','','','#f1c40f','#2ecc71','#2ecc71','#f1c40f','','','','#2ecc71','#27ae60','#27ae60','#2ecc71','#f1c40f','#27ae60','#27ae60','#27ae60','#f1c40f','#2ecc71','#27ae60','#27ae60','#2ecc71','','','#f1c40f','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#f1c40f','','#2ecc71','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','#2ecc71','','#27ae60','#ffffff','#111111','#111111','#ffffff','#27ae60','#27ae60','#27ae60','#27ae60','#ffffff','#111111','#111111','#ffffff','#27ae60','#27ae60','','#27ae60','#ffffff','#111111','#ffffff','#ffffff','#27ae60','#a8ff9a','#27ae60','#a8ff9a','#ffffff','#111111','#ffffff','#ffffff','#27ae60','#27ae60','','#27ae60','#ffffff','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','','#27ae60','#27ae60','#a8ff9a','#27ae60','#27ae60','#111111','#27ae60','#27ae60','#27ae60','#111111','#27ae60','#a8ff9a','#27ae60','#27ae60','#27ae60','','#2ecc71','#27ae60','#27ae60','#27ae60','#111111','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#111111','#27ae60','#27ae60','#27ae60','#2ecc71','','','#2ecc71','#27ae60','#27ae60','#27ae60','#111111','#111111','#27ae60','#111111','#111111','#27ae60','#27ae60','#27ae60','#2ecc71','','','','','#f1c40f','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#f1c40f','','','','','','','#f1c40f','#2ecc71','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#2ecc71','#f1c40f','','','','','','','','','#f1c40f','#2ecc71','#8b4513','#2ecc71','#2ecc71','#8b4513','#2ecc71','#f1c40f','','','','','','','','','','#f1c40f','#8b4513','#8b4513','#8b4513','#8b4513','#f1c40f','','','','','','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','',''],
+  grass2: ['','#f1c40f','#f1c40f','#f1c40f','','','#27ae60','#27ae60','','','#f1c40f','#f1c40f','#f1c40f','','','','#f1c40f','#2ecc71','#2ecc71','#2ecc71','#f1c40f','#f1c40f','#2ecc71','#2ecc71','#f1c40f','#f1c40f','#2ecc71','#2ecc71','#2ecc71','#f1c40f','','','#2ecc71','#27ae60','#27ae60','#27ae60','#2ecc71','#2ecc71','#27ae60','#27ae60','#2ecc71','#2ecc71','#27ae60','#27ae60','#27ae60','#2ecc71','#f1c40f','','#f1c40f','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#2ecc71','#f1c40f','#2ecc71','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','#2ecc71','#27ae60','#ffffff','#111111','#111111','#ffffff','#27ae60','#f1c40f','#27ae60','#f1c40f','#27ae60','#ffffff','#111111','#111111','#ffffff','#27ae60','','#27ae60','#ffffff','#111111','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#ffffff','#111111','#ffffff','#ffffff','#27ae60','','#27ae60','#ffffff','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','','#27ae60','#27ae60','#a8ff9a','#27ae60','#27ae60','#111111','#111111','#111111','#111111','#111111','#27ae60','#a8ff9a','#27ae60','#27ae60','#27ae60','','#27ae60','#27ae60','#27ae60','#27ae60','#111111','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#111111','#27ae60','#27ae60','#27ae60','#27ae60','','#2ecc71','#27ae60','#27ae60','#27ae60','#27ae60','#111111','#111111','#27ae60','#111111','#111111','#27ae60','#27ae60','#27ae60','#27ae60','#2ecc71','','#f1c40f','#2ecc71','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#2ecc71','#f1c40f','','','#f1c40f','#2ecc71','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#2ecc71','#f1c40f','','','','','#f1c40f','#2ecc71','#27ae60','#8b4513','#27ae60','#27ae60','#27ae60','#8b4513','#27ae60','#2ecc71','#f1c40f','','','','','','','#f1c40f','#2ecc71','#8b4513','#8b4513','#8b4513','#8b4513','#8b4513','#2ecc71','#f1c40f','','','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','',''],
+  grass3: ['#f1c40f','#2ecc71','#f1c40f','#2ecc71','#f1c40f','#2ecc71','#f1c40f','#2ecc71','#f1c40f','#2ecc71','#f1c40f','#2ecc71','#f1c40f','#2ecc71','#f1c40f','','#2ecc71','#006400','#2ecc71','#006400','#2ecc71','#006400','#2ecc71','#006400','#2ecc71','#006400','#2ecc71','#006400','#2ecc71','#006400','#2ecc71','','#006400','#27ae60','#006400','#27ae60','#006400','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#006400','#27ae60','#006400','#27ae60','#006400','','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','','#27ae60','#ffffff','#111111','#111111','#ffffff','#27ae60','#f1c40f','#27ae60','#f1c40f','#27ae60','#ffffff','#111111','#111111','#ffffff','#27ae60','','#27ae60','#ffffff','#111111','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#ffffff','#111111','#ffffff','#ffffff','#27ae60','','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#ffffff','#ffffff','#27ae60','#27ae60','','#27ae60','#27ae60','#a8ff9a','#27ae60','#27ae60','#111111','#111111','#111111','#111111','#111111','#27ae60','#a8ff9a','#27ae60','#27ae60','#27ae60','','#006400','#27ae60','#27ae60','#27ae60','#111111','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#111111','#27ae60','#27ae60','#27ae60','#006400','','#006400','#27ae60','#27ae60','#27ae60','#27ae60','#111111','#111111','#27ae60','#111111','#111111','#27ae60','#27ae60','#27ae60','#27ae60','#006400','','#006400','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#006400','','#006400','#006400','#27ae60','#27ae60','#27ae60','#006400','#27ae60','#27ae60','#27ae60','#006400','#27ae60','#27ae60','#27ae60','#006400','#006400','','','#006400','#006400','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#27ae60','#006400','#006400','','','','','#006400','#006400','#8b4513','#8b4513','#8b4513','#8b4513','#8b4513','#8b4513','#006400','#006400','','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','',''],
+  elec1: ['','','#f1c40f','#f1c40f','#f1c40f','','','','','#f1c40f','#f1c40f','#f1c40f','','','','','','#f1c40f','#e67e22','#e67e22','#e67e22','#f1c40f','','','#f1c40f','#e67e22','#e67e22','#e67e22','#f1c40f','','','','#f1c40f','#e67e22','#f1c40f','#f1c40f','#e67e22','#e67e22','#f1c40f','#f1c40f','#e67e22','#e67e22','#f1c40f','#f1c40f','#e67e22','#f1c40f','','','#e67e22','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#e67e22','#f1c40f','#f1c40f','#e67e22','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#e67e22','','','#e67e22','#f1c40f','#ffffff','#ffffff','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#ffffff','#ffffff','#f1c40f','#e67e22','','','#f1c40f','#ffffff','#111111','#111111','#ffffff','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#ffffff','#111111','#111111','#ffffff','#f1c40f','#e67e22','','#f1c40f','#ffffff','#111111','#ffffff','#ffffff','#f1c40f','#fff9c4','#f1c40f','#fff9c4','#ffffff','#111111','#ffffff','#ffffff','#f1c40f','#e67e22','','#f1c40f','#ffffff','#ffffff','#ffffff','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#ffffff','#ffffff','#f1c40f','#f1c40f','#f1c40f','','#f1c40f','#f1c40f','#e74c3c','#f1c40f','#f1c40f','#111111','#f1c40f','#f1c40f','#f1c40f','#111111','#f1c40f','#e74c3c','#f1c40f','#f1c40f','#f1c40f','','#e67e22','#f1c40f','#f1c40f','#f1c40f','#111111','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#111111','#f1c40f','#f1c40f','#f1c40f','#e67e22','','','#e67e22','#f1c40f','#f1c40f','#f1c40f','#111111','#111111','#f1c40f','#111111','#111111','#f1c40f','#f1c40f','#f1c40f','#e67e22','','','','','#e67e22','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#e67e22','','','','','','#f1c40f','#e67e22','#f1c40f','#f1c40f','#e67e22','#f1c40f','#e67e22','#f1c40f','#f1c40f','#e67e22','#f1c40f','','','','','','','#f1c40f','#e67e22','#e67e22','#f1c40f','#f1c40f','#f1c40f','#e67e22','#e67e22','#f1c40f','','','','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','','','','','','','','','','','','','','','','','',''],
+  elec2: ['#f1c40f','','#f1c40f','','','','','','','','','','#f1c40f','','#f1c40f','','#e67e22','#f1c40f','#e67e22','#f1c40f','','','','','','','','#f1c40f','#e67e22','#f1c40f','#e67e22','','','#e67e22','#f1c40f','#e67e22','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#e67e22','#f1c40f','#e67e22','','','','#f1c40f','#e67e22','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','#e67e22','#f1c40f','','','','#e67e22','#f1c40f','#ffffff','#ffffff','#e67e22','#e67e22','#e67e22','#e67e22','#ffffff','#ffffff','#f1c40f','#e67e22','#e67e22','','','','#f1c40f','#ffffff','#111111','#111111','#ffffff','#e67e22','#e67e22','#ffffff','#111111','#111111','#ffffff','#f1c40f','#e67e22','','','','#f1c40f','#ffffff','#111111','#ffffff','#ffffff','#e67e22','#e67e22','#ffffff','#111111','#ffffff','#ffffff','#f1c40f','#f1c40f','','','','#f1c40f','#ffffff','#ffffff','#ffffff','#e67e22','#e67e22','#e67e22','#e67e22','#ffffff','#ffffff','#f1c40f','#f1c40f','#f1c40f','','','','#e67e22','#e67e22','#e74c3c','#e67e22','#e67e22','#111111','#e67e22','#111111','#e67e22','#e74c3c','#e67e22','#e67e22','#e67e22','','','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#111111','#e67e22','#e67e22','#e67e22','#111111','#e67e22','#e67e22','#e67e22','#f1c40f','','','#f1c40f','#e67e22','#f1c40f','#e67e22','#e67e22','#e67e22','#111111','#111111','#111111','#e67e22','#e67e22','#e67e22','#f1c40f','#e67e22','#f1c40f','','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','','','#e67e22','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','#e67e22','','','','','#e67e22','#e67e22','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','#e67e22','#e67e22','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','','','','','','','','','','','','','','','',''],
+  elec3: ['#f1c40f','#e67e22','','#e67e22','#f1c40f','','#f1c40f','#f1c40f','#f1c40f','','#f1c40f','#e67e22','','#e67e22','#f1c40f','','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#e67e22','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','','','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#f1c40f','#f1c40f','#f1c40f','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','','','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#e67e22','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','','#f1c40f','#e67e22','#ffffff','#ffffff','#e67e22','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#e67e22','#ffffff','#ffffff','#e67e22','#f1c40f','','#e67e22','#ffffff','#111111','#111111','#ffffff','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#ffffff','#111111','#111111','#ffffff','#e67e22','','#e67e22','#ffffff','#111111','#ffffff','#ffffff','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#ffffff','#111111','#ffffff','#ffffff','#e67e22','','#e67e22','#ffffff','#ffffff','#ffffff','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#ffffff','#ffffff','#e67e22','#e67e22','','#e67e22','#e67e22','#e74c3c','#e67e22','#e67e22','#111111','#111111','#111111','#111111','#111111','#e67e22','#e74c3c','#e67e22','#e67e22','#e67e22','','#e67e22','#e67e22','#e67e22','#e67e22','#111111','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#111111','#e67e22','#e67e22','#e67e22','#e67e22','','#7f6000','#e67e22','#e67e22','#e67e22','#e67e22','#111111','#111111','#e67e22','#111111','#111111','#e67e22','#e67e22','#e67e22','#e67e22','#7f6000','','#7f6000','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#7f6000','','#7f6000','#e67e22','#f1c40f','#e67e22','#e67e22','#e67e22','#f1c40f','#e67e22','#f1c40f','#e67e22','#e67e22','#e67e22','#f1c40f','#e67e22','#7f6000','','','#7f6000','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#7f6000','','','','','#7f6000','#f1c40f','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','#f1c40f','#7f6000','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','',''],
+  ice1: ['','','','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','','','','','','','','','#00b4d8','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#00b4d8','','','','','','','#00b4d8','#74b9ff','#dfe6e9','#dfe6e9','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#dfe6e9','#dfe6e9','#74b9ff','#00b4d8','','','','#00b4d8','#74b9ff','#dfe6e9','#ffffff','#ffffff','#dfe6e9','#74b9ff','#74b9ff','#dfe6e9','#ffffff','#ffffff','#dfe6e9','#74b9ff','#00b4d8','','','#74b9ff','#dfe6e9','#ffffff','#111111','#111111','#ffffff','#74b9ff','#74b9ff','#ffffff','#111111','#111111','#ffffff','#dfe6e9','#74b9ff','#00b4d8','','#74b9ff','#dfe6e9','#111111','#ffffff','#ffffff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#ffffff','#ffffff','#111111','#74b9ff','#74b9ff','#74b9ff','','#74b9ff','#ffffff','#ffffff','#ffffff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#ffffff','#ffffff','#74b9ff','#74b9ff','#74b9ff','','#74b9ff','#74b9ff','#a29bfe','#74b9ff','#74b9ff','#00b4d8','#74b9ff','#74b9ff','#00b4d8','#74b9ff','#74b9ff','#a29bfe','#74b9ff','#74b9ff','#74b9ff','','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#111111','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#111111','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','','#00b4d8','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#111111','#111111','#74b9ff','#111111','#111111','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#00b4d8','','','#00b4d8','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#00b4d8','','','','','#00b4d8','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#00b4d8','','','','','','','#00b4d8','#74b9ff','#74b9ff','#00b4d8','#74b9ff','#74b9ff','#00b4d8','#74b9ff','#00b4d8','','','','','','','','','#00b4d8','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#00b4d8','','','','','','','','','','','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','','','','','','','','','','','','','','','','','','','','','',''],
+  ice2: ['#00b4d8','','#00b4d8','','','','','','','','','','#00b4d8','','#00b4d8','','#00b4d8','#74b9ff','#00b4d8','#74b9ff','','','','','','','','#74b9ff','#00b4d8','#74b9ff','#00b4d8','','','#00b4d8','#74b9ff','#00b4d8','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#00b4d8','#74b9ff','#00b4d8','','','','#74b9ff','#00b4d8','#74b9ff','#dfe6e9','#dfe6e9','#dfe6e9','#dfe6e9','#dfe6e9','#dfe6e9','#dfe6e9','#74b9ff','#00b4d8','#74b9ff','','','','#dfe6e9','#74b9ff','#ffffff','#ffffff','#dfe6e9','#74b9ff','#74b9ff','#74b9ff','#dfe6e9','#ffffff','#ffffff','#74b9ff','#dfe6e9','','','','#74b9ff','#ffffff','#111111','#111111','#ffffff','#74b9ff','#74b9ff','#74b9ff','#ffffff','#111111','#111111','#ffffff','#74b9ff','','','','#74b9ff','#ffffff','#111111','#ffffff','#ffffff','#74b9ff','#74b9ff','#74b9ff','#ffffff','#111111','#ffffff','#ffffff','#74b9ff','','','','#74b9ff','#ffffff','#ffffff','#74b9ff','#74b9ff','#00b4d8','#74b9ff','#00b4d8','#74b9ff','#74b9ff','#ffffff','#ffffff','#74b9ff','','','','#74b9ff','#74b9ff','#a29bfe','#74b9ff','#111111','#74b9ff','#74b9ff','#74b9ff','#111111','#74b9ff','#a29bfe','#74b9ff','#74b9ff','','','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#111111','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#111111','#74b9ff','#74b9ff','#74b9ff','#74b9ff','','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#111111','#111111','#74b9ff','#111111','#111111','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','','#00b4d8','#74b9ff','#dfe6e9','#74b9ff','#74b9ff','#74b9ff','#00b4d8','#74b9ff','#00b4d8','#74b9ff','#74b9ff','#74b9ff','#dfe6e9','#74b9ff','#00b4d8','','','#00b4d8','#dfe6e9','#dfe6e9','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#dfe6e9','#dfe6e9','#00b4d8','','','','','#00b4d8','#dfe6e9','#dfe6e9','#dfe6e9','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#dfe6e9','#dfe6e9','#00b4d8','','','','','','','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','','','',''],
+  ice3: ['#00b4d8','#a29bfe','#00b4d8','','#a29bfe','#00b4d8','#a29bfe','','#a29bfe','#00b4d8','#a29bfe','','#00b4d8','#a29bfe','#00b4d8','','#a29bfe','#74b9ff','#a29bfe','#00b4d8','#74b9ff','#a29bfe','#74b9ff','#00b4d8','#74b9ff','#a29bfe','#74b9ff','#00b4d8','#a29bfe','#74b9ff','#a29bfe','','#00b4d8','#a29bfe','#74b9ff','#a29bfe','#74b9ff','#00b4d8','#74b9ff','#a29bfe','#74b9ff','#00b4d8','#74b9ff','#a29bfe','#74b9ff','#a29bfe','#00b4d8','','#dfe6e9','#74b9ff','#ffffff','#ffffff','#dfe6e9','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#dfe6e9','#ffffff','#ffffff','#74b9ff','#dfe6e9','#74b9ff','','#74b9ff','#ffffff','#111111','#111111','#ffffff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#ffffff','#111111','#111111','#ffffff','#74b9ff','#74b9ff','','#74b9ff','#ffffff','#111111','#ffffff','#ffffff','#74b9ff','#00b4d8','#74b9ff','#00b4d8','#74b9ff','#ffffff','#111111','#ffffff','#ffffff','#74b9ff','','#74b9ff','#ffffff','#ffffff','#ffffff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#ffffff','#ffffff','#74b9ff','#74b9ff','','#74b9ff','#74b9ff','#a29bfe','#74b9ff','#74b9ff','#111111','#111111','#74b9ff','#111111','#111111','#74b9ff','#74b9ff','#a29bfe','#74b9ff','#74b9ff','','#0000cd','#74b9ff','#74b9ff','#74b9ff','#111111','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#111111','#74b9ff','#74b9ff','#74b9ff','#0000cd','','#0000cd','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#111111','#111111','#74b9ff','#111111','#111111','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#0000cd','','#0000cd','#74b9ff','#00b4d8','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#00b4d8','#74b9ff','#0000cd','','#0000cd','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#0000cd','','#00b4d8','#0000cd','#74b9ff','#dfe6e9','#74b9ff','#00b4d8','#74b9ff','#74b9ff','#74b9ff','#00b4d8','#74b9ff','#dfe6e9','#74b9ff','#0000cd','#00b4d8','','','#00b4d8','#0000cd','#dfe6e9','#dfe6e9','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#74b9ff','#dfe6e9','#dfe6e9','#0000cd','#00b4d8','','','','','#00b4d8','#00b4d8','#dfe6e9','#dfe6e9','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#dfe6e9','#dfe6e9','#00b4d8','#00b4d8','','','','','','','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','#00b4d8','','','',''],
+  dark1: ['','','#6c5ce7','#6c5ce7','','','','','','','#6c5ce7','#6c5ce7','','','','','','#6c5ce7','#a29bfe','#a29bfe','#6c5ce7','','','','','#6c5ce7','#a29bfe','#a29bfe','#6c5ce7','','','','#6c5ce7','#a29bfe','#6c5ce7','#6c5ce7','#a29bfe','#6c5ce7','#1a1a2e','#1a1a2e','#6c5ce7','#a29bfe','#6c5ce7','#6c5ce7','#a29bfe','#6c5ce7','','','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','#6c5ce7','#6c5ce7','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','','','#a29bfe','#6c5ce7','#ffffff','#ffffff','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#ffffff','#ffffff','#6c5ce7','#a29bfe','','','#6c5ce7','#ffffff','#111111','#111111','#ffffff','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#ffffff','#111111','#111111','#ffffff','#6c5ce7','#a29bfe','','#6c5ce7','#ffffff','#111111','#ffffff','#ffffff','#6c5ce7','#f1c40f','#6c5ce7','#f1c40f','#ffffff','#111111','#ffffff','#ffffff','#6c5ce7','#a29bfe','','#6c5ce7','#ffffff','#ffffff','#ffffff','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#ffffff','#ffffff','#6c5ce7','#6c5ce7','#6c5ce7','','#6c5ce7','#6c5ce7','#2d3436','#6c5ce7','#6c5ce7','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#6c5ce7','#2d3436','#6c5ce7','#6c5ce7','#6c5ce7','','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','','','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#111111','#6c5ce7','#111111','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','','','','','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','','','','','','#6c5ce7','#a29bfe','#6c5ce7','#6c5ce7','#a29bfe','#6c5ce7','#a29bfe','#6c5ce7','#6c5ce7','#a29bfe','#6c5ce7','','','','','','','#6c5ce7','#a29bfe','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','#a29bfe','#6c5ce7','','','','','','','','','','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','','','','','','','','','','','','','','','','','','','','','',''],
+  dark2: ['#6c5ce7','','#6c5ce7','','','','','','','','','','#6c5ce7','','#6c5ce7','','#6c5ce7','#1a1a2e','#6c5ce7','#1a1a2e','','','','','','','','#1a1a2e','#6c5ce7','#1a1a2e','#6c5ce7','','','#6c5ce7','#1a1a2e','#6c5ce7','#1a1a2e','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#1a1a2e','#6c5ce7','#1a1a2e','#6c5ce7','','','','','#1a1a2e','#6c5ce7','#1a1a2e','#a29bfe','#a29bfe','#a29bfe','#a29bfe','#a29bfe','#a29bfe','#1a1a2e','#6c5ce7','#1a1a2e','','','','','#a29bfe','#1a1a2e','#ffffff','#ffffff','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','#ffffff','#ffffff','#1a1a2e','#a29bfe','','','','#6c5ce7','#ffffff','#111111','#111111','#ffffff','#6c5ce7','#6c5ce7','#6c5ce7','#ffffff','#111111','#111111','#ffffff','#6c5ce7','','','','#6c5ce7','#ffffff','#111111','#ffffff','#ffffff','#6c5ce7','#6c5ce7','#6c5ce7','#ffffff','#111111','#ffffff','#ffffff','#6c5ce7','','','','#6c5ce7','#ffffff','#ffffff','#6c5ce7','#6c5ce7','#f1c40f','#6c5ce7','#f1c40f','#6c5ce7','#6c5ce7','#ffffff','#ffffff','#6c5ce7','','','','#6c5ce7','#6c5ce7','#2d3436','#6c5ce7','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#6c5ce7','#2d3436','#6c5ce7','#6c5ce7','','','#1a1a2e','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#1a1a2e','','#1a1a2e','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#111111','#6c5ce7','#111111','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#1a1a2e','','#1a1a2e','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#1a1a2e','','#6c5ce7','#1a1a2e','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','#1a1a2e','#6c5ce7','','','#6c5ce7','#a29bfe','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','#a29bfe','#6c5ce7','','','','','#6c5ce7','#a29bfe','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','#a29bfe','#6c5ce7','','','','','','','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','','','',''],
+  dark3: ['#4a0080','#6c5ce7','#4a0080','','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#4a0080','','#4a0080','#6c5ce7','#4a0080','','#4a0080','','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','','#4a0080','#6c5ce7','#a29bfe','#6c5ce7','#a29bfe','#6c5ce7','#a29bfe','#6c5ce7','#a29bfe','#6c5ce7','#a29bfe','#6c5ce7','#a29bfe','#6c5ce7','#4a0080','','#6c5ce7','#a29bfe','#ffffff','#ffffff','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#a29bfe','#ffffff','#ffffff','#a29bfe','#6c5ce7','#6c5ce7','','#a29bfe','#ffffff','#111111','#111111','#ffffff','#a29bfe','#6c5ce7','#6c5ce7','#6c5ce7','#ffffff','#111111','#111111','#ffffff','#a29bfe','#a29bfe','','#a29bfe','#ffffff','#111111','#ffffff','#ffffff','#6c5ce7','#f1c40f','#6c5ce7','#f1c40f','#ffffff','#111111','#ffffff','#ffffff','#a29bfe','#a29bfe','','#a29bfe','#ffffff','#ffffff','#ffffff','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#ffffff','#ffffff','#a29bfe','#a29bfe','','#6c5ce7','#6c5ce7','#2d3436','#6c5ce7','#6c5ce7','#111111','#111111','#111111','#111111','#111111','#6c5ce7','#2d3436','#6c5ce7','#6c5ce7','#6c5ce7','','#4a0080','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#4a0080','','#4a0080','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#111111','#111111','#6c5ce7','#111111','#111111','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#4a0080','','#4a0080','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#4a0080','','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#6c5ce7','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#6c5ce7','#6c5ce7','#4a0080','#6c5ce7','#4a0080','','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#6c5ce7','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','','','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#4a0080','#6c5ce7','#4a0080','#6c5ce7','','','','','#4a0080','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#4a0080','','','','','','','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','#6c5ce7','','','',''],
+  light1: ['','','#f1c40f','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','#f1c40f','','','','','#f1c40f','#e67e22','#f1c40f','#f1c40f','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#f1c40f','#f1c40f','#e67e22','#f1c40f','','','#f1c40f','#e67e22','#f1c40f','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#f1c40f','#e67e22','#f1c40f','','','#f1c40f','#ffffff','#ffffff','#fdcb6e','#fdcb6e','#ffffff','#ffffff','#ffffff','#fdcb6e','#fdcb6e','#ffffff','#ffffff','#f1c40f','','','','#ffffff','#fdcb6e','#ffffff','#111111','#111111','#ffffff','#ffffff','#ffffff','#111111','#111111','#ffffff','#fdcb6e','#ffffff','','','','#ffffff','#fdcb6e','#111111','#ffffff','#ffffff','#fdcb6e','#ffffff','#fdcb6e','#ffffff','#ffffff','#111111','#fdcb6e','#ffffff','','','','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','','','','#ffffff','#ffffff','#ffe0b2','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffe0b2','#ffffff','#ffffff','#ffffff','','','','#ffffff','#ffffff','#ffffff','#111111','#ffffff','#ffffff','#ffffff','#ffffff','#111111','#ffffff','#ffffff','#ffffff','#ffffff','','','#f1c40f','#ffffff','#ffffff','#ffffff','#ffffff','#111111','#111111','#ffffff','#111111','#111111','#ffffff','#ffffff','#ffffff','#ffffff','#f1c40f','','#f1c40f','#e67e22','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#e67e22','#f1c40f','','','#f1c40f','#e67e22','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#e67e22','#f1c40f','','','','','#f1c40f','#e67e22','#ffffff','#ffffff','#f1c40f','#ffffff','#f1c40f','#ffffff','#ffffff','#e67e22','#f1c40f','','','','','','','#f1c40f','#e67e22','#e67e22','#ffffff','#ffffff','#ffffff','#e67e22','#e67e22','#f1c40f','','','','','','','','','#f1c40f','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','#f1c40f','','','','','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','',''],
+  light2: ['','#f1c40f','','#f1c40f','','#e67e22','#e67e22','#e67e22','#e67e22','','#f1c40f','','#f1c40f','','','','#f1c40f','#e67e22','#f1c40f','#e67e22','#f1c40f','#ffffff','#fdcb6e','#fdcb6e','#ffffff','#f1c40f','#e67e22','#f1c40f','#e67e22','#f1c40f','','','#e67e22','#f1c40f','#e67e22','#ffffff','#ffffff','#fdcb6e','#ffffff','#ffffff','#ffffff','#fdcb6e','#ffffff','#ffffff','#e67e22','#f1c40f','#e67e22','','#f1c40f','#e67e22','#ffffff','#fdcb6e','#ffffff','#111111','#111111','#ffffff','#111111','#111111','#ffffff','#fdcb6e','#ffffff','#e67e22','#f1c40f','','#e67e22','#ffffff','#fdcb6e','#111111','#111111','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#111111','#111111','#fdcb6e','#ffffff','#e67e22','','#ffffff','#fdcb6e','#111111','#ffffff','#ffffff','#ffffff','#f1c40f','#ffffff','#f1c40f','#ffffff','#ffffff','#ffffff','#111111','#fdcb6e','#ffffff','','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','','#ffffff','#ffffff','#ffe0b2','#ffffff','#ffffff','#111111','#111111','#111111','#111111','#111111','#ffffff','#ffe0b2','#ffffff','#ffffff','#ffffff','','#e67e22','#ffffff','#ffffff','#ffffff','#111111','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#111111','#ffffff','#ffffff','#ffffff','#e67e22','','#e67e22','#ffffff','#ffffff','#ffffff','#ffffff','#111111','#111111','#ffffff','#111111','#111111','#ffffff','#ffffff','#ffffff','#ffffff','#e67e22','','#f1c40f','#e67e22','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#e67e22','#f1c40f','','','#f1c40f','#e67e22','#ffffff','#ffffff','#ffffff','#e67e22','#ffffff','#e67e22','#ffffff','#ffffff','#ffffff','#e67e22','#f1c40f','','','','','#f1c40f','#e67e22','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#e67e22','#f1c40f','','','','','','','#f1c40f','#e67e22','#e67e22','#f1c40f','#ffffff','#f1c40f','#e67e22','#e67e22','#f1c40f','','','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','','','','','','','','','','','','','','','',''],
+  light3: ['#f1c40f','','#f1c40f','','#f1c40f','','#f1c40f','','#f1c40f','','#f1c40f','','#f1c40f','','#f1c40f','','','#e67e22','','#e67e22','','#e67e22','','#e67e22','','#e67e22','','#e67e22','','#e67e22','','','#e67e22','#ffffff','#e67e22','#ffffff','#e67e22','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#e67e22','#ffffff','#e67e22','#ffffff','#e67e22','','#ffffff','#fffde7','#ffffff','#fdcb6e','#ffffff','#ffffff','#111111','#111111','#ffffff','#ffffff','#fdcb6e','#ffffff','#fffde7','#ffffff','#ffffff','','#fffde7','#fdcb6e','#ffffff','#111111','#111111','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#111111','#111111','#ffffff','#fdcb6e','#fffde7','','#fdcb6e','#ffffff','#111111','#ffffff','#ffffff','#ffffff','#f1c40f','#ffffff','#f1c40f','#ffffff','#ffffff','#ffffff','#111111','#ffffff','#fdcb6e','','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','','#ffffff','#ffffff','#ffe0b2','#ffffff','#ffffff','#111111','#111111','#111111','#111111','#111111','#ffffff','#ffe0b2','#ffffff','#ffffff','#ffffff','','#e67e22','#ffffff','#ffffff','#ffffff','#111111','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#111111','#ffffff','#ffffff','#ffffff','#e67e22','','#e67e22','#ffffff','#ffffff','#ffffff','#ffffff','#111111','#111111','#ffffff','#111111','#111111','#ffffff','#ffffff','#ffffff','#ffffff','#e67e22','','#f1c40f','#e67e22','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#e67e22','#f1c40f','','#f1c40f','#f1c40f','#e67e22','#ffffff','#ffffff','#e67e22','#ffffff','#ffffff','#ffffff','#e67e22','#ffffff','#ffffff','#e67e22','#f1c40f','#f1c40f','','','#f1c40f','#f1c40f','#e67e22','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#e67e22','#f1c40f','#f1c40f','','','','','#f1c40f','#f1c40f','#e67e22','#e67e22','#f1c40f','#ffffff','#f1c40f','#e67e22','#e67e22','#f1c40f','#f1c40f','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','',''],
+  rock1: ['','','','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','','','','','','','','','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','','','','','','','#636e72','#95a5a6','#bdc3c7','#bdc3c7','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#bdc3c7','#bdc3c7','#95a5a6','#636e72','','','','#636e72','#95a5a6','#bdc3c7','#ffffff','#ffffff','#bdc3c7','#95a5a6','#95a5a6','#bdc3c7','#ffffff','#ffffff','#bdc3c7','#95a5a6','#636e72','','','#95a5a6','#bdc3c7','#ffffff','#111111','#111111','#ffffff','#95a5a6','#95a5a6','#ffffff','#111111','#111111','#ffffff','#bdc3c7','#95a5a6','#636e72','','#95a5a6','#ffffff','#111111','#ffffff','#ffffff','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#ffffff','#ffffff','#111111','#95a5a6','#95a5a6','#95a5a6','','#95a5a6','#ffffff','#ffffff','#ffffff','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#ffffff','#ffffff','#95a5a6','#95a5a6','#95a5a6','','#95a5a6','#95a5a6','#f1c40f','#95a5a6','#95a5a6','#636e72','#95a5a6','#95a5a6','#636e72','#95a5a6','#95a5a6','#f1c40f','#95a5a6','#95a5a6','#95a5a6','','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#111111','#95a5a6','#111111','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','','','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','','','','','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','','','','','','','#636e72','#95a5a6','#95a5a6','#636e72','#95a5a6','#95a5a6','#636e72','#95a5a6','#636e72','','','','','','','','','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','','','','','','','','','','','#636e72','#636e72','#636e72','#636e72','#636e72','','','','','','','','','','','','','','','','','','','','','',''],
+  rock2: ['','#636e72','#636e72','','','','','','','','','','#636e72','#636e72','','','#636e72','#2d3436','#2d3436','#636e72','','','','','','','','#636e72','#2d3436','#2d3436','#636e72','','#636e72','#2d3436','#95a5a6','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','#95a5a6','#2d3436','#636e72','','#95a5a6','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','#95a5a6','','#95a5a6','#95a5a6','#bdc3c7','#bdc3c7','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#bdc3c7','#bdc3c7','#95a5a6','#95a5a6','#95a5a6','','#95a5a6','#bdc3c7','#ffffff','#111111','#111111','#ffffff','#95a5a6','#95a5a6','#95a5a6','#ffffff','#111111','#111111','#ffffff','#95a5a6','#95a5a6','','#95a5a6','#ffffff','#111111','#ffffff','#ffffff','#95a5a6','#f1c40f','#95a5a6','#f1c40f','#95a5a6','#ffffff','#111111','#ffffff','#95a5a6','#95a5a6','','#95a5a6','#ffffff','#ffffff','#ffffff','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#ffffff','#ffffff','#95a5a6','#95a5a6','','#95a5a6','#95a5a6','#f1c40f','#95a5a6','#95a5a6','#111111','#111111','#111111','#111111','#111111','#95a5a6','#f1c40f','#95a5a6','#95a5a6','#95a5a6','','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','','#2d3436','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#111111','#95a5a6','#111111','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#2d3436','','#2d3436','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','#2d3436','','#2d3436','#636e72','#636e72','#95a5a6','#95a5a6','#95a5a6','#636e72','#95a5a6','#636e72','#95a5a6','#95a5a6','#95a5a6','#636e72','#636e72','#2d3436','','','#2d3436','#636e72','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','#636e72','#2d3436','','','','','#2d3436','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','#636e72','#2d3436','','','','','','','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','','','',''],
+  rock3: ['#f1c40f','#636e72','#f1c40f','','#636e72','#2d3436','#2d3436','#2d3436','#2d3436','#636e72','','#636e72','#f1c40f','#636e72','#f1c40f','','#636e72','#2d3436','#636e72','#2d3436','#2d3436','#636e72','#636e72','#636e72','#636e72','#2d3436','#2d3436','#636e72','#2d3436','#636e72','','','#2d3436','#636e72','#2d3436','#95a5a6','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','#95a5a6','#2d3436','#636e72','#2d3436','','','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','','#95a5a6','#bdc3c7','#bdc3c7','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#bdc3c7','#bdc3c7','#95a5a6','#95a5a6','','#95a5a6','#bdc3c7','#ffffff','#111111','#111111','#ffffff','#95a5a6','#95a5a6','#95a5a6','#ffffff','#111111','#111111','#ffffff','#bdc3c7','#95a5a6','','#95a5a6','#ffffff','#111111','#ffffff','#ffffff','#95a5a6','#f1c40f','#95a5a6','#f1c40f','#95a5a6','#ffffff','#111111','#ffffff','#ffffff','#95a5a6','','#95a5a6','#ffffff','#ffffff','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#ffffff','#ffffff','#95a5a6','#95a5a6','','#95a5a6','#95a5a6','#f1c40f','#95a5a6','#95a5a6','#111111','#111111','#111111','#111111','#111111','#95a5a6','#f1c40f','#95a5a6','#95a5a6','#95a5a6','','#4a4a4a','#95a5a6','#95a5a6','#95a5a6','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#95a5a6','#95a5a6','#95a5a6','#4a4a4a','','#4a4a4a','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#111111','#95a5a6','#111111','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#4a4a4a','','#4a4a4a','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#4a4a4a','','#4a4a4a','#2d3436','#95a5a6','#95a5a6','#95a5a6','#2d3436','#95a5a6','#95a5a6','#95a5a6','#2d3436','#95a5a6','#95a5a6','#95a5a6','#2d3436','#4a4a4a','','','#4a4a4a','#2d3436','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#2d3436','#4a4a4a','','','','','#4a4a4a','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#4a4a4a','','','','','','','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','','','',''],
 };
 
 var MONSTERS = [
@@ -681,7 +495,7 @@ function totalExpForLevel(lv) {
 }
 
 function renderSprite(artKey, container, size) {
-  var cols = 12;
+  var cols = 16;
   var pxSize = Math.floor(size / cols);
   var art = ARTS[artKey] || [];
   container.innerHTML = '';
@@ -911,17 +725,14 @@ function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()
 
 function build(n){
   var pool=[],i;
-  var rev=getTodayReview();
   if(mode==='kanji')for(i=0;i<KANJI.length;i++)pool.push({type:'kanji',q:KANJI[i].question,a:KANJI[i].answer});
   else if(mode==='proverb')for(i=0;i<PROVERB.length;i++)pool.push({type:'proverb',q:PROVERB[i].meaning,a:PROVERB[i].phrase,reading:PROVERB[i].reading});
   else{for(i=0;i<KANJI.length;i++)pool.push({type:'kanji',q:KANJI[i].question,a:KANJI[i].answer});for(i=0;i<PROVERB.length;i++)pool.push({type:'proverb',q:PROVERB[i].meaning,a:PROVERB[i].phrase,reading:PROVERB[i].reading});}
   shuffle(pool);
   var limit=(n>0)?Math.min(n,pool.length):pool.length;
-  var revF=[],seen={};
-  for(i=0;i<rev.length;i++){var rv=rev[i];if(mode==='mixed'||rv.type===mode){seen[rv.q+'|'+rv.a]=true;revF.push(rv);}}
-  var mainF=[];for(i=0;i<pool.length;i++){if(!seen[pool[i].q+'|'+pool[i].a])mainF.push(pool[i]);}
-  questions=revF.concat(mainF).slice(0,limit+revF.length);
-  idx=0;scoreOK=0;scoreNG=0;wrongThisSession=[];sessionExpGained=0;
+  // 復習問題は混ぜない。指定問題数をきっちり出す
+  questions=pool.slice(0,limit);
+  idx=0;scoreOK=0;scoreNG=0;wrongThisSession=[];sessionExpGained=0;isReviewMode=false;
   show('s-quiz');loadQuestion();
 }
 
@@ -953,11 +764,11 @@ function fetchChoices(q){
   var ak=q.type==='kanji'?'answer':'phrase';
   var prompt;
   if(q.type==='kanji'){
-    prompt='あなたは漢字クイズの選択肢を作る専門家です。\n正解：「'+q.a+'」（読み：'+q.q+'）\n\n【絶対条件】正解とほぼ見分けがつかないレベルで紛らわしい間違い選択肢を3つ作れ。\n優先順位：\n1位：同じ読みの別の漢字（同音異義語）\n2位：1〜2画だけ違う・へん/つくりが似ている\n3位：意味が近くて混同しやすい\n禁止：明らかに違うと分かる選択肢・存在しない漢字\nJSONのみ返答：{"distractors": ["選択肢1", "選択肢2", "選択肢3"]}';
+    prompt='あなたは小学生向け漢字クイズの選択肢作成の超一流専門家です。\n\n正解：「'+q.a+'」（読み：'+q.q+'）\n\n【ミッション】ちゃんと勉強していないと絶対に間違える、極めて紛らわしい不正解選択肢を3つ作れ。\n\n【戦略（優先順位順）】\n1. 完全同音異義語：同じ読みで意味が違う熟語。例「以外」→「意外」「異外」「違外」\n2. 部首・画数が似た漢字：へん・つくりが1〜2画違うだけ。例「待」→「持」「侍」「特」\n3. 意味が似て混同しやすい：例「努力」→「怒力」「勉力」「努力」\n4. 送り仮名だけ違う：例「暖かい」→「温かい」（実際に混同される）\n\n【禁止事項】\n- 明らかに違うと一目でわかる選択肢（例：「火事」に「野球」）\n- 実在しない漢字・熟語\n- 正解と同じもの\n\nJSONのみ返答（説明・前置き一切不要）：{"distractors": ["選択肢1", "選択肢2", "選択肢3"]}';
   }else{
-    prompt='あなたはことわざ・慣用句クイズの選択肢を作る専門家です。\n意味：「'+q.q+'」\n正解：「'+q.a+'」\n\n絶妙に紛らわしい間違い選択肢を3つ作ってください。意味や語感が似ているが違うもの。実在する日本語のみ。\nJSONのみ返答：{"distractors": ["選択肢1", "選択肢2", "選択肢3"]}';
+    prompt='あなたは小学生向けことわざ・慣用句クイズの選択肢作成の超一流専門家です。\n\n意味：「'+q.q+'」\n正解：「'+q.a+'」\n\n【ミッション】ちゃんと覚えていないと絶対にひっかかる、極めて紛らわしい不正解選択肢を3つ作れ。\n\n【戦略（優先順位順）】\n1. 一部の言葉を入れ替え：正解の一部だけ変える。例「立て板に水」→「立て板に耳」「流れ板に水」\n2. 似た構造の別のことわざ：同じテーマ・同じリズムで違う意味。例「七転び八起き」→「七転び七起き」「六転び八起き」\n3. 意味は正解と真逆・似ているが実在しないもの：惑わせる\n4. 本物のことわざだが意味が似ていて混同しやすいもの\n\n【禁止事項】\n- 正解と全く関係ない選択肢\n- 正解と同じもの\n\nJSONのみ返答（説明・前置き一切不要）：{"distractors": ["選択肢1", "選択肢2", "選択肢3"]}';
   }
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:prompt}]})})
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();})
   .then(function(data){
     var text=data.content&&data.content[0]?data.content[0].text:'';
