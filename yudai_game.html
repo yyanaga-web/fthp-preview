@@ -359,52 +359,84 @@ header p{font-size:0.7rem;color:#888;margin-top:2px;}
 <!-- CONFIRM -->
 <!-- RULES -->
 <div class="screen" id="s-rules">
-  <div class="rules-title">📖 あそびかた・ルール</div>
+  <div class="rules-title">📖 あそびかた</div>
 
-  <div class="rules-section">
-    <div class="rules-section-title">🎮 基本のルール</div>
-    <div class="rules-item">① モードと問題数をえらぶ</div>
-    <div class="rules-item">② 問題が出たら<strong>4つの選択肢</strong>から正解をタップ！</div>
-    <div class="rules-item">③ わからないときは <strong>「❓ わからない」</strong> ボタンを押すと正解がわかるよ</div>
-    <div class="rules-item">④ まちがえたら<strong>声に出して読む</strong>まで次に進めないよ。しっかり覚えよう！</div>
-  </div>
-
-  <div class="rules-section">
-    <div class="rules-section-title">⚡ EXPとレベルアップ</div>
-    <table class="rules-exp-table">
-      <tr><td>正解</td><td>+10 EXP</td></tr>
-      <tr><td>復習問題の正解</td><td>+15 EXP（ボーナス！）</td></tr>
-      <tr><td>毎日続けるボーナス</td><td>連続日数×2 EXP</td></tr>
-    </table>
-    <div class="rules-item" style="margin-top:8px;">EXPがたまると<strong>モンスターがレベルアップ</strong>するよ！<br>Lv.20で<strong>しんか</strong>、Lv.50で<strong>さいしゅうしんか</strong>！</div>
-  </div>
-
-  <div class="rules-section">
-    <div class="rules-section-title">🔁 復習問題って何？</div>
-    <div class="rules-item">まちがえた問題は<strong>翌日・翌々日</strong>に自動で復習問題になるよ。</div>
-    <div class="rules-item">ホーム画面にオレンジのバナーが出たら<strong>復習問題あり</strong>のサイン！</div>
-    <div class="rules-item">復習問題は<strong>+15 EXP</strong>もらえるからお得！先にやろう！</div>
-  </div>
-
-  <div class="rules-section">
-    <div class="rules-section-title">🐾 モンスターをあつめよう！</div>
-    <div class="rules-item">最初は<strong>ホノオン（炎）</strong>からスタート！</div>
-    <div class="rules-mon-unlock">
-      正解50問 → アクアン（水）が仲間に！<br>
-      正解120問 → クサラン（草）が仲間に！<br>
-      正解200問 → カミナリン（電）が仲間に！<br>
-      正解300問 → コオリン（氷）が仲間に！<br>
-      正解420問 → カゲロン（闇）が仲間に！<br>
-      正解560問 → ヒカリン（光）が仲間に！<br>
-      正解700問 → イワラン（岩）が仲間に！
+  <!-- STEP 1-4 visual cards -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+    <div class="rules-section" style="text-align:center;padding:12px 10px;">
+      <div style="font-size:2rem;margin-bottom:6px;">1️⃣</div>
+      <div style="font-size:0.8rem;font-weight:900;color:#f1c40f;margin-bottom:4px;">モードをえらぶ</div>
+      <div style="font-size:0.72rem;color:#bbb;line-height:1.5;">漢字・ことわざ・<br>ミックスから選ぼう</div>
+    </div>
+    <div class="rules-section" style="text-align:center;padding:12px 10px;">
+      <div style="font-size:2rem;margin-bottom:6px;">2️⃣</div>
+      <div style="font-size:0.8rem;font-weight:900;color:#f1c40f;margin-bottom:4px;">4択で答える</div>
+      <div style="font-size:0.72rem;color:#bbb;line-height:1.5;">4つの中から<br>正解をタップ！</div>
+    </div>
+    <div class="rules-section" style="text-align:center;padding:12px 10px;">
+      <div style="font-size:2rem;margin-bottom:6px;">3️⃣</div>
+      <div style="font-size:0.8rem;font-weight:900;color:#f1c40f;margin-bottom:4px;">わからない時は？</div>
+      <div style="font-size:0.72rem;color:#bbb;line-height:1.5;">❓ボタンで<br>正解を確認できるよ</div>
+    </div>
+    <div class="rules-section" style="text-align:center;padding:12px 10px;">
+      <div style="font-size:2rem;margin-bottom:6px;">4️⃣</div>
+      <div style="font-size:0.8rem;font-weight:900;color:#e74c3c;margin-bottom:4px;">まちがえたら</div>
+      <div style="font-size:0.72rem;color:#bbb;line-height:1.5;">🔊声に出して読む<br>まで次に進めない！</div>
     </div>
   </div>
 
-  <div class="rules-section">
-    <div class="rules-section-title">🔥 れんぞく記録</div>
-    <div class="rules-item">毎日クイズをやると<strong>連続日数</strong>が増えるよ！</div>
-    <div class="rules-item">7日→🎖️、14日→🏅、30日→🏆 の特別メッセージが出るぞ！</div>
-    <div class="rules-item">連続日数が増えると<strong>ボーナスEXP</strong>ももらえる！</div>
+  <!-- EXP -->
+  <div class="rules-section" style="margin-bottom:12px;">
+    <div class="rules-section-title">⚡ EXPのもらいかた</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;text-align:center;">
+      <div style="background:#0a0a1a;border-radius:8px;padding:10px 6px;">
+        <div style="font-size:1.4rem;">✅</div>
+        <div style="font-size:0.75rem;color:#f1c40f;font-weight:900;margin-top:4px;">正解</div>
+        <div style="font-size:1rem;font-weight:900;color:#fff;">+10</div>
+        <div style="font-size:0.6rem;color:#888;">EXP</div>
+      </div>
+      <div style="background:#0a0a1a;border-radius:8px;padding:10px 6px;border:1px solid #e67e22;">
+        <div style="font-size:1.4rem;">🔁</div>
+        <div style="font-size:0.75rem;color:#e67e22;font-weight:900;margin-top:4px;">復習正解</div>
+        <div style="font-size:1rem;font-weight:900;color:#fff;">+15</div>
+        <div style="font-size:0.6rem;color:#888;">EXP</div>
+      </div>
+      <div style="background:#0a0a1a;border-radius:8px;padding:10px 6px;border:1px solid #f1c40f;">
+        <div style="font-size:1.4rem;">🔥</div>
+        <div style="font-size:0.75rem;color:#f1c40f;font-weight:900;margin-top:4px;">連続ボーナス</div>
+        <div style="font-size:1rem;font-weight:900;color:#fff;">日数×2</div>
+        <div style="font-size:0.6rem;color:#888;">EXP</div>
+      </div>
+    </div>
+    <div style="font-size:0.75rem;color:#aaa;margin-top:10px;text-align:center;">Lv.<span style="color:#f1c40f;font-weight:900;">20</span>でしんか ／ Lv.<span style="color:#f1c40f;font-weight:900;">50</span>でさいしゅうしんか！</div>
+  </div>
+
+  <!-- Monsters -->
+  <div class="rules-section" style="margin-bottom:12px;">
+    <div class="rules-section-title">🐾 モンスターをあつめよう！</div>
+    <div style="font-size:0.75rem;color:#aaa;margin-bottom:8px;">正解数が増えると新しいモンスターが仲間になるよ！</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+      <div style="background:#0a0a1a;border-radius:8px;padding:8px;font-size:0.72rem;color:#ccc;">🔥 <span style="color:#f1c40f">スタート</span> → ホノオン</div>
+      <div style="background:#0a0a1a;border-radius:8px;padding:8px;font-size:0.72rem;color:#ccc;">💧 <span style="color:#74b9ff">50問</span> → アクアン</div>
+      <div style="background:#0a0a1a;border-radius:8px;padding:8px;font-size:0.72rem;color:#ccc;">🌿 <span style="color:#2ecc71">120問</span> → クサラン</div>
+      <div style="background:#0a0a1a;border-radius:8px;padding:8px;font-size:0.72rem;color:#ccc;">⚡ <span style="color:#f1c40f">200問</span> → カミナリン</div>
+      <div style="background:#0a0a1a;border-radius:8px;padding:8px;font-size:0.72rem;color:#ccc;">❄️ <span style="color:#74b9ff">300問</span> → コオリン</div>
+      <div style="background:#0a0a1a;border-radius:8px;padding:8px;font-size:0.72rem;color:#ccc;">🌑 <span style="color:#a29bfe">420問</span> → カゲロン</div>
+      <div style="background:#0a0a1a;border-radius:8px;padding:8px;font-size:0.72rem;color:#ccc;">✨ <span style="color:#fdcb6e">560問</span> → ヒカリン</div>
+      <div style="background:#0a0a1a;border-radius:8px;padding:8px;font-size:0.72rem;color:#ccc;">🪨 <span style="color:#aab7b8">700問</span> → イワラン</div>
+      <div style="background:#0a0a1a;border:1px solid #f1c40f;border-radius:8px;padding:8px;font-size:0.72rem;color:#ccc;grid-column:1/-1;text-align:center;">⭐ <span style="color:#f1c40f;font-weight:900;">999問達成でレアキャラ「タイチャン」出現！</span></div>
+    </div>
+  </div>
+
+  <!-- Streak -->
+  <div class="rules-section" style="margin-bottom:14px;">
+    <div class="rules-section-title">🔥 毎日続けると…</div>
+    <div style="display:flex;justify-content:space-around;margin-top:8px;text-align:center;">
+      <div><div style="font-size:1.6rem;">🔥</div><div style="font-size:0.7rem;color:#aaa;margin-top:3px;">3日〜</div></div>
+      <div><div style="font-size:1.6rem;">🔥🔥</div><div style="font-size:0.7rem;color:#aaa;margin-top:3px;">7日</div><div style="font-size:0.6rem;color:#f1c40f">🎖️</div></div>
+      <div><div style="font-size:1.6rem;">🔥🔥🔥</div><div style="font-size:0.7rem;color:#aaa;margin-top:3px;">14日</div><div style="font-size:0.6rem;color:#f1c40f">🏅</div></div>
+      <div><div style="font-size:1.6rem;">💥🔥💥</div><div style="font-size:0.7rem;color:#aaa;margin-top:3px;">30日</div><div style="font-size:0.6rem;color:#f1c40f">🏆</div></div>
+    </div>
   </div>
 
   <button class="home-btn" onclick="show('s-home')" style="margin-top:4px;">🏠 ホームに戻る</button>
@@ -450,6 +482,201 @@ var C = {
 };
 
 // 12x12 pixel art definitions
+var TAICHAN_SVG = `
+
+  <!-- bg glow -->
+  <ellipse cx="140" cy="220" rx="100" ry="115" fill="#f1c40f" opacity="0.04"/>
+
+  <!-- ======================================
+       ちょんまげ
+  ======================================= -->
+  <rect x="134" y="36" width="12" height="30" rx="6" fill="#2a1608"/>
+  <!-- fluffy top hairs -->
+  <path d="M138,38 Q132,24 128,11" stroke="#2a1608" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+  <path d="M140,35 Q138,19 137,5"  stroke="#2a1608" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  <path d="M142,38 Q148,22 152,11" stroke="#2a1608" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+  <!-- hair tie -->
+  <ellipse cx="140" cy="41" rx="9" ry="5"  fill="#c0392b"/>
+  <ellipse cx="140" cy="41" rx="5.5" ry="3" fill="#e74c3c"/>
+
+  <!-- ======================================
+       HEAD  — big round baby melon
+  ======================================= -->
+  <!-- soft drop shadow -->
+  <ellipse cx="143" cy="141" rx="74" ry="72" fill="#c8904a" opacity="0.18"/>
+  <!-- main head -->
+  <ellipse cx="140" cy="137" rx="74" ry="72" fill="#fde8c0"/>
+  <!-- warm highlight on forehead -->
+  <ellipse cx="124" cy="108" rx="26" ry="16" fill="#fff" opacity="0.28"/>
+
+  <!-- ======================================
+       HAIR CAP  — neat, no side flyouts
+  ======================================= -->
+  <path d="M76,128
+           Q80,82 106,69
+           Q121,61 140,60
+           Q159,61 174,69
+           Q200,82 204,128
+           Q188,96 164,88
+           Q152,84 140,84
+           Q128,84 116,88
+           Q92,96 76,128 Z"
+        fill="#2a1608"/>
+  <!-- fringe — soft over forehead -->
+  <path d="M88,110 Q104,90 126,86" stroke="#2a1608" stroke-width="11" fill="none" stroke-linecap="round"/>
+  <path d="M154,86 Q176,90 192,110" stroke="#2a1608" stroke-width="11" fill="none" stroke-linecap="round"/>
+  <!-- two soft hair wisps -->
+  <path d="M122,92 Q124,104 121,114" stroke="#3a2010" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.45"/>
+  <path d="M138,87 Q139,100 137,111" stroke="#3a2010" stroke-width="2"   fill="none" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- ======================================
+       EARS  — small, tidy
+  ======================================= -->
+  <ellipse cx="67"  cy="142" rx="9" ry="11" fill="#f5c88a"/>
+  <ellipse cx="213" cy="142" rx="9" ry="11" fill="#f5c88a"/>
+  <ellipse cx="67"  cy="142" rx="5" ry="7"  fill="#e8a060" opacity="0.4"/>
+  <ellipse cx="213" cy="142" rx="5" ry="7"  fill="#e8a060" opacity="0.4"/>
+
+  <!-- ======================================
+       EYES  — large anime-style, very cute
+  ======================================= -->
+  <!-- eye white shadow (give depth) -->
+  <ellipse cx="114" cy="138" rx="22" ry="21" fill="#e8d0a8" opacity="0.3"/>
+  <ellipse cx="166" cy="138" rx="22" ry="21" fill="#e8d0a8" opacity="0.3"/>
+  <!-- whites -->
+  <ellipse cx="113" cy="136" rx="21" ry="20" fill="white"/>
+  <ellipse cx="167" cy="136" rx="21" ry="20" fill="white"/>
+  <!-- coloured iris — warm chestnut -->
+  <ellipse cx="115" cy="138" rx="14" ry="15" fill="#5c3010"/>
+  <ellipse cx="169" cy="138" rx="14" ry="15" fill="#5c3010"/>
+  <!-- inner iris lighter ring -->
+  <ellipse cx="115" cy="139" rx="10" ry="11" fill="#3a1c08"/>
+  <ellipse cx="169" cy="139" rx="10" ry="11" fill="#3a1c08"/>
+  <!-- pupil -->
+  <ellipse cx="116" cy="140" rx="7"  ry="8"  fill="#0d0600"/>
+  <ellipse cx="170" cy="140" rx="7"  ry="8"  fill="#0d0600"/>
+  <!-- PRIMARY shine — large, oval -->
+  <ellipse cx="108" cy="129" rx="6"  ry="6"  fill="white"/>
+  <ellipse cx="162" cy="129" rx="6"  ry="6"  fill="white"/>
+  <!-- secondary sparkle -->
+  <ellipse cx="120" cy="143" rx="3"  ry="3"  fill="white" opacity="0.8"/>
+  <ellipse cx="174" cy="143" rx="3"  ry="3"  fill="white" opacity="0.8"/>
+  <!-- tiny star sparkle in eye -->
+  <circle  cx="109" cy="130" r="1.5" fill="white" opacity="0.9"/>
+  <circle  cx="163" cy="130" r="1.5" fill="white" opacity="0.9"/>
+
+  <!-- upper eyelid — thick cute line -->
+  <path d="M94,127  Q113,116 132,124" stroke="#1a0800" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M148,124 Q167,116 186,127" stroke="#1a0800" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <!-- eyelash flicks -->
+  <line x1="95"  y1="127" x2="90"  y2="120" stroke="#1a0800" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="123" x2="97"  y2="116" stroke="#1a0800" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="185" y1="127" x2="190" y2="120" stroke="#1a0800" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="180" y1="123" x2="183" y2="116" stroke="#1a0800" stroke-width="2"   stroke-linecap="round"/>
+  <!-- lower lash line -->
+  <path d="M96,150  Q113,158 132,150" stroke="#b07840" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.3"/>
+  <path d="M148,150 Q167,158 184,150" stroke="#b07840" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- ======================================
+       EYEBROWS — soft, slightly arched
+  ======================================= -->
+  <path d="M97,115  Q113,106 130,110" stroke="#2a1608" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+  <path d="M150,110 Q167,106 183,115" stroke="#2a1608" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+
+  <!-- ======================================
+       NOSE — tiny upturned cute button
+  ======================================= -->
+  <path d="M135,161 Q140,165 145,161" stroke="#c88050" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- ======================================
+       MOUTH — wide happy ^^ smile
+  ======================================= -->
+  <!-- smile line -->
+  <path d="M118,172 Q140,192 162,172" stroke="#d06040" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <!-- mouth fill -->
+  <path d="M120,173 Q140,188 160,173 Q154,182 140,185 Q126,182 120,173 Z" fill="#e07050"/>
+  <!-- teeth — clean white -->
+  <path d="M124,174 Q140,184 156,174 Q150,180 140,182 Q130,180 124,174 Z" fill="white" opacity="0.95"/>
+  <!-- tooth gap -->
+  <line x1="140" y1="174" x2="140" y2="181" stroke="#ddd" stroke-width="1.2" opacity="0.4"/>
+  <!-- lower lip -->
+  <path d="M128,182 Q140,188 152,182" stroke="#c06848" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- ======================================
+       CHEEKS — big soft anime blush
+  ======================================= -->
+  <!-- left -->
+  <ellipse cx="90"  cy="156" rx="24" ry="14" fill="#ff6080" opacity="0.28"/>
+  <ellipse cx="90"  cy="157" rx="16" ry="9"  fill="#ff6080" opacity="0.18"/>
+  <!-- right -->
+  <ellipse cx="190" cy="156" rx="24" ry="14" fill="#ff6080" opacity="0.28"/>
+  <ellipse cx="190" cy="157" rx="16" ry="9"  fill="#ff6080" opacity="0.18"/>
+  <!-- tiny sparkle dots on cheeks -->
+  <circle cx="80"  cy="152" r="2.5" fill="#ffaacc" opacity="0.6"/>
+  <circle cx="75"  cy="158" r="1.8" fill="#ffaacc" opacity="0.5"/>
+  <circle cx="200" cy="152" r="2.5" fill="#ffaacc" opacity="0.6"/>
+  <circle cx="205" cy="158" r="1.8" fill="#ffaacc" opacity="0.5"/>
+
+  <!-- ======================================
+       NECK
+  ======================================= -->
+  <rect x="124" y="198" width="32" height="22" rx="10" fill="#f0c090"/>
+
+  <!-- ======================================
+       BODY — navy/white stripe shirt
+  ======================================= -->
+  <path d="M90,222 Q82,236 80,278 Q79,300 94,304 L186,304 Q201,300 200,278 Q198,236 190,222 Z"
+        fill="#1a237e"/>
+  <!-- white stripes -->
+  <path d="M84,234 Q140,231 196,234 L196,242 Q140,239 84,242 Z" fill="white" opacity="0.92"/>
+  <path d="M82,254 Q140,251 198,254 L198,262 Q140,259 82,262 Z" fill="white" opacity="0.92"/>
+  <path d="M81,274 Q140,271 199,274 L199,282 Q140,279 81,282 Z" fill="white" opacity="0.92"/>
+  <path d="M81,292 Q140,289 199,292 L199,298 Q140,295 81,298 Z" fill="white" opacity="0.85"/>
+  <!-- collar V -->
+  <path d="M124,214 L135,228 L140,220 L145,228 L156,214 Q148,220 140,218 Q132,220 124,214 Z" fill="#1a237e"/>
+
+  <!-- ======================================
+       ARMS — chubby
+  ======================================= -->
+  <!-- left -->
+  <path d="M90,230 Q70,242 64,273 Q62,288 74,291 Q86,285 90,268 Q92,250 98,236 Z" fill="#1a237e"/>
+  <path d="M66,261 Q78,258 90,261" stroke="white" stroke-width="5" fill="none" opacity="0.85" stroke-linecap="round"/>
+  <path d="M64,276 Q76,273 88,276" stroke="white" stroke-width="5" fill="none" opacity="0.85" stroke-linecap="round"/>
+  <ellipse cx="68" cy="293" rx="13" ry="11" fill="#f5c88a"/>
+  <!-- right -->
+  <path d="M190,230 Q210,242 216,273 Q218,288 206,291 Q194,285 190,268 Q188,250 182,236 Z" fill="#1a237e"/>
+  <path d="M190,261 Q202,258 214,261" stroke="white" stroke-width="5" fill="none" opacity="0.85" stroke-linecap="round"/>
+  <path d="M192,276 Q204,273 216,276" stroke="white" stroke-width="5" fill="none" opacity="0.85" stroke-linecap="round"/>
+  <ellipse cx="212" cy="293" rx="13" ry="11" fill="#f5c88a"/>
+
+  <!-- ======================================
+       PANTS — olive/khaki
+  ======================================= -->
+  <path d="M94,302 Q88,315 86,356 L120,356 Q122,322 124,304 Z" fill="#8c8c6a"/>
+  <path d="M186,302 Q192,315 194,356 L160,356 Q158,322 156,304 Z" fill="#8c8c6a"/>
+  <path d="M89,320 Q104,317 118,320" stroke="#aaaa80" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+  <path d="M162,320 Q176,317 191,320" stroke="#aaaa80" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+
+  <!-- shoes -->
+  <ellipse cx="103" cy="358" rx="20" ry="9" fill="#444"/>
+  <ellipse cx="177" cy="358" rx="20" ry="9" fill="#444"/>
+  <ellipse cx="101" cy="356" rx="16" ry="6" fill="#666"/>
+  <ellipse cx="175" cy="356" rx="16" ry="6" fill="#666"/>
+
+  <!-- ======================================
+       SPARKLES
+  ======================================= -->
+  <g class="sp1"><text x="30"  y="98"  font-size="22" fill="#f1c40f">✦</text></g>
+  <g class="sp2"><text x="230" y="86"  font-size="17" fill="#f1c40f">✦</text></g>
+  <g class="sp3"><text x="18"  y="205" font-size="12" fill="#fff" opacity="0.5">✦</text></g>
+  <g class="sp1"><text x="244" y="200" font-size="14" fill="#fff" opacity="0.5">✦</text></g>
+  <g class="sp2"><text x="26"  y="296" font-size="10" fill="#f1c40f" opacity="0.5">✦</text></g>
+  <g class="sp3"><text x="242" y="285" font-size="10" fill="#f1c40f" opacity="0.5">✦</text></g>
+  <!-- extra heart -->
+  <g class="sp2"><text x="50"  y="160" font-size="14" fill="#ff6080" opacity="0.7">♥</text></g>
+  <g class="sp3"><text x="212" y="155" font-size="14" fill="#ff6080" opacity="0.7">♥</text></g>
+
+`;
 var ARTS = {
   fire1: ['','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','','','','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','','','','','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','','','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','','','#e67e22','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e67e22','','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#111111','#111111','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e67e22','','','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e67e22','','','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#f1c40f','','','','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e67e22','#f1c40f','','','','','','#f1c40f','#e67e22','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#f1c40f','','','','','','','','#f1c40f','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','#f1c40f','','','','','','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','','','','',''],
   fire2: ['','','#f1c40f','#f1c40f','','','','','','','','','#f1c40f','#f1c40f','','','','#f1c40f','#e67e22','#e67e22','#f1c40f','','','','','','','#f1c40f','#e67e22','#e67e22','#f1c40f','','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e67e22','#f1c40f','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e67e22','#f1c40f','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#e74c3c','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#e74c3c','#e67e22','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#111111','#111111','#ffffff','#e74c3c','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#f1c40f','#e74c3c','#e74c3c','#f1c40f','#e74c3c','#ffffff','#111111','#ffffff','#ffffff','#e74c3c','#e74c3c','#ffffff','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffffff','#ffffff','#ffffff','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e74c3c','#111111','#111111','#111111','#111111','#e74c3c','#e74c3c','#ffb3b3','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#111111','#e74c3c','#e74c3c','#e74c3c','#e67e22','#8b0000','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#8b0000','#8b0000','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#8b0000','','#8b0000','#e67e22','#e67e22','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#8b0000','','','','#f1c40f','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#e67e22','#f1c40f','','','','','','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','#f1c40f','','',''],
@@ -477,6 +704,7 @@ var ARTS = {
   rock3: ['#f1c40f','#636e72','#f1c40f','','#636e72','#2d3436','#2d3436','#2d3436','#2d3436','#636e72','','#636e72','#f1c40f','#636e72','#f1c40f','','#636e72','#2d3436','#636e72','#2d3436','#2d3436','#636e72','#636e72','#636e72','#636e72','#2d3436','#2d3436','#636e72','#2d3436','#636e72','','','#2d3436','#636e72','#2d3436','#95a5a6','#636e72','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#636e72','#95a5a6','#2d3436','#636e72','#2d3436','','','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','','#95a5a6','#bdc3c7','#bdc3c7','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#bdc3c7','#bdc3c7','#95a5a6','#95a5a6','','#95a5a6','#bdc3c7','#ffffff','#111111','#111111','#ffffff','#95a5a6','#95a5a6','#95a5a6','#ffffff','#111111','#111111','#ffffff','#bdc3c7','#95a5a6','','#95a5a6','#ffffff','#111111','#ffffff','#ffffff','#95a5a6','#f1c40f','#95a5a6','#f1c40f','#95a5a6','#ffffff','#111111','#ffffff','#ffffff','#95a5a6','','#95a5a6','#ffffff','#ffffff','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#ffffff','#ffffff','#95a5a6','#95a5a6','','#95a5a6','#95a5a6','#f1c40f','#95a5a6','#95a5a6','#111111','#111111','#111111','#111111','#111111','#95a5a6','#f1c40f','#95a5a6','#95a5a6','#95a5a6','','#4a4a4a','#95a5a6','#95a5a6','#95a5a6','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#95a5a6','#95a5a6','#95a5a6','#4a4a4a','','#4a4a4a','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#111111','#111111','#95a5a6','#111111','#111111','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#4a4a4a','','#4a4a4a','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#4a4a4a','','#4a4a4a','#2d3436','#95a5a6','#95a5a6','#95a5a6','#2d3436','#95a5a6','#95a5a6','#95a5a6','#2d3436','#95a5a6','#95a5a6','#95a5a6','#2d3436','#4a4a4a','','','#4a4a4a','#2d3436','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#95a5a6','#2d3436','#4a4a4a','','','','','#4a4a4a','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#2d3436','#4a4a4a','','','','','','','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','','','',''],
 };
 
+
 var MONSTERS = [
   {id:0,name:'ホノオン',type:'炎',color:'#e74c3c',color2:'#f39c12',evos:[{name:'ホノオン',lv:1,art:'fire1'},{name:'ホノオラン',lv:20,art:'fire2'},{name:'ホノオキング',lv:50,art:'fire3'}]},
   {id:1,name:'アクアン',type:'水',color:'#3498db',color2:'#1abc9c',evos:[{name:'アクアン',lv:1,art:'water1'},{name:'アクアラン',lv:20,art:'water2'},{name:'アクアキング',lv:50,art:'water3'}]},
@@ -485,7 +713,8 @@ var MONSTERS = [
   {id:4,name:'コオリン',type:'氷',color:'#74b9ff',color2:'#a29bfe',evos:[{name:'コオリン',lv:1,art:'ice1'},{name:'コオリラン',lv:20,art:'ice2'},{name:'コオリキング',lv:50,art:'ice3'}]},
   {id:5,name:'カゲロン',type:'闇',color:'#6c5ce7',color2:'#2d3436',evos:[{name:'カゲロン',lv:1,art:'dark1'},{name:'カゲラビ',lv:20,art:'dark2'},{name:'カゲキング',lv:50,art:'dark3'}]},
   {id:6,name:'ヒカリン',type:'光',color:'#fdcb6e',color2:'#fff',evos:[{name:'ヒカリン',lv:1,art:'light1'},{name:'ヒカリラン',lv:20,art:'light2'},{name:'ヒカリキング',lv:50,art:'light3'}]},
-  {id:7,name:'イワラン',type:'岩',color:'#b2bec3',color2:'#636e72',evos:[{name:'イワラン',lv:1,art:'rock1'},{name:'イワラビ',lv:20,art:'rock2'},{name:'イワキング',lv:50,art:'rock3'}]}
+  {id:7,name:'イワラン',type:'岩',color:'#b2bec3',color2:'#636e72',evos:[{name:'イワラン',lv:1,art:'rock1'},{name:'イワラビ',lv:20,art:'rock2'},{name:'イワキング',lv:50,art:'rock3'}]},
+  {id:8,name:'タイチャン',type:'⭐レア',color:'#f1c40f',color2:'#e74c3c',rare:true,evos:[{name:'タイチャン',lv:1,art:'taichan'},{name:'タイチャン改',lv:20,art:'taichan'},{name:'タイチャン伝説',lv:50,art:'taichan'}]}
 ];
 
 // EXP needed per level
@@ -495,6 +724,15 @@ function totalExpForLevel(lv) {
 }
 
 function renderSprite(artKey, container, size) {
+  // Taichan uses SVG, others use pixel art
+  if (artKey === 'taichan') {
+    var svgData = TAICHAN_SVG;
+    var scale = size / 280;
+    var h = Math.round(380 * scale);
+    container.innerHTML = '<svg width="'+size+'" height="'+h+'" viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">'+svgData+'</svg>';
+    container.style.margin = '0 auto 4px';
+    return;
+  }
   var cols = 16;
   var pxSize = Math.floor(size / cols);
   var art = ARTS[artKey] || [];
@@ -572,7 +810,7 @@ function addExp(amount) {
 
   // Maybe unlock new monster (every 50 correct answers)
   var tc = md.totalCorrect;
-  var unlockAt = [50,120,200,300,420,560,700];
+  var unlockAt = [50,120,200,300,420,560,700,999];
   var newMon = null;
   for(var i=0;i<unlockAt.length;i++) {
     if(tc === unlockAt[i]) {
@@ -634,7 +872,13 @@ function renderMonCard() {
     if(owned) renderSprite(mevo.art, miniSprite, 40);
     else { miniSprite.textContent='?'; miniSprite.style.cssText='width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto;'; }
     item.appendChild(miniSprite);
-    var nm = document.createElement('div'); nm.className='mini-name'; nm.textContent = owned ? mevo.name : '???';
+    var nm = document.createElement('div'); nm.className='mini-name';
+    if(owned) {
+      nm.textContent = mevo.name;
+      if(MONSTERS[i].rare) { var rb=document.createElement('span'); rb.style.cssText='background:#f1c40f;color:#0a0a1a;font-size:0.55rem;font-weight:900;padding:1px 4px;border-radius:4px;margin-left:2px;'; rb.textContent='★'; nm.appendChild(rb); }
+    } else {
+      nm.textContent = MONSTERS[i].rare ? '⭐???' : '???';
+    }
     var lv2 = document.createElement('div'); lv2.className='mini-lv'; lv2.textContent = owned ? 'Lv.'+mlv : '';
     item.appendChild(nm); item.appendChild(lv2);
     if(owned) { (function(idx){item.onclick=function(){switchMonster(idx);};})(i); }
@@ -724,13 +968,41 @@ function startReview(){var items=getTodayReview();if(!items.length)return;isRevi
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
 function build(n){
-  var pool=[],i;
-  if(mode==='kanji')for(i=0;i<KANJI.length;i++)pool.push({type:'kanji',q:KANJI[i].question,a:KANJI[i].answer});
-  else if(mode==='proverb')for(i=0;i<PROVERB.length;i++)pool.push({type:'proverb',q:PROVERB[i].meaning,a:PROVERB[i].phrase,reading:PROVERB[i].reading});
-  else{for(i=0;i<KANJI.length;i++)pool.push({type:'kanji',q:KANJI[i].question,a:KANJI[i].answer});for(i=0;i<PROVERB.length;i++)pool.push({type:'proverb',q:PROVERB[i].meaning,a:PROVERB[i].phrase,reading:PROVERB[i].reading});}
+  var pool=[],i,r;
+  if(mode==='kanji'){
+    for(i=0;i<KANJI.length;i++){
+      // 約30%の確率で「漢字→読み」問題にする
+      r=Math.random();
+      if(r<0.3){
+        pool.push({type:'kanji_read',q:KANJI[i].answer,a:KANJI[i].question,kanji:KANJI[i].answer});
+      } else {
+        pool.push({type:'kanji',q:KANJI[i].question,a:KANJI[i].answer});
+      }
+    }
+  } else if(mode==='proverb'){
+    for(i=0;i<PROVERB.length;i++){
+      // 約40%の確率で「ことわざ→意味」問題にする
+      r=Math.random();
+      if(r<0.4){
+        pool.push({type:'proverb_meaning',q:PROVERB[i].phrase,a:PROVERB[i].meaning,phrase:PROVERB[i].phrase,reading:PROVERB[i].reading});
+      } else {
+        pool.push({type:'proverb',q:PROVERB[i].meaning,a:PROVERB[i].phrase,reading:PROVERB[i].reading});
+      }
+    }
+  } else {
+    for(i=0;i<KANJI.length;i++){
+      r=Math.random();
+      if(r<0.3) pool.push({type:'kanji_read',q:KANJI[i].answer,a:KANJI[i].question,kanji:KANJI[i].answer});
+      else pool.push({type:'kanji',q:KANJI[i].question,a:KANJI[i].answer});
+    }
+    for(i=0;i<PROVERB.length;i++){
+      r=Math.random();
+      if(r<0.4) pool.push({type:'proverb_meaning',q:PROVERB[i].phrase,a:PROVERB[i].meaning,phrase:PROVERB[i].phrase,reading:PROVERB[i].reading});
+      else pool.push({type:'proverb',q:PROVERB[i].meaning,a:PROVERB[i].phrase,reading:PROVERB[i].reading});
+    }
+  }
   shuffle(pool);
   var limit=(n>0)?Math.min(n,pool.length):pool.length;
-  // 復習問題は混ぜない。指定問題数をきっちり出す
   questions=pool.slice(0,limit);
   idx=0;scoreOK=0;scoreNG=0;wrongThisSession=[];sessionExpGained=0;isReviewMode=false;
   show('s-quiz');loadQuestion();
@@ -744,8 +1016,19 @@ function loadQuestion(){
   document.getElementById('sc-o').textContent='○'+scoreOK;
   document.getElementById('sc-x').textContent='✕'+scoreNG;
   var badge=document.getElementById('type-badge');
-  if(q.type==='kanji'){badge.textContent='漢字';badge.className='type-badge bk';document.getElementById('quiz-label').textContent='次の読みを漢字で書いてください';}
-  else{badge.textContent='ことわざ・慣用句';badge.className='type-badge bp';document.getElementById('quiz-label').textContent='次の意味に当てはまることわざ・慣用句は？';}
+  if(q.type==='kanji'){
+    badge.textContent='漢字'; badge.className='type-badge bk';
+    document.getElementById('quiz-label').textContent='次の読みを漢字で書いてください';
+  } else if(q.type==='kanji_read'){
+    badge.textContent='漢字の読み'; badge.className='type-badge bk';
+    document.getElementById('quiz-label').textContent='この漢字の読み方はどれ？';
+  } else if(q.type==='proverb_meaning'){
+    badge.textContent='ことわざ・意味'; badge.className='type-badge bp';
+    document.getElementById('quiz-label').textContent='このことわざ・慣用句の意味はどれ？';
+  } else {
+    badge.textContent='ことわざ・慣用句'; badge.className='type-badge bp';
+    document.getElementById('quiz-label').textContent='次の意味に当てはまることわざ・慣用句は？';
+  }
   document.getElementById('quiz-q').textContent=q.q;
   document.getElementById('review-tag').style.display=q.isReview?'inline-block':'none';
   document.getElementById('fb-ok').style.display='none';
@@ -760,13 +1043,21 @@ function loadQuestion(){
 }
 
 function fetchChoices(q){
-  var pool=q.type==='kanji'?KANJI:PROVERB;
-  var ak=q.type==='kanji'?'answer':'phrase';
+  var pool=(q.type==='kanji'||q.type==='kanji_read')?KANJI:PROVERB;
+  var ak;
+  if(q.type==='kanji') ak='answer';
+  else if(q.type==='kanji_read') ak='question';
+  else if(q.type==='proverb_meaning') ak='meaning';
+  else ak='phrase';
   var prompt;
   if(q.type==='kanji'){
-    prompt='あなたは小学生向け漢字クイズの選択肢作成の超一流専門家です。\n\n正解：「'+q.a+'」（読み：'+q.q+'）\n\n【ミッション】ちゃんと勉強していないと絶対に間違える、極めて紛らわしい不正解選択肢を3つ作れ。\n\n【戦略（優先順位順）】\n1. 完全同音異義語：同じ読みで意味が違う熟語。例「以外」→「意外」「異外」「違外」\n2. 部首・画数が似た漢字：へん・つくりが1〜2画違うだけ。例「待」→「持」「侍」「特」\n3. 意味が似て混同しやすい：例「努力」→「怒力」「勉力」「努力」\n4. 送り仮名だけ違う：例「暖かい」→「温かい」（実際に混同される）\n\n【禁止事項】\n- 明らかに違うと一目でわかる選択肢（例：「火事」に「野球」）\n- 実在しない漢字・熟語\n- 正解と同じもの\n\nJSONのみ返答（説明・前置き一切不要）：{"distractors": ["選択肢1", "選択肢2", "選択肢3"]}';
-  }else{
-    prompt='あなたは小学生向けことわざ・慣用句クイズの選択肢作成の超一流専門家です。\n\n意味：「'+q.q+'」\n正解：「'+q.a+'」\n\n【ミッション】ちゃんと覚えていないと絶対にひっかかる、極めて紛らわしい不正解選択肢を3つ作れ。\n\n【戦略（優先順位順）】\n1. 一部の言葉を入れ替え：正解の一部だけ変える。例「立て板に水」→「立て板に耳」「流れ板に水」\n2. 似た構造の別のことわざ：同じテーマ・同じリズムで違う意味。例「七転び八起き」→「七転び七起き」「六転び八起き」\n3. 意味は正解と真逆・似ているが実在しないもの：惑わせる\n4. 本物のことわざだが意味が似ていて混同しやすいもの\n\n【禁止事項】\n- 正解と全く関係ない選択肢\n- 正解と同じもの\n\nJSONのみ返答（説明・前置き一切不要）：{"distractors": ["選択肢1", "選択肢2", "選択肢3"]}';
+    prompt='あなたは小学生向け漢字クイズの選択肢作成の超一流専門家です。\n\n正解：「'+q.a+'」（読み：'+q.q+'）\n\n【ミッション】ちゃんと勉強していないと絶対に間違える、極めて紛らわしい不正解選択肢を3つ作れ。\n\n【戦略（優先順位順）】\n1. 完全同音異義語：同じ読みで意味が違う熟語\n2. 部首・画数が似た漢字：へん・つくりが1〜2画違うだけ\n3. 意味が似て混同しやすい\n4. 送り仮名だけ違う\n\n禁止：実在しない漢字・正解と同じもの\n\nJSONのみ返答：{"distractors": ["選択肢1", "選択肢2", "選択肢3"]}';
+  } else if(q.type==='kanji_read'){
+    prompt='あなたは漢字の読み方クイズの選択肢作成の超一流専門家です。\n\n漢字：「'+q.q+'」\n正解の読み：「'+q.a+'」\n\n【ミッション】読み方を間違えやすい、極めて紛らわしい不正解の読みを3つ作れ。\n\n【戦略】\n1. 同じ漢字が使われる別の熟語の読み方（音読み・訓読みの混同）\n2. 似た発音だが違う読み（例：じょうず→じょうじゅ）\n3. 送り仮名の違いで読みが変わるパターン\n4. よく間違えられる読み方\n\n禁止：正解と同じもの・明らかに違う読み\n\nJSONのみ返答：{"distractors": ["読み1", "読み2", "読み3"]}';
+  } else if(q.type==='proverb_meaning'){
+    prompt='あなたはことわざ・慣用句クイズの選択肢作成の超一流専門家です。\n\nことわざ：「'+q.q+'」\n正解の意味：「'+q.a+'」\n\n【ミッション】意味を問う問題で、ちゃんと覚えていないと引っかかる紛らわしい意味の選択肢を3つ作れ。\n\n【戦略】\n1. 似ているが微妙に違う意味（正解の一部だけ変える）\n2. 逆の意味や真逆のニュアンス\n3. 言葉から連想しやすいが実際は違う意味\n4. 似た別のことわざの意味\n\n禁止：正解と同じもの・明らかにおかしい意味\n\nJSONのみ返答（説明不要）：{"distractors": ["意味1", "意味2", "意味3"]}';
+  } else {
+    prompt='あなたは小学生向けことわざ・慣用句クイズの選択肢作成の超一流専門家です。\n\n意味：「'+q.q+'」\n正解：「'+q.a+'」\n\n【ミッション】ちゃんと覚えていないと絶対にひっかかる、極めて紛らわしい不正解選択肢を3つ作れ。\n1. 一部の言葉を入れ替え（例「立て板に水」→「立て板に耳」）\n2. 似た構造の別のことわざ\n3. 意味が似て混同しやすいもの\n\n禁止：正解と同じもの\n\nJSONのみ返答（説明不要）：{"distractors": ["選択肢1", "選択肢2", "選択肢3"]}';
   }
   fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();})
@@ -823,10 +1114,20 @@ function onChoice(val){
   }else{
     scoreNG++;wrongThisSession.push(q);if(!q.isReview)addToReview(q);
     for(var i=0;i<btns.length;i++){if(btns[i].getAttribute('data-val')===val)btns[i].classList.add('wrong');}
-    document.getElementById('fb-ng-body').textContent=(q.type==='kanji'?'正解：'+q.a:'正解：'+q.a+(q.reading?' ('+q.reading+')':''));
-    document.getElementById('fb-ng-meaning').textContent=q.type==='proverb'?'意味：'+q.q:'';
+    var ngBody, ngMeaning, readText;
+    if(q.type==='kanji'){
+      ngBody='正解：'+q.a; ngMeaning=''; readText=q.q+' → '+q.a;
+    } else if(q.type==='kanji_read'){
+      ngBody='正解の読み：'+q.a; ngMeaning='（漢字：'+q.q+'）'; readText=q.q+' の読み方：'+q.a;
+    } else if(q.type==='proverb_meaning'){
+      ngBody='正解の意味：'+q.a.substring(0,40)+(q.a.length>40?'…':''); ngMeaning='（'+q.q+'）'; readText=q.q+' 意味：'+q.a;
+    } else {
+      ngBody='正解：'+q.a+(q.reading?' ('+q.reading+')':''); ngMeaning='意味：'+q.q; readText=q.a+(q.reading?' ('+q.reading+')':'')+' 意味：'+q.q;
+    }
+    document.getElementById('fb-ng-body').textContent=ngBody;
+    document.getElementById('fb-ng-meaning').textContent=ngMeaning;
     document.getElementById('fb-ng').style.display='block';
-    document.getElementById('read-box').textContent=q.type==='kanji'?q.q+' → '+q.a:q.a+(q.reading?' ('+q.reading+')':'')+' 意味：'+q.q;
+    document.getElementById('read-box').textContent=readText;
     document.getElementById('speech-gate').style.display='block';
     document.getElementById('speech-btn').disabled=false;
     document.getElementById('speech-btn').textContent='🔊 読み上げる';
@@ -841,10 +1142,20 @@ function onDunno(){
   disableChoices();document.getElementById('dunno-btn').disabled=true;
   var btns=document.getElementById('choices').querySelectorAll('.choice-btn');
   for(var i=0;i<btns.length;i++){if(btns[i].getAttribute('data-val')===q.a)btns[i].classList.add('reveal');}
-  document.getElementById('fb-ng-body').textContent=(q.type==='kanji'?'正解：'+q.a:'正解：'+q.a+(q.reading?' ('+q.reading+')':''));
-  document.getElementById('fb-ng-meaning').textContent=q.type==='proverb'?'意味：'+q.q:'';
+  var ngBody2, ngMeaning2, readText2;
+  if(q.type==='kanji'){
+    ngBody2='正解：'+q.a; ngMeaning2=''; readText2=q.q+' → '+q.a;
+  } else if(q.type==='kanji_read'){
+    ngBody2='正解の読み：'+q.a; ngMeaning2='（漢字：'+q.q+'）'; readText2=q.q+' の読み方：'+q.a;
+  } else if(q.type==='proverb_meaning'){
+    ngBody2='正解の意味：'+q.a.substring(0,40)+(q.a.length>40?'…':''); ngMeaning2='（'+q.q+'）'; readText2=q.q+' 意味：'+q.a;
+  } else {
+    ngBody2='正解：'+q.a+(q.reading?' ('+q.reading+')':''); ngMeaning2='意味：'+q.q; readText2=q.a+(q.reading?' ('+q.reading+')':'')+' 意味：'+q.q;
+  }
+  document.getElementById('fb-ng-body').textContent=ngBody2;
+  document.getElementById('fb-ng-meaning').textContent=ngMeaning2;
   document.getElementById('fb-ng').style.display='block';
-  document.getElementById('read-box').textContent=q.type==='kanji'?q.q+' → '+q.a:q.a+(q.reading?' ('+q.reading+')':'')+' 意味：'+q.q;
+  document.getElementById('read-box').textContent=readText2;
   document.getElementById('speech-gate').style.display='block';
   document.getElementById('speech-btn').disabled=false;
   document.getElementById('speech-btn').textContent='🔊 読み上げる';
