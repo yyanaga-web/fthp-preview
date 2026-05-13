@@ -234,6 +234,41 @@ header p{font-size:0.7rem;color:#888;margin-top:2px;}
     <div class="cal-grid" id="cal-grid"></div>
   </div>
 
+  <!-- 累計正解数カード -->
+  <div style="margin-bottom:12px;">
+    <div style="font-size:0.75rem;color:#888;text-align:center;margin-bottom:8px;font-weight:700;">📊 これまでの正解数（重複なし）</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;">
+      <div style="background:#1a0800;border:1px solid #e74c3c;border-radius:10px;padding:8px;text-align:center;">
+        <div style="font-size:1rem;">✏️</div>
+        <div style="font-size:0.62rem;color:#e74c3c;font-weight:700;">漢字</div>
+        <div id="stat-kanji" style="font-size:1.1rem;font-weight:900;color:#fff;line-height:1.2;">0</div>
+        <div style="font-size:0.55rem;color:#666;">問</div>
+      </div>
+      <div style="background:#0a001a;border:1px solid #9b59b6;border-radius:10px;padding:8px;text-align:center;">
+        <div style="font-size:1rem;">📖</div>
+        <div style="font-size:0.62rem;color:#9b59b6;font-weight:700;">ことわざ</div>
+        <div id="stat-proverb" style="font-size:1.1rem;font-weight:900;color:#fff;line-height:1.2;">0</div>
+        <div style="font-size:0.55rem;color:#666;">問</div>
+      </div>
+      <div style="background:#001a0a;border:1px solid #27ae60;border-radius:10px;padding:8px;text-align:center;">
+        <div style="font-size:1rem;">🔬</div>
+        <div style="font-size:0.62rem;color:#27ae60;font-weight:700;">理科</div>
+        <div id="stat-science" style="font-size:1.1rem;font-weight:900;color:#fff;line-height:1.2;">0</div>
+        <div style="font-size:0.55rem;color:#666;">問</div>
+      </div>
+      <div style="background:#1a0500;border:1px solid #e67e22;border-radius:10px;padding:8px;text-align:center;">
+        <div style="font-size:1rem;">🌏</div>
+        <div style="font-size:0.62rem;color:#e67e22;font-weight:700;">社会</div>
+        <div id="stat-social" style="font-size:1.1rem;font-weight:900;color:#fff;line-height:1.2;">0</div>
+        <div style="font-size:0.55rem;color:#666;">問</div>
+      </div>
+    </div>
+    <div style="background:#0a0a0a;border:1px solid #f1c40f;border-radius:10px;padding:10px;text-align:center;margin-top:6px;">
+      <span style="font-size:0.75rem;color:#f1c40f;font-weight:700;">🏆 合計（漢字＋ことわざ＋理科＋社会）</span>
+      <div id="stat-total" style="font-size:1.4rem;font-weight:900;color:#f1c40f;line-height:1.3;">0 問</div>
+    </div>
+  </div>
+
   <div class="review-banner" id="review-banner" onclick="startReview()">
     <div class="review-banner-title">🔁 復習問題あり！<span class="review-banner-bonus">+15 EXP ボーナス</span></div>
     <div class="review-banner-sub" id="review-banner-sub">昨日まちがえた問題が出るよ！</div>
@@ -457,6 +492,13 @@ header p{font-size:0.7rem;color:#888;margin-top:2px;}
   </div>
 
   <button class="home-btn" onclick="show('s-home')" style="margin-top:4px;">🏠 ホームに戻る</button>
+
+  <div style="margin-top:20px;border-top:1px solid #222;padding-top:16px;">
+    <div style="font-size:0.75rem;color:#888;text-align:center;margin-bottom:10px;font-weight:700;">⚙️ データ管理</div>
+    <button onclick="clearTodayReviewManual()" style="display:block;width:100%;background:none;border:1px solid #555;border-radius:10px;padding:12px;color:#aaa;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:sans-serif;margin-bottom:8px;">🗑️ 今日の復習問題をリセット</button>
+    <button onclick="clearAllReviewManual()" style="display:block;width:100%;background:none;border:1px solid #555;border-radius:10px;padding:12px;color:#aaa;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:sans-serif;margin-bottom:8px;">🗑️ 復習キューを全部クリア</button>
+    <button onclick="resetAllData()" style="display:block;width:100%;background:none;border:1px solid #c0392b;border-radius:10px;padding:12px;color:#e74c3c;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:sans-serif;">⚠️ 全データをリセット（最初からやり直す）</button>
+  </div>
 </div>
 
 <!-- HANDWRITING QUIZ SCREEN -->
@@ -865,7 +907,8 @@ function getMonsterData() {
     levels: {0:1},
     exps: {0:0},
     totalCorrect: 0,
-    streak: 0
+    streak: 0,
+    modeCounts: {kanji:0, proverb:0, mixed:0, science:0, social:0, review:0}
   });
 }
 function saveMonsterData(md) { setData('monsters', md); }
@@ -899,7 +942,23 @@ function addExp(amount) {
   }
   md.levels[id] = lv;
   md.exps[id] = exp;
-  md.totalCorrect = (md.totalCorrect || 0) + (amount > 0 ? 1 : 0);
+  // 重複なしカウント（復習は含めない）
+  if(amount > 0) {
+    if(!md.modeCounts) md.modeCounts={kanji:0,proverb:0,mixed:0,science:0,social:0};
+    if(!md.solvedKeys) md.solvedKeys={};
+    var mk = (typeof currentMode !== 'undefined' ? currentMode : null) || 'mixed';
+    // 復習モードはカウントしない
+    if(mk !== 'review') {
+      var curQ = (typeof questions !== 'undefined' && questions[typeof idx !== 'undefined' ? idx : 0]);
+      // 問題のベースキー（モードに関係なく問題と答えで判断）
+      var qkey = curQ ? (curQ.q+'|'+curQ.a) : null;
+      if(qkey && !md.solvedKeys[qkey]) {
+        md.solvedKeys[qkey] = 1;
+        md.modeCounts[mk] = (md.modeCounts[mk]||0) + 1;
+      }
+    }
+    md.totalCorrect = (md.totalCorrect || 0) + 1; // EXP用合計は従来通り
+  }
   saveMonsterData(md);
 
   // Maybe unlock new monster (every 50 correct answers)
@@ -985,7 +1044,13 @@ function getReviewQueue(){return getData('reviewQueue',{});}
 function saveReviewQueue(q){setData('reviewQueue',q);}
 function addToReview(q){
   var rq=getReviewQueue();
-  var key=q.type+'|'+q.q+'|'+q.a;
+  // 理科・社会は選択肢も保存（JSON形式）
+  var key;
+  if((q.type==='science'||q.type==='social')&&q.choices){
+    key=q.type+'|'+q.q+'|'+q.a+'|CHOICES:'+JSON.stringify(q.choices);
+  } else {
+    key=q.type+'|'+q.q+'|'+q.a;
+  }
   var d1=dateStr(1),d2=dateStr(2);
   if(!rq[d1])rq[d1]=[];if(!rq[d2])rq[d2]=[];
   if(rq[d1].indexOf(key)===-1)rq[d1].push(key);
@@ -994,7 +1059,22 @@ function addToReview(q){
 }
 function getTodayReview(){
   var rq=getReviewQueue(),today=todayStr(),items=rq[today]||[],result=[];
-  for(var i=0;i<items.length;i++){var p=items[i].split('|');if(p.length>=3)result.push({type:p[0],q:p[1],a:p.slice(2).join('|'),isReview:true});}
+  for(var i=0;i<items.length;i++){
+    var item=items[i];
+    var choicesData=null;
+    // 選択肢データが含まれている場合（理科・社会）
+    var choicesIdx=item.indexOf('|CHOICES:');
+    if(choicesIdx!==-1){
+      try{ choicesData=JSON.parse(item.slice(choicesIdx+9)); }catch(e){}
+      item=item.slice(0,choicesIdx);
+    }
+    var p=item.split('|');
+    if(p.length>=3){
+      var obj={type:p[0],q:p[1],a:p.slice(2).join('|'),isReview:true};
+      if(choicesData) obj.choices=choicesData;
+      result.push(obj);
+    }
+  }
   return result;
 }
 function clearTodayReview(){var rq=getReviewQueue();delete rq[todayStr()];saveReviewQueue(rq);}
@@ -1039,6 +1119,20 @@ function initHome(){
   var rb=document.getElementById('review-banner');
   rb.style.display=rev.length>0?'block':'none';
   if(rev.length>0)document.getElementById('review-banner-sub').textContent='復習問題が '+rev.length+' 問あります！先にやっておこう';
+  // 累計正解数を表示（復習は含めない・modeCounts優先）
+  var md2=getMonsterData();
+  var mc=md2.modeCounts||{};
+  var setS=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v||0;};
+  var kanjiCount   = mc.kanji||0;
+  var provCount    = (mc.proverb||0)+(mc.mixed||0);
+  var sciCount     = mc.science||0;
+  var socCount     = mc.social||0;
+  var totalCount   = kanjiCount + provCount + sciCount + socCount;
+  setS('stat-kanji',   kanjiCount);
+  setS('stat-proverb', provCount);
+  setS('stat-science', sciCount);
+  setS('stat-social',  socCount);
+  setS('stat-total',   totalCount);
   // Lock mode buttons if review exists
   var locked = rev.length > 0;
   var modeBtns = document.querySelectorAll('.mode-btn');
@@ -1068,7 +1162,7 @@ function buildCalendar(done,today){
 }
 
 // ===== MODE / BUILD =====
-var mode='',questions=[],idx=0,scoreOK=0,scoreNG=0,answered=false,speechOK=false,wrongThisSession=[],isReviewMode=false;
+var mode='',currentMode='',questions=[],idx=0,scoreOK=0,scoreNG=0,answered=false,speechOK=false,wrongThisSession=[],isReviewMode=false;
 var sessionExpGained=0;
 
 function selectMode(m){
@@ -1084,13 +1178,14 @@ function selectMode(m){
   show('s-count');
 }
 
-function startReview(){var items=getTodayReview();if(!items.length)return;isReviewMode=true;mode='review';questions=items;shuffle(questions);idx=0;scoreOK=0;scoreNG=0;wrongThisSession=[];sessionExpGained=0;show('s-quiz');loadQuestion();}
+function startReview(){var items=getTodayReview();if(!items.length)return;isReviewMode=true;mode='review';currentMode='review';questions=items;shuffle(questions);idx=0;scoreOK=0;scoreNG=0;wrongThisSession=[];sessionExpGained=0;show('s-quiz');loadQuestion();}
 
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
 function build(n){
   var pool=[],i,r;
   // 漢字モードは手書き画面へ
+  currentMode = mode;
   if(mode==='kanji'){
     for(i=0;i<KANJI.length;i++) pool.push({type:'kanji',q:KANJI[i].question,a:KANJI[i].answer});
     shuffle(pool);
@@ -1216,7 +1311,17 @@ function renderChoices(choices,answer){
 function fetchChoices(q){
   // 理科・社会は固定選択肢を使う（AI不要）
   if(q.type==='science'||q.type==='social'){
-    var fixedChoices=q.choices.slice();
+    // choicesがない場合はSCIENCE/SOCIALから検索して補完
+    var fixedChoices=[];
+    if(q.choices && q.choices.length){
+      fixedChoices=q.choices.slice();
+    } else {
+      var src=(q.type==='science')?SCIENCE:SOCIAL;
+      for(var si=0;si<src.length;si++){
+        if(src[si].q===q.q){ fixedChoices=src[si].choices.slice(); break; }
+      }
+    }
+    if(!fixedChoices.length) fixedChoices=[q.a,'わからない','その他','なし'];
     shuffle(fixedChoices);
     renderChoices(fixedChoices,q.a);
     return;
@@ -1850,6 +1955,28 @@ function closeMonAnim() {
   }
 }
 
+function resetAllData(){
+  if(!confirm('全てのデータをリセットしますか？この操作は取り消せません！')) return;
+  try{ localStorage.removeItem('yuuta_q2'); }catch(e){}
+  window._mem = {};
+  initHome();
+  alert('全データをリセットしました！');
+}
+
+function clearTodayReviewManual(){
+  if(!confirm('今日の復習問題をリセットしますか？')) return;
+  var rq=getReviewQueue();
+  delete rq[todayStr()];
+  saveReviewQueue(rq);
+  initHome();
+  alert('今日の復習問題をリセットしました！');
+}
+function clearAllReviewManual(){
+  if(!confirm('復習キューを全部クリアしますか？')) return;
+  saveReviewQueue({});
+  initHome();
+  alert('全ての復習問題をクリアしました！');
+}
 initHome();
 </script>
 </body>
