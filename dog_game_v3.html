@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>わんわんゲーム</title>
+    <style>
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #FFFDE7;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            width: 100vw; height: 100vh;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .dog-card {
+            width: 28%; height: 60%;
+            background: white;
+            border: 10px solid #333;
+            border-radius: 30px;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s, border-color 0.3s, background-color 0.3s;
+            overflow: hidden;
+        }
+        .dog-card.selected {
+            border-color: #FF5252;
+            transform: scale(1.1);
+            background-color: #FFEBEE;
+        }
+        .dog-emoji { font-size: clamp(48px, 10vw, 80px); line-height: 1; }
+        .dog-name  { margin-top: 12px; font-size: clamp(14px, 3vw, 22px); font-weight: bold; color: #555; }
+        .timer-bar {
+            position: absolute; bottom: 0; left: 0;
+            height: 14px; background: #4CAF50; width: 0%;
+            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+            transition: width 0.1s linear;
+        }
+
+        /* カメラ＋顔検出オーバーレイ */
+        #cam-wrap {
+            position: absolute; top: 10px; right: 10px;
+            width: 140px; height: 105px;
+            border: 4px solid #333; border-radius: 10px;
+            overflow: hidden; background: #000; z-index: 100;
+        }
+        #video  { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+        #overlay{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: scaleX(-1); pointer-events: none; }
+
+        /* 視線インジケーター */
+        #gaze-bar {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 36px;
+            background: rgba(255,255,255,0.9); border: 3px solid #333; border-radius: 18px;
+            z-index: 100; overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+        #gaze-dot {
+            width: 24px; height: 24px;
+            background: #FF5252; border-radius: 50%;
+            position: absolute; left: 50%; transform: translateX(-50%);
+            transition: left 0.08s ease;
+        }
+
+        #status {
+            position: absolute; bottom: 20px; width: 100%;
+            text-align: center; font-size: clamp(18px, 4vw, 26px);
+            font-weight: bold; color: #333; z-index: 100;
+        }
+        @keyframes bark {
+            0%   { transform: scale(1.1); }
+            50%  { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1.1); }
+        }
+        .barking { animation: bark 0.3s infinite; }
+
+        /* ローディング */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #FFFDE7; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 1000; gap: 16px; font-size: 20px; font-weight: bold; color: #555;
+        }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 6px solid #eee; border-top-color: #FF5252;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #load-sub { font-size: 14px; color: #888; font-weight: normal; }
+
+        #error-box {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff3f3; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 1000; gap: 14px; padding: 30px; text-align: center;
+            font-size: 18px; color: #c00;
+        }
+        #retry-btn {
+            padding: 12px 28px; font-size: 18px;
+            background: #FF5252; color: white; border: none; border-radius: 12px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <div id="load-msg">カメラを起動中...</div>
+    <div id="load-sub">カメラの許可をタップしてください</div>
+</div>
+
+<div id="error-box">
+    <div style="font-size:48px">📷</div>
+    <div id="err-msg">カメラを使用できませんでした</div>
+    <button id="retry-btn" onclick="location.reload()">もう一度試す</button>
+</div>
+
+<div id="cam-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="overlay"></canvas>
+</div>
+
+<div id="gaze-bar"><div id="gaze-dot"></div></div>
+
+<div id="game-container">
+    <div class="dog-card" id="dog-0">
+        <div class="dog-emoji">🐶</div>
+        <div class="dog-name">ポチ</div>
+        <div class="timer-bar" id="timer-0"></div>
+    </div>
+    <div class="dog-card" id="dog-1">
+        <div class="dog-emoji">🐕</div>
+        <div class="dog-name">コロ</div>
+        <div class="timer-bar" id="timer-1"></div>
+    </div>
+    <div class="dog-card" id="dog-2">
+        <div class="dog-emoji">🦮</div>
+        <div class="dog-name">タロ</div>
+        <div class="timer-bar" id="timer-2"></div>
+    </div>
+</div>
+
+<div id="status">顔を左右に向けて選んでね！</div>
+
+<script>
+// =============================================
+//  顔の向き検出の仕組み：
+//  FaceDetector API（Chrome標準）で両目の座標を取得し、
+//  「鼻の推定位置（目の中心）」と「実際の顔の中心X」のズレから
+//  左右の向きを判定する。
+//  FaceDetector非対応なら肌色重心＋キャリブレーションにフォールバック。
+// =============================================
+
+const DECISION_TIME = 1500;
+let currentSelection = -1;
+let selectionStartTime = 0;
+let lastDecideTime = 0;
+
+const video   = document.getElementById("video");
+const overlayCanvas = document.getElementById("overlay");
+const octx    = overlayCanvas.getContext("2d");
+
+// ----- Web Audio 犬鳴き声 -----
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playBark() {
+    [0, 0.2].forEach(t => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.frequency.setValueAtTime(350, audioCtx.currentTime + t);
+        o.frequency.exponentialRampToValueAtTime(160, audioCtx.currentTime + t + 0.13);
+        g.gain.setValueAtTime(0.45, audioCtx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + 0.15);
+        o.start(audioCtx.currentTime + t);
+        o.stop(audioCtx.currentTime + t + 0.16);
+    });
+}
+
+// ----- ゲームロジック -----
+let smoothGaze = 0.5; // 0=完全左, 1=完全右
+
+function updateGazeDot(gaze) {
+    const bar = document.getElementById("gaze-bar");
+    const dot = document.getElementById("gaze-dot");
+    const range = (bar.offsetWidth - 28) / 2;
+    const offset = (gaze - 0.5) * 2 * range;
+    dot.style.left = `calc(50% + ${offset}px)`;
+}
+
+function updateSelection(index) {
+    const cards  = document.querySelectorAll(".dog-card");
+    const timers = document.querySelectorAll(".timer-bar");
+
+    if (index !== currentSelection) {
+        currentSelection = index;
+        selectionStartTime = performance.now();
+        cards.forEach((c, i) => {
+            c.classList.toggle("selected", i === index);
+            if (i !== index) timers[i].style.width = "0%";
+        });
+    }
+    if (currentSelection !== -1) {
+        const elapsed  = performance.now() - selectionStartTime;
+        const progress = Math.min(elapsed / DECISION_TIME * 100, 100);
+        document.getElementById(`timer-${currentSelection}`).style.width = `${progress}%`;
+        if (progress >= 100) executeDecision(currentSelection);
+    }
+}
+
+function executeDecision(index) {
+    const card = document.getElementById(`dog-${index}`);
+    const now  = performance.now();
+    if (now - lastDecideTime < 2500) return;
+    lastDecideTime = now;
+    if (!card.classList.contains("barking")) {
+        card.classList.add("barking");
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        playBark();
+        document.getElementById("status").innerText = "わんわん！🐾";
+        setTimeout(() => {
+            card.classList.remove("barking");
+            document.getElementById("status").innerText = "つぎはどれかな？";
+            selectionStartTime = performance.now();
+        }, 2000);
+    }
+}
+
+// =============================================
+//  方式A: FaceDetector API（Chrome 74+対応）
+//  両目のランドマークから顔のヨー角を推定
+// =============================================
+async function runFaceDetector() {
+    const detector = new FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+    document.getElementById("load-msg").innerText = "顔検出を準備中...";
+
+    // オーバーレイcanvasサイズ同期
+    overlayCanvas.width  = overlayCanvas.offsetWidth;
+    overlayCanvas.height = overlayCanvas.offsetHeight;
+
+    async function detect() {
+        if (video.readyState < 2) { requestAnimationFrame(detect); return; }
+        try {
+            const faces = await detector.detect(video);
+            octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+            if (faces.length > 0) {
+                const face = faces[0];
+                const box  = face.boundingBox;
+
+                // 両目のランドマーク
+                const landmarks = face.landmarks || [];
+                const leftEye   = landmarks.find(l => l.type === "eye");
+                const eyes      = landmarks.filter(l => l.type === "eye");
+
+                let gaze = 0.5;
+
+                if (eyes.length >= 2) {
+                    // 両目の中心X = 顔の「正面向き」基準
+                    // ミラー表示なので左右反転済み
+                    const eyeCenterX = (eyes[0].location.x + eyes[1].location.x) / 2;
+                    const faceCenterX = box.x + box.width / 2;
+
+                    // eyeCenterがfaceCenterに対して右にズレ = 右向き
+                    const offset = (eyeCenterX - faceCenterX) / (box.width * 0.5);
+                    // -1(左向き)〜+1(右向き) → 0〜1
+                    gaze = Math.max(0, Math.min(1, 0.5 + offset * 1.5));
+
+                    // デバッグ描画（小さなカメラプレビュー上）
+                    const scaleX = overlayCanvas.width  / video.videoWidth;
+                    const scaleY = overlayCanvas.height / video.videoHeight;
+                    octx.strokeStyle = "#0f0";
+                    octx.lineWidth = 2;
+                    octx.strokeRect(
+                        box.x * scaleX, box.y * scaleY,
+                        box.width * scaleX, box.height * scaleY
+                    );
+                    eyes.forEach(e => {
+                        octx.fillStyle = "#f00";
+                        octx.beginPath();
+                        octx.arc(e.location.x * scaleX, e.location.y * scaleY, 3, 0, Math.PI*2);
+                        octx.fill();
+                    });
+                } else {
+                    // ランドマークなし → 顔位置のX中心で代替
+                    const faceCenterX = (box.x + box.width / 2) / video.videoWidth;
+                    gaze = faceCenterX; // ミラー反転済みなので左=小, 右=大
+                }
+
+                smoothGaze += (gaze - smoothGaze) * 0.25;
+                updateGazeDot(smoothGaze);
+
+                const delta = smoothGaze - 0.5;
+                let sel;
+                if      (delta < -0.12) sel = 0;
+                else if (delta >  0.12) sel = 2;
+                else                    sel = 1;
+                updateSelection(sel);
+
+            } else {
+                updateSelection(-1);
+            }
+        } catch(e) { /* フレームスキップ */ }
+        requestAnimationFrame(detect);
+    }
+
+    document.getElementById("loading-overlay").style.display = "none";
+    detect();
+}
+
+// =============================================
+//  方式B: フォールバック（FaceDetector非対応時）
+//  肌色検出＋顔位置キャリブレーション
+//  ※v2と同じだが感度を改善
+// =============================================
+const fbCanvas = document.createElement("canvas");
+fbCanvas.width = 96; fbCanvas.height = 72;
+const fbCtx = fbCanvas.getContext("2d", { willReadFrequently: true });
+
+let fbBaseline = null, fbCalibFrames = 0, fbCalibSum = 0;
+let fbSmooth = 0.5;
+
+function fallbackDetect() {
+    if (video.readyState < 2) { requestAnimationFrame(fallbackDetect); return; }
+
+    fbCtx.drawImage(video, 0, 0, 96, 72);
+    const d = fbCtx.getImageData(0, 0, 96, 72).data;
+
+    // 顔エリアを上半分に絞る（服の色などを除外）
+    let sumX = 0, count = 0;
+    for (let y = 0; y < 36; y++) {
+        for (let x = 0; x < 96; x++) {
+            const i = (y * 96 + x) * 4;
+            const r = d[i], g = d[i+1], b = d[i+2];
+            if (r > 100 && g > 50 && b > 30 &&
+                r > g && r > b &&
+                r - g > 10 && r - b > 20 &&
+                r < 240) {
+                sumX += x;
+                count++;
+            }
+        }
+    }
+
+    if (count >= 20) {
+        const rawX = sumX / count / 96; // ミラーなので左右は既に反転
+
+        if (fbBaseline === null) {
+            fbCalibSum += rawX;
+            fbCalibFrames++;
+            if (fbCalibFrames >= 40) {
+                fbBaseline = fbCalibSum / fbCalibFrames;
+                document.getElementById("loading-overlay").style.display = "none";
+            }
+        } else {
+            fbSmooth += (rawX - fbSmooth) * 0.2;
+            updateGazeDot(fbSmooth);
+
+            const delta = fbSmooth - fbBaseline;
+            const THRESH = 0.07;
+            let sel;
+            if      (delta < -THRESH) sel = 0;
+            else if (delta >  THRESH) sel = 2;
+            else                      sel = 1;
+            updateSelection(sel);
+        }
+    } else if (fbBaseline !== null) {
+        updateSelection(-1);
+    }
+
+    requestAnimationFrame(fallbackDetect);
+}
+
+// =============================================
+//  起動
+// =============================================
+async function start() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+        video.srcObject = stream;
+
+        await new Promise(resolve => video.onloadeddata = resolve);
+
+        if (typeof FaceDetector !== "undefined") {
+            // FaceDetector API 対応ブラウザ
+            document.getElementById("load-sub").innerText = "FaceDetector APIを使用";
+            await runFaceDetector();
+        } else {
+            // フォールバック
+            document.getElementById("load-msg").innerText = "キャリブレーション中...";
+            document.getElementById("load-sub").innerText = "画面中央を向いてください";
+            fallbackDetect();
+        }
+
+    } catch (e) {
+        document.getElementById("loading-overlay").style.display = "none";
+        document.getElementById("err-msg").innerText =
+            e.name === "NotAllowedError"
+                ? "カメラの許可が必要です。\nブラウザ設定からカメラを許可してください。"
+                : `エラー: ${e.message}`;
+        document.getElementById("error-box").style.display = "flex";
+    }
+}
+
+start();
+</script>
+</body>
+</html>
