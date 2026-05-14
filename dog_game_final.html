@@ -14,38 +14,40 @@
             user-select: none;
         }
 
-        /* ===== カード ===== */
+        /* ===== カード（縦並び） ===== */
         #game {
             width: 100vw; height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: space-around;
             align-items: center;
+            padding: 8px 0;
         }
         .card {
-            width: 28%; height: 62%;
+            width: 80%; height: 26%;
             background: white;
             border: 8px solid #ddd;
             border-radius: 28px;
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: row;
             justify-content: center; align-items: center;
+            gap: 20px;
             position: relative; overflow: hidden;
             box-shadow: 0 8px 24px rgba(0,0,0,0.12);
             transition: border-color 0.15s, transform 0.15s, background 0.15s;
         }
         .card.gazing {
             border-color: #FF5252;
-            transform: scale(1.07);
+            transform: scale(1.04);
             background: #FFF3F3;
         }
-        .card .emoji { font-size: clamp(52px, 12vw, 88px); line-height: 1; }
+        .card .emoji { font-size: clamp(48px, 12vw, 72px); line-height: 1; }
         .card .name  {
-            margin-top: 12px;
-            font-size: clamp(15px, 4vw, 24px);
+            font-size: clamp(20px, 5vw, 32px);
             font-weight: bold; color: #555;
         }
         .dwell {
             position: absolute; bottom: 0; left: 0;
-            height: 14px; width: 0%;
+            height: 12px; width: 0%;
             background: linear-gradient(90deg, #4CAF50, #8BC34A);
             border-radius: 0 0 20px 20px;
             transition: width 0.06s linear;
@@ -208,22 +210,22 @@ import {
 // ============================================================
 //  パラメーター
 // ============================================================
-const DWELL_MS    = 1800;  // 視線滞留→確定(ms)
+const DWELL_MS    = 1400;  // 視線滞留→確定(ms)
 const COOLDOWN_MS = 2500;  // 確定後クールダウン(ms)
 const SMOOTH_K    = 0.15;  // スムージング
-const MARGIN_PX   = 30;    // カード判定余白(px)
+const MARGIN_PX   = 50;    // カード判定余白(px) ← 広げた
 
 // 虹彩ランドマーク（MediaPipe Tasks Vision）
 const L_IRIS = 468;
 const R_IRIS = 473;
 
-// キャリブレーション点（画面%）
+// キャリブレーション点（縦3列×横3行 → スマホ縦画面向け）
 const CALIB_PTS = [
-    [15,15],[50,15],[85,15],
-    [15,50],[50,50],[85,50],
-    [15,85],[50,85],[85,85],
+    [25,12],[50,12],[75,12],
+    [25,50],[50,50],[75,50],
+    [25,88],[50,88],[75,88],
 ];
-const SAMPLES_PER_PT = 20;
+const SAMPLES_PER_PT = 25; // サンプル数を増やして精度アップ
 
 // ============================================================
 //  状態
