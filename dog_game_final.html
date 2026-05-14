@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>わんわんゲーム 👀</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #FFFDE7;
+            font-family: Arial, sans-serif;
+            user-select: none;
+        }
+
+        /* ===== カード ===== */
+        #game {
+            width: 100vw; height: 100vh;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .card {
+            width: 28%; height: 62%;
+            background: white;
+            border: 8px solid #ddd;
+            border-radius: 28px;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            position: relative; overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: border-color 0.15s, transform 0.15s, background 0.15s;
+        }
+        .card.gazing {
+            border-color: #FF5252;
+            transform: scale(1.07);
+            background: #FFF3F3;
+        }
+        .card .emoji { font-size: clamp(52px, 12vw, 88px); line-height: 1; }
+        .card .name  {
+            margin-top: 12px;
+            font-size: clamp(15px, 4vw, 24px);
+            font-weight: bold; color: #555;
+        }
+        .dwell {
+            position: absolute; bottom: 0; left: 0;
+            height: 14px; width: 0%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 0 0 20px 20px;
+            transition: width 0.06s linear;
+        }
+        @keyframes woof {
+            0%,100% { transform: scale(1.07); }
+            40%     { transform: scale(1.18) rotate(5deg); }
+            70%     { transform: scale(1.15) rotate(-4deg); }
+        }
+        .card.woofing {
+            animation: woof 0.28s ease-in-out infinite;
+            border-color: #FF5252;
+        }
+
+        /* ===== カメラ ===== */
+        #cam-wrap {
+            position: fixed; bottom: 12px; right: 12px;
+            width: 100px; height: 75px;
+            border: 3px solid #333; border-radius: 10px;
+            overflow: hidden; background: #000; z-index: 200;
+        }
+        #video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            display: block;
+        }
+
+        /* ===== 視線カーソル ===== */
+        #cursor {
+            position: fixed;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 82, 82, 0.3);
+            border: 3px solid rgba(255, 82, 82, 0.9);
+            pointer-events: none;
+            z-index: 300;
+            transform: translate(-50%, -50%);
+            display: none;
+            transition: left 0.05s ease, top 0.05s ease;
+        }
+
+        /* ===== ステータス ===== */
+        #status {
+            position: fixed; top: 16px; left: 0; width: 100%;
+            text-align: center;
+            font-size: clamp(15px, 3.5vw, 22px);
+            font-weight: bold; color: #444; z-index: 100;
+        }
+
+        /* ===== オーバーレイ ===== */
+        .overlay {
+            position: fixed; inset: 0;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            gap: 20px; z-index: 500;
+            font-size: 20px; font-weight: bold; color: #444;
+            padding: 32px; text-align: center;
+            background: #FFFDE7;
+        }
+        #ov-loading { }
+        #ov-calib   { display: none; }
+        #ov-error   { display: none; background: #fff3f3; color: #c00; }
+
+        .spinner {
+            width: 52px; height: 52px;
+            border: 7px solid #ddd; border-top-color: #FF5252;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .sub { font-size: 14px; color: #777; font-weight: normal; line-height: 1.7; }
+
+        /* ===== キャリブレーション ===== */
+        #calib-area {
+            position: fixed; inset: 0;
+            display: none; z-index: 400;
+            background: rgba(255,253,231,0.97);
+        }
+        .cdot {
+            position: absolute;
+            width: 54px; height: 54px;
+            background: #FF5252; border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 0 0 0 rgba(255,82,82,0.5);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(255,82,82,0.5); }
+            70%  { box-shadow: 0 0 0 20px rgba(255,82,82,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,82,82,0); }
+        }
+        .cdot.done { background: #4CAF50; animation: none; }
+        #calib-msg {
+            position: absolute; bottom: 80px; left: 0; width: 100%;
+            text-align: center; font-size: 18px; font-weight: bold; color: #444;
+        }
+        #calib-prog {
+            position: absolute; bottom: 48px; left: 0; width: 100%;
+            text-align: center; font-size: 14px; color: #888;
+        }
+
+        #err-btn {
+            padding: 14px 32px; font-size: 18px;
+            background: #FF5252; color: white;
+            border: none; border-radius: 14px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="ov-loading">
+    <div class="spinner"></div>
+    <div id="load-msg">読み込み中...</div>
+    <div class="sub">初回は20〜30秒かかります</div>
+</div>
+
+<div class="overlay" id="ov-error">
+    <div style="font-size:52px">⚠️</div>
+    <div id="err-title">エラーが発生しました</div>
+    <div class="sub" id="err-msg"></div>
+    <button id="err-btn" onclick="location.reload()">もう一度試す</button>
+</div>
+
+<div id="calib-area">
+    <div id="calib-msg">👁️ 赤い点を順番に見てください</div>
+    <div id="calib-prog"></div>
+</div>
+
+<div id="cursor"></div>
+<div id="status">読み込み中...</div>
+
+<div id="game">
+    <div class="card" id="c0">
+        <div class="emoji">🐶</div>
+        <div class="name">ポチ</div>
+        <div class="dwell" id="d0"></div>
+    </div>
+    <div class="card" id="c1">
+        <div class="emoji">🐕</div>
+        <div class="name">コロ</div>
+        <div class="dwell" id="d1"></div>
+    </div>
+    <div class="card" id="c2">
+        <div class="emoji">🦮</div>
+        <div class="name">タロ</div>
+        <div class="dwell" id="d2"></div>
+    </div>
+</div>
+
+<div id="cam-wrap"><video id="video" autoplay playsinline muted></video></div>
+
+<script type="module">
+import {
+    FaceLandmarker,
+    FilesetResolver
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/vision_bundle.mjs";
+
+// ============================================================
+//  パラメーター
+// ============================================================
+const DWELL_MS    = 1800;  // 視線滞留→確定(ms)
+const COOLDOWN_MS = 2500;  // 確定後クールダウン(ms)
+const SMOOTH_K    = 0.15;  // スムージング
+const MARGIN_PX   = 30;    // カード判定余白(px)
+
+// 虹彩ランドマーク（MediaPipe Tasks Vision）
+const L_IRIS = 468;
+const R_IRIS = 473;
+
+// キャリブレーション点（画面%）
+const CALIB_PTS = [
+    [15,15],[50,15],[85,15],
+    [15,50],[50,50],[85,50],
+    [15,85],[50,85],[85,85],
+];
+const SAMPLES_PER_PT = 20;
+
+// ============================================================
+//  状態
+// ============================================================
+const video  = document.getElementById("video");
+const cursor = document.getElementById("cursor");
+
+let landmarker  = null;
+let calibIdx    = 0;
+let calibData   = [];   // [{eyeX,eyeY,screenX,screenY}]
+let calibBuf    = [];
+let calibCollecting = false;
+let calibDone   = false;
+let regX = null, regY = null;
+
+let gazeX = window.innerWidth  / 2;
+let gazeY = window.innerHeight / 2;
+let curSel    = -1;
+let selStart  = 0;
+let lastDecide= 0;
+let gameReady = false;
+
+// ============================================================
+//  音
+// ============================================================
+const ac = new (window.AudioContext || window.webkitAudioContext)();
+function bark() {
+    if (ac.state === "suspended") ac.resume();
+    [[0,380,165],[0.22,320,135]].forEach(([t,f0,f1]) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.connect(g); g.connect(ac.destination);
+        o.frequency.setValueAtTime(f0, ac.currentTime+t);
+        o.frequency.exponentialRampToValueAtTime(f1, ac.currentTime+t+0.13);
+        g.gain.setValueAtTime(0.48, ac.currentTime+t);
+        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+t+0.15);
+        o.start(ac.currentTime+t); o.stop(ac.currentTime+t+0.16);
+    });
+}
+
+// ============================================================
+//  線形回帰（最小二乗法）
+//  eyeX,eyeY → screenX or screenY
+// ============================================================
+function fitLinear(data, key) {
+    const n = data.length;
+    if (n < 4) return null;
+    let sx=0,sy=0,sz=0,sx2=0,sy2=0,sxy=0,sxz=0,syz=0;
+    data.forEach(d => {
+        const x=d.eyeX, y=d.eyeY, z=d[key];
+        sx+=x; sy+=y; sz+=z; sx2+=x*x; sy2+=y*y;
+        sxy+=x*y; sxz+=x*z; syz+=y*z;
+    });
+    const A = [
+        [sx2,sxy,sx,sxz],
+        [sxy,sy2,sy,syz],
+        [sx, sy, n, sz ],
+    ];
+    for (let c=0;c<3;c++) {
+        let mx=c;
+        for (let r=c+1;r<3;r++) if (Math.abs(A[r][c])>Math.abs(A[mx][c])) mx=r;
+        [A[c],A[mx]]=[A[mx],A[c]];
+        if (Math.abs(A[c][c])<1e-10) return null;
+        for (let r=c+1;r<3;r++) {
+            const f=A[r][c]/A[c][c];
+            for (let k=c;k<4;k++) A[r][k]-=f*A[c][k];
+        }
+    }
+    const cc=A[2][3]/A[2][2];
+    const b=(A[1][3]-A[1][2]*cc)/A[1][1];
+    const a=(A[0][3]-A[0][2]*cc-A[0][1]*b)/A[0][0];
+    return {a,b,c:cc};
+}
+
+function predictGaze(ex, ey) {
+    if (!regX || !regY) return null;
+    return {
+        x: regX.a*ex + regX.b*ey + regX.c,
+        y: regY.a*ex + regY.b*ey + regY.c,
+    };
+}
+
+// ============================================================
+//  キャリブレーション
+// ============================================================
+function showCalibDot(idx) {
+    const area = document.getElementById("calib-area");
+    area.querySelectorAll(".cdot").forEach(d => d.remove());
+
+    if (idx >= CALIB_PTS.length) {
+        regX = fitLinear(calibData, "screenX");
+        regY = fitLinear(calibData, "screenY");
+        calibDone = true;
+        area.style.display = "none";
+        startGame();
+        return;
+    }
+
+    const [px, py] = CALIB_PTS[idx];
+    const sx = window.innerWidth  * px / 100;
+    const sy = window.innerHeight * py / 100;
+
+    const dot = document.createElement("div");
+    dot.className = "cdot";
+    dot.style.left = `${px}%`;
+    dot.style.top  = `${py}%`;
+    dot.textContent = "👁️";
+    area.appendChild(dot);
+    document.getElementById("calib-prog").textContent = `${idx+1} / ${CALIB_PTS.length}`;
+
+    calibBuf = [];
+    calibCollecting = true;
+
+    // タップでも進める
+    let done = false;
+    const advance = () => {
+        if (done) return; done = true;
+        finishDot(dot, sx, sy);
+    };
+    dot.addEventListener("click",      advance, { once: true });
+    dot.addEventListener("touchstart", advance, { once: true, passive: true });
+    // 2.5秒で自動進行
+    setTimeout(advance, 2500);
+}
+
+function finishDot(dot, sx, sy) {
+    calibCollecting = false;
+    if (dot) dot.classList.add("done");
+    if (calibBuf.length >= 3) {
+        const ex = calibBuf.reduce((s,d)=>s+d.x,0)/calibBuf.length;
+        const ey = calibBuf.reduce((s,d)=>s+d.y,0)/calibBuf.length;
+        calibData.push({ eyeX:ex, eyeY:ey, screenX:sx, screenY:sy });
+    }
+    setTimeout(() => { calibIdx++; showCalibDot(calibIdx); }, 350);
+}
+
+// ============================================================
+//  ゲームロジック
+// ============================================================
+function hitCard(x, y) {
+    for (let i=0;i<3;i++) {
+        const r = document.getElementById(`c${i}`).getBoundingClientRect();
+        if (x>=r.left-MARGIN_PX && x<=r.right+MARGIN_PX &&
+            y>=r.top-MARGIN_PX  && y<=r.bottom+MARGIN_PX) return i;
+    }
+    return -1;
+}
+
+function onGaze(x, y) {
+    gazeX += (x - gazeX) * SMOOTH_K;
+    gazeY += (y - gazeY) * SMOOTH_K;
+    cursor.style.left = `${gazeX}px`;
+    cursor.style.top  = `${gazeY}px`;
+
+    const sel = hitCard(gazeX, gazeY);
+    if (sel !== curSel) {
+        if (curSel !== -1) {
+            document.getElementById(`c${curSel}`).classList.remove("gazing");
+            document.getElementById(`d${curSel}`).style.width = "0%";
+        }
+        curSel   = sel;
+        selStart = performance.now();
+        if (curSel !== -1)
+            document.getElementById(`c${curSel}`).classList.add("gazing");
+    }
+    if (curSel !== -1) {
+        const prog = Math.min((performance.now()-selStart)/DWELL_MS*100, 100);
+        document.getElementById(`d${curSel}`).style.width = `${prog}%`;
+        if (prog >= 100) decide(curSel);
+    }
+}
+
+function decide(idx) {
+    const now = performance.now();
+    if (now - lastDecide < COOLDOWN_MS) return;
+    lastDecide = now;
+    const card = document.getElementById(`c${idx}`);
+    if (card.classList.contains("woofing")) return;
+    document.getElementById(`d${idx}`).style.width = "0%";
+    selStart = now + COOLDOWN_MS;
+    card.classList.add("woofing");
+    bark();
+    document.getElementById("status").textContent = "わんわん！🐾";
+    setTimeout(() => {
+        card.classList.remove("woofing");
+        document.getElementById("status").textContent = "どのこをみてる？👀";
+    }, 2000);
+}
+
+function startGame() {
+    cursor.style.display = "block";
+    gameReady = true;
+    document.getElementById("status").textContent = "どのこをみてる？👀";
+}
+
+// ============================================================
+//  検出ループ
+// ============================================================
+let lastVideoTime = -1;
+
+function detect() {
+    if (video.readyState < 2 || video.currentTime === lastVideoTime) {
+        requestAnimationFrame(detect); return;
+    }
+    lastVideoTime = video.currentTime;
+
+    const results = landmarker.detectForVideo(video, performance.now());
+
+    if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+        const lms = results.faceLandmarks[0];
+        const L = lms[L_IRIS];
+        const R = lms[R_IRIS];
+
+        if (L && R) {
+            // 正規化座標(0〜1)を実際のカメラ画素に変換
+            // tasks-visionはflipHorizontal不要（内部で処理済み）
+            const eyeX = (L.x + R.x) / 2;
+            const eyeY = (L.y + R.y) / 2;
+
+            if (calibCollecting) {
+                calibBuf.push({ x: eyeX, y: eyeY });
+                if (calibBuf.length >= SAMPLES_PER_PT) {
+                    const dot = document.querySelector(".cdot:not(.done)");
+                    const [px, py] = CALIB_PTS[calibIdx];
+                    finishDot(dot,
+                        window.innerWidth  * px / 100,
+                        window.innerHeight * py / 100);
+                }
+            } else if (calibDone && gameReady) {
+                const pred = predictGaze(eyeX, eyeY);
+                if (pred) {
+                    onGaze(pred.x, pred.y);
+                } else {
+                    // 回帰なし（データ不足）→ 左右3分割で簡易判定
+                    const gx = eyeX * window.innerWidth;
+                    const gy = eyeY * window.innerHeight;
+                    onGaze(gx, gy);
+                }
+            }
+        }
+    }
+
+    requestAnimationFrame(detect);
+}
+
+// ============================================================
+//  初期化
+// ============================================================
+try {
+    document.getElementById("load-msg").textContent = "カメラを起動中...";
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }
+    });
+    video.srcObject = stream;
+    await new Promise(r => video.onloadeddata = r);
+
+    document.getElementById("load-msg").textContent = "AIモデルを読み込み中...";
+    const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+    );
+
+    landmarker = await FaceLandmarker.createFromOptions(vision, {
+        baseOptions: {
+            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+            delegate: "GPU"
+        },
+        outputFaceBlendshapes: false,
+        runningMode: "VIDEO",
+        numFaces: 1
+    });
+
+    // キャリブレーション開始
+    document.getElementById("ov-loading").style.display = "none";
+    document.getElementById("calib-area").style.display = "block";
+    showCalibDot(0);
+    detect();
+
+} catch(e) {
+    document.getElementById("ov-loading").style.display = "none";
+    document.getElementById("err-title").textContent =
+        e.name === "NotAllowedError" ? "カメラの許可が必要です" : "読み込みに失敗しました";
+    document.getElementById("err-msg").textContent = e.message || String(e);
+    document.getElementById("ov-error").style.display = "flex";
+}
+</script>
+</body>
+</html>
