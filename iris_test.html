@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>虹彩検出テスト</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #111; color: #fff; font-family: Arial, sans-serif; }
+        #wrap {
+            position: relative;
+            width: 100vw; height: 56vw; max-height: 50vh;
+            background: #000;
+        }
+        video, canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        video { transform: scaleX(-1); }
+        #log {
+            padding: 12px;
+            font-size: 13px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .ok  { color: #4CAF50; }
+        .err { color: #FF5252; }
+        .inf { color: #90CAF9; }
+        #spinner {
+            display: inline-block;
+            width: 16px; height: 16px;
+            border: 3px solid #555; border-top-color: #fff;
+            border-radius: 50%; animation: spin 0.7s linear infinite;
+            vertical-align: middle; margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div id="wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+</div>
+<div id="log"><span id="spinner"></span> 初期化中...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.13.0/dist/tf-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@4.13.0/dist/tf-converter.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.13.0/dist/tf-backend-webgl.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection@1.0.2/dist/face-detection.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.5/dist/face-landmarks-detection.min.js"></script>
+
+<script>
+const video  = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx    = canvas.getContext("2d");
+const logEl  = document.getElementById("log");
+
+let frameCount = 0;
+
+function log(msg, cls="") {
+    const now = new Date().toLocaleTimeString("ja-JP");
+    logEl.innerHTML = `[${now}] <span class="${cls}">${msg}</span>\n` + logEl.innerHTML;
+    // spinnerは最初だけ
+    document.getElementById("spinner")?.remove();
+}
+
+async function main() {
+    try {
+        log("カメラ起動中...", "inf");
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+        video.srcObject = stream;
+        await new Promise(r => video.onloadeddata = r);
+        log(`カメラOK: ${video.videoWidth}x${video.videoHeight}`, "ok");
+
+        log("TF.js バックエンド初期化中...", "inf");
+        await tf.setBackend("webgl");
+        await tf.ready();
+        log(`バックエンド: ${tf.getBackend()}`, "ok");
+
+        log("FaceMeshモデル読み込み中（30秒ほどかかることがあります）...", "inf");
+        const detector = await faceLandmarksDetection.createDetector(
+            faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh,
+            {
+                runtime: "tfjs",
+                refineLandmarks: true,  // 虹彩ランドマーク有効化
+                maxFaces: 1,
+            }
+        );
+        log("モデル読み込み完了！", "ok");
+
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        log("検出ループ開始...", "inf");
+
+        async function detect() {
+            if (video.readyState < 2) { requestAnimationFrame(detect); return; }
+            try {
+                const faces = await detector.estimateFaces(video, { flipHorizontal: true });
+                frameCount++;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (faces.length === 0) {
+                    if (frameCount % 30 === 0) log("顔が検出されていません", "err");
+                } else {
+                    const kps = faces[0].keypoints;
+                    log(`フレーム${frameCount}: ランドマーク${kps.length}点検出`, "ok");
+
+                    // 全ランドマークを緑の点で描画
+                    ctx.fillStyle = "rgba(0,255,0,0.6)";
+                    kps.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+                        ctx.fill();
+                    });
+
+                    // 虹彩（468,473）を大きく赤で描画
+                    const L = kps[468];
+                    const R = kps[473];
+                    if (L && R) {
+                        [L, R].forEach(p => {
+                            ctx.fillStyle = "red";
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, 8, 0, Math.PI*2);
+                            ctx.fill();
+                        });
+                        log(`✅ 虹彩取得OK! 左目:(${L.x.toFixed(0)},${L.y.toFixed(0)}) 右目:(${R.x.toFixed(0)},${R.y.toFixed(0)})`, "ok");
+                    } else {
+                        log(`⚠️ 虹彩ランドマーク(468,473)なし。kps[468]=${JSON.stringify(kps[468])}`, "err");
+                    }
+                }
+            } catch(e) {
+                log(`検出エラー: ${e.message}`, "err");
+            }
+
+            // 5フレームごとに実行（ログ見やすくするため）
+            setTimeout(() => requestAnimationFrame(detect), 500);
+        }
+
+        detect();
+
+    } catch(e) {
+        log(`エラー: ${e.name}: ${e.message}`, "err");
+    }
+}
+
+window.addEventListener("load", main);
+</script>
+</body>
+</html>
