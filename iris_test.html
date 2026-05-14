@@ -81,12 +81,13 @@ async function main() {
         await tf.ready();
         log(`バックエンド: ${tf.getBackend()}`, "ok");
 
-        log("FaceMeshモデル読み込み中（30秒ほどかかることがあります）...", "inf");
+        log("FaceMeshモデル読み込み中...", "inf");
         const detector = await faceLandmarksDetection.createDetector(
             faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh,
             {
-                runtime: "tfjs",
-                refineLandmarks: true,  // 虹彩ランドマーク有効化
+                runtime: "mediapipe",
+                solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619",
+                refineLandmarks: true,
                 maxFaces: 1,
             }
         );
@@ -94,52 +95,50 @@ async function main() {
 
         canvas.width  = video.videoWidth;
         canvas.height = video.videoHeight;
+        // canvasの表示サイズはCSSで制御（videoと同じ）
+        canvas.style.transform = "scaleX(-1)"; // ミラー表示（videoと合わせる）
 
-        log("検出ループ開始...", "inf");
+        log(`canvas: ${canvas.width}x${canvas.height}`, "inf");
+        log("検出ループ開始（flipHorizontal:false で試します）...", "inf");
 
         async function detect() {
             if (video.readyState < 2) { requestAnimationFrame(detect); return; }
             try {
-                const faces = await detector.estimateFaces(video, { flipHorizontal: true });
+                // flipHorizontal:false で試す（縦向きカメラ対策）
+                const faces = await detector.estimateFaces(video, { flipHorizontal: false });
                 frameCount++;
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 if (faces.length === 0) {
-                    if (frameCount % 30 === 0) log("顔が検出されていません", "err");
+                    if (frameCount % 6 === 0) log(`[${frameCount}] 顔未検出`, "err");
                 } else {
                     const kps = faces[0].keypoints;
-                    log(`フレーム${frameCount}: ランドマーク${kps.length}点検出`, "ok");
-
-                    // 全ランドマークを緑の点で描画
-                    ctx.fillStyle = "rgba(0,255,0,0.6)";
+                    // 全ランドマーク描画
+                    ctx.fillStyle = "rgba(0,255,0,0.7)";
                     kps.forEach(p => {
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
                         ctx.fill();
                     });
-
-                    // 虹彩（468,473）を大きく赤で描画
-                    const L = kps[468];
-                    const R = kps[473];
-                    if (L && R) {
+                    // 虹彩
+                    const L = kps[468], R = kps[473];
+                    if (L && R && L.x > 0) {
                         [L, R].forEach(p => {
                             ctx.fillStyle = "red";
                             ctx.beginPath();
                             ctx.arc(p.x, p.y, 8, 0, Math.PI*2);
                             ctx.fill();
                         });
-                        log(`✅ 虹彩取得OK! 左目:(${L.x.toFixed(0)},${L.y.toFixed(0)}) 右目:(${R.x.toFixed(0)},${R.y.toFixed(0)})`, "ok");
+                        log(`✅ 虹彩OK! L:(${L.x.toFixed(0)},${L.y.toFixed(0)}) R:(${R.x.toFixed(0)},${R.y.toFixed(0)})`, "ok");
                     } else {
-                        log(`⚠️ 虹彩ランドマーク(468,473)なし。kps[468]=${JSON.stringify(kps[468])}`, "err");
+                        log(`顔検出OK(${kps.length}点) ⚠️ 虹彩(468,473)なし`, "err");
                     }
                 }
             } catch(e) {
                 log(`検出エラー: ${e.message}`, "err");
             }
-
-            // 5フレームごとに実行（ログ見やすくするため）
-            setTimeout(() => requestAnimationFrame(detect), 500);
+            setTimeout(() => requestAnimationFrame(detect), 800);
         }
 
         detect();
