@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>わんわんゲーム</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #FFFDE7;
+            font-family: Arial, sans-serif;
+            touch-action: none;
+        }
+
+        /* ===== ゲーム画面 ===== */
+        #game {
+            width: 100vw; height: 100vh;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .card {
+            width: 28%; height: 58%;
+            background: white;
+            border: 8px solid #ccc;
+            border-radius: 28px;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            position: relative; overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transition: border-color 0.2s, transform 0.2s, background 0.2s;
+        }
+        .card.active {
+            border-color: #FF5252;
+            transform: scale(1.08);
+            background: #FFF3F3;
+        }
+        .card .emoji { font-size: clamp(50px, 11vw, 80px); }
+        .card .name  { margin-top: 10px; font-size: clamp(14px, 3.5vw, 22px); font-weight: bold; color: #555; }
+        .progress {
+            position: absolute; bottom: 0; left: 0;
+            height: 12px; width: 0%;
+            background: #4CAF50;
+            border-radius: 0 0 20px 20px;
+            transition: width 0.08s linear;
+        }
+        @keyframes woof {
+            0%,100% { transform: scale(1.08); }
+            50% { transform: scale(1.18) rotate(6deg); }
+        }
+        .card.woofing { animation: woof 0.25s infinite; border-color: #FF5252; }
+
+        /* ===== カメラUI ===== */
+        #cam-box {
+            position: fixed; top: 12px; right: 12px;
+            width: 120px; height: 90px;
+            border: 3px solid #333; border-radius: 10px;
+            overflow: hidden; background: #000; z-index: 50;
+        }
+        #video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* ミラー表示 */
+            display: block;
+        }
+        /* 顔位置インジケーター（カメラ下） */
+        #indicator {
+            position: fixed; top: 108px; right: 12px;
+            width: 120px; height: 18px;
+            background: rgba(255,255,255,0.9);
+            border: 2px solid #333; border-radius: 9px;
+            overflow: hidden; z-index: 50;
+        }
+        #ind-dot {
+            position: absolute; top: 2px;
+            width: 14px; height: 14px;
+            background: #FF5252; border-radius: 50%;
+            left: 53px; /* 初期中央 */
+            transition: left 0.08s ease;
+        }
+
+        /* ===== ステータス ===== */
+        #status {
+            position: fixed; bottom: 18px; left: 0; width: 100%;
+            text-align: center;
+            font-size: clamp(16px, 4vw, 24px);
+            font-weight: bold; color: #333; z-index: 50;
+        }
+
+        /* ===== オーバーレイ ===== */
+        .overlay {
+            position: fixed; inset: 0;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            gap: 16px; z-index: 100;
+            font-size: 20px; font-weight: bold;
+        }
+        #ov-loading { background: #FFFDE7; }
+        #ov-calib   { background: rgba(255,253,231,0.97); display: none; }
+        #ov-error   { background: #fff3f3; display: none; color: #c00; }
+
+        .spinner {
+            width: 48px; height: 48px;
+            border: 6px solid #ddd; border-top-color: #FF5252;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* キャリブ用の大きなバー */
+        #calib-bar-wrap {
+            width: 260px; height: 28px;
+            background: #eee; border-radius: 14px; overflow: hidden;
+        }
+        #calib-bar {
+            height: 100%; width: 0%; background: #4CAF50;
+            border-radius: 14px; transition: width 0.1s linear;
+        }
+        #calib-face-hint {
+            font-size: 60px; line-height: 1;
+        }
+        .sub { font-size: 14px; color: #777; font-weight: normal; }
+
+        #retry-btn {
+            padding: 12px 28px; font-size: 18px;
+            background: #FF5252; color: white;
+            border: none; border-radius: 12px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ローディング -->
+<div class="overlay" id="ov-loading">
+    <div class="spinner"></div>
+    <div>カメラを起動中...</div>
+    <div class="sub">カメラの許可をタップしてください</div>
+</div>
+
+<!-- キャリブレーション -->
+<div class="overlay" id="ov-calib">
+    <div id="calib-face-hint">😐</div>
+    <div id="calib-msg">画面の中央を向いてください</div>
+    <div id="calib-bar-wrap"><div id="calib-bar"></div></div>
+    <div class="sub" id="calib-sub">正面の基準を測定中...</div>
+</div>
+
+<!-- エラー -->
+<div class="overlay" id="ov-error">
+    <div style="font-size:52px">📷</div>
+    <div id="err-msg">カメラを使用できませんでした</div>
+    <div class="sub" id="err-sub"></div>
+    <button id="retry-btn" onclick="location.reload()">もう一度試す</button>
+</div>
+
+<!-- カメラ表示 -->
+<div id="cam-box"><video id="video" autoplay playsinline muted></video></div>
+<div id="indicator"><div id="ind-dot"></div></div>
+
+<!-- ゲーム -->
+<div id="game">
+    <div class="card" id="c0"><div class="emoji">🐶</div><div class="name">ポチ</div><div class="progress" id="p0"></div></div>
+    <div class="card" id="c1"><div class="emoji">🐕</div><div class="name">コロ</div><div class="progress" id="p1"></div></div>
+    <div class="card" id="c2"><div class="emoji">🦮</div><div class="name">タロ</div><div class="progress" id="p2"></div></div>
+</div>
+<div id="status">顔を左右に動かして選んでね！</div>
+
+<script>
+"use strict";
+
+// ============================================================
+//  定数・パラメーター（ここを調整するだけでチューニング可能）
+// ============================================================
+const CALIB_FRAMES  = 45;   // キャリブレーション取得フレーム数
+const MOVE_RANGE    = 0.12; // 顔を動かす範囲（顔幅に対する比率）。小さいほど敏感
+const SMOOTH        = 0.25; // スムージング係数（0〜1、大きいほど即時反応）
+const DECIDE_MS     = 1400; // 選択確定までの時間(ms)
+const COOLDOWN_MS   = 2200; // 確定後のクールダウン(ms)
+
+// ============================================================
+//  状態
+// ============================================================
+const video   = document.getElementById("video");
+let detector  = null;
+let baselineX = null;  // キャリブ後の正面X位置（0〜1）
+let smoothX   = 0.5;   // 平滑化後のX（0=左端, 1=右端）
+let curSel    = -1;
+let selStart  = 0;
+let lastDecide= 0;
+
+// ============================================================
+//  音（Web Audio、外部依存なし）
+// ============================================================
+const ac = new (window.AudioContext || window.webkitAudioContext)();
+function bark() {
+    if (ac.state === "suspended") ac.resume();
+    [[0, 380, 170], [0.22, 320, 140]].forEach(([t, f0, f1]) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.connect(g); g.connect(ac.destination);
+        o.frequency.setValueAtTime(f0, ac.currentTime + t);
+        o.frequency.exponentialRampToValueAtTime(f1, ac.currentTime + t + 0.12);
+        g.gain.setValueAtTime(0.5, ac.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + t + 0.14);
+        o.start(ac.currentTime + t);
+        o.stop(ac.currentTime + t + 0.15);
+    });
+}
+
+// ============================================================
+//  インジケーター更新
+// ============================================================
+function setDot(x) {
+    // x: 0〜1、カメラの左=0、右=1（ミラー表示なのでゲーム上は逆）
+    const ind = document.getElementById("indicator");
+    const w   = ind.offsetWidth;
+    const dot = document.getElementById("ind-dot");
+    // ミラー反転してゲーム座標に合わせる
+    const px  = Math.round((1 - x) * (w - 18));
+    dot.style.left = `${px}px`;
+}
+
+// ============================================================
+//  カード選択ロジック
+// ============================================================
+function tick(faceX) {
+    // faceX: カメラ座標（0=左, 1=右）→ ゲーム上はミラー反転
+    const gameX = 1 - faceX; // 0=ゲーム左, 1=ゲーム右
+
+    smoothX += (gameX - smoothX) * SMOOTH;
+    setDot(faceX);
+
+    // 正面基準からのズレをRANGEで正規化
+    const delta = (smoothX - baselineX) / MOVE_RANGE;
+    // delta: -1より小=左, +1より大=右, その間=中央
+
+    let sel;
+    if      (delta < -0.55) sel = 0;
+    else if (delta >  0.55) sel = 2;
+    else                    sel = 1;
+
+    // 選択が変わったらリセット
+    if (sel !== curSel) {
+        curSel   = sel;
+        selStart = performance.now();
+        [0,1,2].forEach(i => {
+            document.getElementById(`c${i}`).classList.toggle("active", i === sel);
+            if (i !== sel) document.getElementById(`p${i}`).style.width = "0%";
+        });
+    }
+
+    // 進捗バー更新
+    const elapsed  = performance.now() - selStart;
+    const progress = Math.min(elapsed / DECIDE_MS * 100, 100);
+    document.getElementById(`p${curSel}`).style.width = `${progress}%`;
+
+    if (progress >= 100) decide(curSel);
+}
+
+function decide(idx) {
+    const now = performance.now();
+    if (now - lastDecide < COOLDOWN_MS) return;
+    lastDecide = now;
+
+    const card = document.getElementById(`c${idx}`);
+    if (card.classList.contains("woofing")) return;
+    card.classList.add("woofing");
+    bark();
+    document.getElementById("status").textContent = "わんわん！🐾";
+
+    setTimeout(() => {
+        card.classList.remove("woofing");
+        document.getElementById("status").textContent = "つぎはどれかな？";
+        selStart = performance.now(); // タイマーリセット
+    }, 2000);
+}
+
+// ============================================================
+//  FaceDetector ループ
+// ============================================================
+let calibSum = 0, calibCount = 0;
+
+async function loop() {
+    if (video.readyState < 2) { requestAnimationFrame(loop); return; }
+    try {
+        const faces = await detector.detect(video);
+        if (faces.length > 0) {
+            const box = faces[0].boundingBox;
+            // 顔の中心X（カメラ映像の0〜1）
+            const cx = (box.x + box.width / 2) / video.videoWidth;
+
+            if (baselineX === null) {
+                // ===== キャリブレーション中 =====
+                calibSum   += cx;
+                calibCount++;
+                const pct   = calibCount / CALIB_FRAMES;
+                document.getElementById("calib-bar").style.width = `${pct * 100}%`;
+                document.getElementById("calib-sub").textContent =
+                    `${Math.round(pct * 100)}% 完了`;
+
+                if (calibCount >= CALIB_FRAMES) {
+                    baselineX = calibSum / CALIB_FRAMES;
+                    smoothX   = 1 - baselineX; // ゲーム座標に変換して初期化
+                    document.getElementById("ov-calib").style.display = "none";
+                    document.getElementById("status").textContent = "顔を左右に動かして選んでね！";
+                }
+            } else {
+                // ===== ゲーム中 =====
+                tick(cx);
+            }
+        }
+    } catch(_) {}
+    requestAnimationFrame(loop);
+}
+
+// ============================================================
+//  起動
+// ============================================================
+async function start() {
+    try {
+        // カメラ取得
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+        video.srcObject = stream;
+        await new Promise(r => { video.onloadeddata = r; });
+
+        // FaceDetector チェック
+        if (typeof FaceDetector === "undefined") {
+            throw new Error("FaceDetector APIが使えません。\nChrome（Android）でお試しください。");
+        }
+        detector = new FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+
+        // キャリブ画面へ
+        document.getElementById("ov-loading").style.display = "none";
+        document.getElementById("ov-calib").style.display   = "flex";
+
+        loop();
+
+    } catch(e) {
+        document.getElementById("ov-loading").style.display = "none";
+        document.getElementById("err-msg").textContent =
+            e.name === "NotAllowedError"
+                ? "カメラの許可が必要です"
+                : "エラーが発生しました";
+        document.getElementById("err-sub").textContent = e.message;
+        document.getElementById("ov-error").style.display = "flex";
+    }
+}
+
+start();
+</script>
+</body>
+</html>
