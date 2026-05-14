@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>虹彩検出テスト v2</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #111; color: #fff; font-family: Arial, sans-serif; }
+        #wrap {
+            position: relative;
+            width: 100vw; height: 60vw; max-height: 45vh;
+            background: #000; overflow: hidden;
+        }
+        video {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+        #log {
+            padding: 10px;
+            font-size: 12px;
+            line-height: 1.9;
+        }
+        .ok  { color: #4CAF50; }
+        .err { color: #FF5252; }
+        .inf { color: #90CAF9; }
+    </style>
+</head>
+<body>
+<div id="wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+</div>
+<div id="log">初期化中...</div>
+
+<script type="module">
+// MediaPipe Tasks Vision — 単一バンドルで完結
+import {
+    FaceLandmarker,
+    FilesetResolver
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/vision_bundle.mjs";
+
+const video  = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx    = canvas.getContext("2d");
+const logEl  = document.getElementById("log");
+
+function log(msg, cls = "") {
+    const t = new Date().toLocaleTimeString("ja-JP");
+    const line = document.createElement("div");
+    line.className = cls;
+    line.textContent = `[${t}] ${msg}`;
+    logEl.prepend(line);
+    // 20行以上は削除
+    while (logEl.children.length > 20) logEl.removeChild(logEl.lastChild);
+}
+
+try {
+    log("カメラ起動中...", "inf");
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" }
+    });
+    video.srcObject = stream;
+    await new Promise(r => video.onloadeddata = r);
+    log(`カメラOK: ${video.videoWidth}x${video.videoHeight}`, "ok");
+
+    log("MediaPipe Tasks 読み込み中...", "inf");
+    const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+    );
+    log("FilesetResolver OK", "ok");
+
+    const landmarker = await FaceLandmarker.createFromOptions(vision, {
+        baseOptions: {
+            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+            delegate: "GPU"
+        },
+        outputFaceBlendshapes: false,
+        runningMode: "VIDEO",
+        numFaces: 1
+    });
+    log("FaceLandmarker 準備完了！", "ok");
+
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // 虹彩のランドマークインデックス（MediaPipe Tasks Vision）
+    // 左目虹彩: 468-471、右目虹彩: 472-476
+    const L_IRIS_CENTER = 468;
+    const R_IRIS_CENTER = 473;
+
+    let lastTime = -1;
+    function detect() {
+        if (video.readyState < 2 || video.currentTime === lastTime) {
+            requestAnimationFrame(detect); return;
+        }
+        lastTime = video.currentTime;
+
+        const results = landmarker.detectForVideo(video, performance.now());
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (!results.faceLandmarks || results.faceLandmarks.length === 0) {
+            log("顔未検出", "err");
+        } else {
+            const lms = results.faceLandmarks[0];
+            log(`顔検出OK: ${lms.length}点`, "ok");
+
+            // 全ランドマーク描画（正規化座標 → ピクセル）
+            ctx.fillStyle = "rgba(0,255,0,0.5)";
+            lms.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x * canvas.width, p.y * canvas.height, 1.5, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            // 虹彩を赤で大きく描画
+            const L = lms[L_IRIS_CENTER];
+            const R = lms[R_IRIS_CENTER];
+            if (L && R) {
+                [L, R].forEach(p => {
+                    ctx.fillStyle = "red";
+                    ctx.beginPath();
+                    ctx.arc(p.x * canvas.width, p.y * canvas.height, 10, 0, Math.PI*2);
+                    ctx.fill();
+                });
+                log(`✅ 虹彩OK! L:(${(L.x*canvas.width).toFixed(0)},${(L.y*canvas.height).toFixed(0)}) R:(${(R.x*canvas.width).toFixed(0)},${(R.y*canvas.height).toFixed(0)})`, "ok");
+            } else {
+                log("⚠️ 虹彩ランドマークなし", "err");
+            }
+        }
+
+        setTimeout(() => requestAnimationFrame(detect), 800);
+    }
+
+    detect();
+
+} catch(e) {
+    log(`エラー: ${e.name}: ${e.message}`, "err");
+}
+</script>
+</body>
+</html>
