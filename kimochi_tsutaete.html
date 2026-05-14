@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>きもちつたえて 👀</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #FFFDE7;
+            font-family: Arial, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* ===== 共通オーバーレイ ===== */
+        .screen {
+            position: fixed; inset: 0;
+            display: none;
+            flex-direction: column;
+            justify-content: center; align-items: center;
+            gap: 24px; z-index: 500;
+            padding: 32px; text-align: center;
+        }
+        .screen.active { display: flex; }
+
+        /* ===== ① タップスタート ===== */
+        #s-tap { background: #FFFDE7; }
+        #s-tap .big-emoji { font-size: 80px; }
+        #s-tap h1 { font-size: 28px; color: #444; }
+        #s-tap .sub { font-size: 15px; color: #888; line-height: 1.7; }
+        .tap-btn {
+            padding: 20px 48px;
+            font-size: 22px; font-weight: bold;
+            background: #FF5252; color: white;
+            border: none; border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(255,82,82,0.4);
+            cursor: pointer;
+            animation: btnpulse 1.5s ease-in-out infinite;
+        }
+        @keyframes btnpulse {
+            0%,100% { transform: scale(1); }
+            50%      { transform: scale(1.05); }
+        }
+
+        /* ===== ② レイアウト選択 ===== */
+        #s-layout { background: #FFFDE7; }
+        #s-layout h2 { font-size: 22px; color: #444; }
+        #s-layout .sub { font-size: 14px; color: #888; }
+        .layout-options { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+        .layout-btn {
+            width: 140px; padding: 20px 12px;
+            background: white; border: 5px solid #ddd; border-radius: 20px;
+            cursor: pointer; display: flex; flex-direction: column;
+            align-items: center; gap: 12px;
+            font-size: 15px; font-weight: bold; color: #555;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .layout-btn:active { transform: scale(0.95); border-color: #FF5252; }
+        .layout-btn .preview { display: flex; gap: 6px; }
+        .layout-btn.vertical   .preview { flex-direction: column; }
+        .layout-btn.horizontal .preview { flex-direction: row; }
+        .preview .pcard { background: #FF5252; border-radius: 6px; }
+        .layout-btn.vertical   .pcard { width: 60px; height: 16px; }
+        .layout-btn.horizontal .pcard { width: 16px; height: 60px; }
+
+        /* ===== ③ 読み込み ===== */
+        #s-loading { background: #FFFDE7; }
+        .spinner {
+            width: 56px; height: 56px;
+            border: 7px solid #ddd; border-top-color: #FF5252;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #load-msg { font-size: 20px; font-weight: bold; color: #444; }
+        .load-sub { font-size: 14px; color: #888; }
+
+        /* ===== ④ キャリブレーション ===== */
+        #calib-area {
+            position: fixed; inset: 0;
+            display: none; z-index: 600;
+            background: rgba(20,20,20,0.88);
+        }
+        .cdot {
+            position: absolute;
+            transform: translate(-50%,-50%);
+            cursor: pointer;
+        }
+        .cdot-inner {
+            width: 86px; height: 86px;
+            background: #FF5252;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 0 0 0 rgba(255,82,82,0.6);
+            animation: dotpulse 1.2s ease-in-out infinite;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 38px;
+        }
+        @keyframes dotpulse {
+            0%   { box-shadow: 0 0 0 0 rgba(255,82,82,0.6); transform: scale(1); }
+            50%  { box-shadow: 0 0 0 26px rgba(255,82,82,0); transform: scale(1.09); }
+            100% { box-shadow: 0 0 0 0 rgba(255,82,82,0); transform: scale(1); }
+        }
+        .cdot.done .cdot-inner {
+            background: #4CAF50; animation: none;
+        }
+        #calib-label {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 18px 20px;
+            background: rgba(0,0,0,0.5);
+            text-align: center;
+            font-size: 16px; font-weight: bold; color: white;
+            z-index: 700; line-height: 1.6;
+        }
+        #calib-prog {
+            position: fixed; bottom: 30px; left: 0; width: 100%;
+            text-align: center; font-size: 16px; color: rgba(255,255,255,0.85);
+            z-index: 700;
+        }
+        /* サンプル蓄積バー */
+        #calib-sample-bar-wrap {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 10px;
+            background: rgba(255,255,255,0.15); z-index: 700;
+        }
+        #calib-sample-bar {
+            height: 100%; width: 0%;
+            background: #4CAF50;
+            transition: width 0.08s linear;
+        }
+
+        /* ===== ⑤ ゲーム ===== */
+        #game {
+            position: fixed; inset: 0;
+            display: none;
+        }
+        #game.active { display: flex; }
+
+        /* 縦並び */
+        #game.vertical {
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0;
+        }
+        #game.vertical .card {
+            width: 82%; height: 26%;
+            flex-direction: row; gap: 20px;
+        }
+        #game.vertical .card .name { margin-top: 0; margin-left: 4px; }
+
+        /* 横並び */
+        #game.horizontal {
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 8px;
+        }
+        #game.horizontal .card {
+            width: 28%; height: 80%;
+            flex-direction: column; gap: 0;
+        }
+        #game.horizontal .card .name { margin-top: 10px; }
+
+        .card {
+            background: white; border: 8px solid #ddd; border-radius: 28px;
+            display: flex; justify-content: center; align-items: center;
+            position: relative; overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: border-color 0.15s, transform 0.15s, background 0.15s;
+        }
+        .card.gazing { border-color: #FF5252; transform: scale(1.04); background: #FFF3F3; }
+        .card .emoji { font-size: clamp(44px, 10vw, 80px); line-height: 1; }
+        .card .name  { font-size: clamp(16px, 4vw, 28px); font-weight: bold; color: #555; }
+        .dwell {
+            position: absolute; bottom: 0; left: 0;
+            height: 12px; width: 0%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 0 0 20px 20px;
+            transition: width 0.06s linear;
+        }
+        @keyframes selected-anim {
+            0%,100% { transform: scale(1.04); }
+            40%     { transform: scale(1.16); }
+            70%     { transform: scale(1.12); }
+        }
+        .card.selected-card {
+            animation: selected-anim 0.4s ease-in-out infinite;
+            border-color: #FF5252;
+            background: #FFF0F0;
+        }
+
+        /* カメラ */
+        #cam-wrap {
+            position: fixed; bottom: 12px; right: 12px;
+            width: 90px; height: 68px;
+            border: 3px solid #333; border-radius: 10px;
+            overflow: hidden; background: #000; z-index: 200;
+        }
+        #video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); display:block; }
+
+        /* カーソル */
+        #cursor {
+            position: fixed; width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,82,82,0.25); border: 3px solid rgba(255,82,82,0.85);
+            pointer-events: none; z-index: 300;
+            transform: translate(-50%,-50%); display: none;
+        }
+
+        /* ステータス */
+        #status {
+            position: fixed; top: 14px; left: 0; width: 100%;
+            text-align: center; font-size: clamp(14px,3.5vw,20px);
+            font-weight: bold; color: #444; z-index: 100; pointer-events: none;
+        }
+
+        /* エラー */
+        #s-error { background: #fff3f3; color: #c00; }
+        .err-sub { font-size: 14px; color: #e57373; line-height: 1.7; max-width: 320px; }
+        .err-btn {
+            padding: 14px 32px; font-size: 18px;
+            background: #FF5252; color: white;
+            border: none; border-radius: 14px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ① タップスタート -->
+<div class="screen active" id="s-tap">
+    <div class="big-emoji">🍚🤗📺</div>
+    <h1>きもちつたえて</h1>
+    <p class="sub">見たいカードを目線で選ぼう！<br>はじめにカメラの準備をします</p>
+    <button class="tap-btn" id="btn-tap">タップしてスタート 👆</button>
+</div>
+
+<!-- ② レイアウト選択 -->
+<div class="screen" id="s-layout">
+    <h2>ならびかたを選んでください</h2>
+    <p class="sub">画面の向きに合わせて選んでね</p>
+    <div class="layout-options">
+        <div class="layout-btn vertical" id="btn-vertical">
+            <div class="preview">
+                <div class="pcard"></div>
+                <div class="pcard"></div>
+                <div class="pcard"></div>
+            </div>
+            <span>たて<br>（スマホ）</span>
+        </div>
+        <div class="layout-btn horizontal" id="btn-horizontal">
+            <div class="preview">
+                <div class="pcard"></div>
+                <div class="pcard"></div>
+                <div class="pcard"></div>
+            </div>
+            <span>よこ<br>（タブレット）</span>
+        </div>
+    </div>
+</div>
+
+<!-- ③ 読み込み -->
+<div class="screen" id="s-loading">
+    <div class="spinner"></div>
+    <div id="load-msg">読み込み中...</div>
+    <div class="load-sub">初回は20〜30秒かかります</div>
+</div>
+
+<!-- ④ キャリブレーション -->
+<div id="calib-area">
+    <div id="calib-label">
+        👁️ 子どもに赤い点を見せてください<br>
+        目線が合ったら　大人の方がタップして登録
+    </div>
+    <div id="calib-prog"></div>
+    <div id="calib-sample-bar-wrap">
+        <div id="calib-sample-bar"></div>
+    </div>
+</div>
+
+<!-- ⑤ ゲーム -->
+<div id="game">
+    <div class="card" id="c0">
+        <div class="emoji">🍚</div>
+        <div class="name">ごはん</div>
+        <div class="dwell" id="d0"></div>
+    </div>
+    <div class="card" id="c1">
+        <div class="emoji">🤗</div>
+        <div class="name">だっこ</div>
+        <div class="dwell" id="d1"></div>
+    </div>
+    <div class="card" id="c2">
+        <div class="emoji">📺</div>
+        <div class="name">テレビ</div>
+        <div class="dwell" id="d2"></div>
+    </div>
+</div>
+
+<!-- エラー -->
+<div class="screen" id="s-error">
+    <div style="font-size:52px">⚠️</div>
+    <div id="err-title">エラーが発生しました</div>
+    <div class="err-sub" id="err-msg"></div>
+    <button class="err-btn" onclick="location.reload()">もう一度試す</button>
+</div>
+
+<div id="cam-wrap"><video id="video" autoplay playsinline muted></video></div>
+<div id="cursor"></div>
+<div id="status"></div>
+
+<script type="module">
+import { FaceLandmarker, FilesetResolver }
+    from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/vision_bundle.mjs";
+
+// ============================================================
+//  パラメーター
+// ============================================================
+const DWELL_MS    = 1400;
+const COOLDOWN_MS = 2500;
+const SMOOTH_K    = 0.14;
+const MARGIN_PX   = 50;
+const L_IRIS      = 468;
+const R_IRIS      = 473;
+
+const CALIB_PTS = [
+    [50,12],
+    [15,12],[85,12],
+    [50,50],
+    [15,50],[85,50],
+    [50,88],
+    [15,88],[85,88],
+];
+const MIN_SAMPLES = 8;   // タップ受付に必要な最低サンプル数
+const MAX_SAMPLES = 40;  // バーが100%になるサンプル数
+
+// ============================================================
+//  状態
+// ============================================================
+const video  = document.getElementById("video");
+const cursor = document.getElementById("cursor");
+
+let landmarker = null;
+let calibIdx = 0, calibData = [], calibBuf = [];
+let calibCollecting = false, calibDone = false;
+let regX = null, regY = null;
+let gazeX = window.innerWidth/2, gazeY = window.innerHeight/2;
+let curSel = -1, selStart = 0, lastDecide = 0, gameReady = false;
+
+// ============================================================
+//  画面切替
+// ============================================================
+function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    if (id) document.getElementById(id)?.classList.add("active");
+}
+
+// ============================================================
+//  音声（Web Speech API でゆっくり読み上げ）
+// ============================================================
+let ac = null;
+function initAudio() {
+    if (ac) return;
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    // speechSynthesisはタップ後に一度空読みしておくと初回から確実に鳴る
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0;
+    speechSynthesis.speak(u);
+}
+
+const VOICES = [
+    { label: "ごはん", status: "ごはん 🍚" },
+    { label: "だっこ", status: "だっこ 🤗" },
+    { label: "テレビ", status: "テレビ 📺" },
+];
+
+function speakForCard(idx) {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel(); // 前の発話をキャンセル
+    const u = new SpeechSynthesisUtterance(VOICES[idx].label);
+    u.lang  = "ja-JP";
+    u.rate  = 0.72;   // ゆっくり
+    u.pitch = 1.1;    // 少し高め（聞き取りやすく）
+    u.volume= 1.0;
+    speechSynthesis.speak(u);
+}
+
+function barkTest() {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance("はじめよう");
+    u.lang = "ja-JP"; u.rate = 0.8; u.volume = 1.0;
+    speechSynthesis.speak(u);
+}
+
+// ============================================================
+//  線形回帰
+// ============================================================
+function fitLinear(data, key) {
+    const n = data.length;
+    if (n < 4) return null;
+    let sx=0,sy=0,sz=0,sx2=0,sy2=0,sxy=0,sxz=0,syz=0;
+    data.forEach(d => {
+        const x=d.eyeX,y=d.eyeY,z=d[key];
+        sx+=x;sy+=y;sz+=z;sx2+=x*x;sy2+=y*y;sxy+=x*y;sxz+=x*z;syz+=y*z;
+    });
+    const A=[[sx2,sxy,sx,sxz],[sxy,sy2,sy,syz],[sx,sy,n,sz]];
+    for(let c=0;c<3;c++){
+        let mx=c;
+        for(let r=c+1;r<3;r++) if(Math.abs(A[r][c])>Math.abs(A[mx][c])) mx=r;
+        [A[c],A[mx]]=[A[mx],A[c]];
+        if(Math.abs(A[c][c])<1e-10) return null;
+        for(let r=c+1;r<3;r++){
+            const f=A[r][c]/A[c][c];
+            for(let k=c;k<4;k++) A[r][k]-=f*A[c][k];
+        }
+    }
+    const cc=A[2][3]/A[2][2];
+    const b=(A[1][3]-A[1][2]*cc)/A[1][1];
+    const a=(A[0][3]-A[0][2]*cc-A[0][1]*b)/A[0][0];
+    return {a,b,c:cc};
+}
+function predictGaze(ex,ey){
+    if(!regX||!regY) return null;
+    return { x:regX.a*ex+regX.b*ey+regX.c, y:regY.a*ex+regY.b*ey+regY.c };
+}
+
+// ============================================================
+//  キャリブレーション
+// ============================================================
+function showCalibDot(idx) {
+    const area = document.getElementById("calib-area");
+    area.querySelectorAll(".cdot").forEach(d => d.remove());
+    document.getElementById("calib-sample-bar").style.width = "0%";
+
+    if (idx >= CALIB_PTS.length) {
+        regX = fitLinear(calibData, "screenX");
+        regY = fitLinear(calibData, "screenY");
+        calibDone = true;
+        area.style.display = "none";
+        startGame();
+        return;
+    }
+
+    const [px, py] = CALIB_PTS[idx];
+    const sx = window.innerWidth  * px / 100;
+    const sy = window.innerHeight * py / 100;
+
+    const dot = document.createElement("div");
+    dot.className = "cdot";
+    dot.style.left = `${px}%`;
+    dot.style.top  = `${py}%`;
+    dot.innerHTML  = `<div class="cdot-inner">👁️</div>`;
+    area.appendChild(dot);
+    document.getElementById("calib-prog").textContent =
+        `${idx+1} / ${CALIB_PTS.length}`;
+
+    calibBuf = [];
+    calibCollecting = true;
+
+    // ★ 自動進行なし — 大人がタップしたときだけ登録
+    // サンプルが MIN_SAMPLES 以上あればタップを受け付ける
+    let registered = false;
+    const onTap = (e) => {
+        e.preventDefault();
+        if (registered) return;
+        if (calibBuf.length < MIN_SAMPLES) return; // まだ目線が合っていない
+        registered = true;
+        finishDot(dot, sx, sy);
+    };
+    dot.addEventListener("pointerdown", onTap);
+    // 点以外の場所をタップしても登録できるよう、背景にも設定
+    area.addEventListener("pointerdown", onTap, { once: false });
+}
+
+function finishDot(dot, sx, sy) {
+    calibCollecting = false;
+    // イベントリスナーをまとめて除去するため calib-area を再取得してclone
+    const area = document.getElementById("calib-area");
+    const newArea = area.cloneNode(true);
+    area.parentNode.replaceChild(newArea, area);
+    // cloneしたのでdotも再取得
+    const newDot = newArea.querySelector(".cdot");
+    if (newDot) newDot.classList.add("done");
+
+    if (calibBuf.length >= MIN_SAMPLES) {
+        const ex = calibBuf.reduce((s,d)=>s+d.x,0)/calibBuf.length;
+        const ey = calibBuf.reduce((s,d)=>s+d.y,0)/calibBuf.length;
+        calibData.push({ eyeX:ex, eyeY:ey, screenX:sx, screenY:sy });
+    }
+
+    // 次の点へ
+    setTimeout(() => { calibIdx++; showCalibDot(calibIdx); }, 500);
+}
+
+// ============================================================
+//  ゲームロジック
+// ============================================================
+function hitCard(x, y) {
+    for (let i=0;i<3;i++){
+        const r = document.getElementById(`c${i}`).getBoundingClientRect();
+        if(x>=r.left-MARGIN_PX&&x<=r.right+MARGIN_PX&&
+           y>=r.top-MARGIN_PX &&y<=r.bottom+MARGIN_PX) return i;
+    }
+    return -1;
+}
+
+function onGaze(x, y) {
+    gazeX += (x-gazeX)*SMOOTH_K;
+    gazeY += (y-gazeY)*SMOOTH_K;
+    cursor.style.left = `${gazeX}px`;
+    cursor.style.top  = `${gazeY}px`;
+
+    const sel = hitCard(gazeX, gazeY);
+    if (sel !== curSel) {
+        if (curSel !== -1){
+            document.getElementById(`c${curSel}`).classList.remove("gazing");
+            document.getElementById(`d${curSel}`).style.width = "0%";
+        }
+        curSel = sel; selStart = performance.now();
+        if (curSel !== -1)
+            document.getElementById(`c${curSel}`).classList.add("gazing");
+    }
+    if (curSel !== -1){
+        const prog = Math.min((performance.now()-selStart)/DWELL_MS*100,100);
+        document.getElementById(`d${curSel}`).style.width = `${prog}%`;
+        if (prog >= 100) decide(curSel);
+    }
+}
+
+function decide(idx) {
+    const now = performance.now();
+    if (now-lastDecide < COOLDOWN_MS) return;
+    lastDecide = now;
+    const card = document.getElementById(`c${idx}`);
+    if (card.classList.contains("selected-card")) return;
+    document.getElementById(`d${idx}`).style.width = "0%";
+    selStart = now + COOLDOWN_MS;
+    card.classList.add("selected-card");
+    speakForCard(idx);
+    document.getElementById("status").textContent = VOICES[idx].status;
+    setTimeout(() => {
+        card.classList.remove("selected-card");
+        document.getElementById("status").textContent = "どれをみてる？👀";
+    }, 2500);
+}
+
+function startGame() {
+    cursor.style.display = "block";
+    gameReady = true;
+    document.getElementById("game").classList.add("active");
+    document.getElementById("status").textContent = "どれをみてる？👀";
+}
+
+// ============================================================
+//  検出ループ
+// ============================================================
+let lastVideoTime = -1;
+function detect() {
+    if (video.readyState < 2 || video.currentTime === lastVideoTime){
+        requestAnimationFrame(detect); return;
+    }
+    lastVideoTime = video.currentTime;
+
+    const results = landmarker.detectForVideo(video, performance.now());
+    if (results.faceLandmarks && results.faceLandmarks.length > 0){
+        const lms = results.faceLandmarks[0];
+        const L = lms[L_IRIS], R = lms[R_IRIS];
+        if (L && R){
+            const eyeX = (L.x+R.x)/2;
+            const eyeY = (L.y+R.y)/2;
+
+            if (calibCollecting){
+                calibBuf.push({x:eyeX, y:eyeY});
+                // バー更新
+                const pct = Math.min(calibBuf.length/MAX_SAMPLES*100, 100);
+                const bar = document.getElementById("calib-sample-bar");
+                if (bar) bar.style.width = `${pct}%`;
+            } else if (calibDone && gameReady){
+                const pred = predictGaze(eyeX, eyeY);
+                if (pred) onGaze(pred.x, pred.y);
+                else      onGaze(eyeX*window.innerWidth, eyeY*window.innerHeight);
+            }
+        }
+    }
+    requestAnimationFrame(detect);
+}
+
+// ============================================================
+//  フロー
+// ============================================================
+
+// ① タップスタート → AudioContext 初期化
+document.getElementById("btn-tap").addEventListener("pointerdown", () => {
+    initAudio();
+    barkTest();
+    showScreen("s-layout");
+});
+
+// ② レイアウト選択
+document.getElementById("btn-vertical").addEventListener("pointerdown", () => {
+    document.getElementById("game").className = "vertical";
+    startLoading();
+});
+document.getElementById("btn-horizontal").addEventListener("pointerdown", () => {
+    document.getElementById("game").className = "horizontal";
+    startLoading();
+});
+
+// ③ 読み込み → ④ キャリブ
+async function startLoading() {
+    showScreen("s-loading");
+    try {
+        document.getElementById("load-msg").textContent = "カメラを起動中...";
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode:"user", width:{ideal:640}, height:{ideal:480} }
+        });
+        video.srcObject = stream;
+        await new Promise(r => { video.onloadeddata = r; });
+
+        document.getElementById("load-msg").textContent = "AIモデルを読み込み中...";
+        const vision = await FilesetResolver.forVisionTasks(
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+        );
+        landmarker = await FaceLandmarker.createFromOptions(vision, {
+            baseOptions: {
+                modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+                delegate: "GPU"
+            },
+            outputFaceBlendshapes: false,
+            runningMode: "VIDEO",
+            numFaces: 1
+        });
+
+        showScreen(null);
+        document.getElementById("calib-area").style.display = "block";
+        showCalibDot(0);
+        detect();
+
+    } catch(e) {
+        document.getElementById("err-title").textContent =
+            e.name==="NotAllowedError" ? "カメラの許可が必要です" : "読み込みに失敗しました";
+        document.getElementById("err-msg").textContent = e.message || String(e);
+        showScreen("s-error");
+    }
+}
+</script>
+</body>
+</html>
