@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>データ確認・復元</title>
+<style>
+body{background:#0a0a1a;color:#fff;font-family:sans-serif;padding:20px;max-width:500px;margin:0 auto;}
+h2{color:#f1c40f;text-align:center;}
+.box{background:#0d1b4b;border:1px solid #333;border-radius:12px;padding:16px;margin:12px 0;font-size:0.85rem;}
+.ok{color:#2ecc71;font-weight:700;}
+.ng{color:#e74c3c;font-weight:700;}
+.warn{color:#f1c40f;font-weight:700;}
+button{display:block;width:100%;background:#f1c40f;color:#0a0a1a;border:none;border-radius:10px;padding:14px;font-size:1rem;font-weight:900;cursor:pointer;margin:8px 0;font-family:sans-serif;}
+button.red{background:#e74c3c;color:#fff;}
+pre{font-size:0.7rem;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:#aaa;}
+</style>
+</head>
+<body>
+<h2>🔍 データ確認・復元ツール</h2>
+
+<div class="box" id="result">確認中...</div>
+
+<button onclick="checkData()">🔍 データを確認する</button>
+<button onclick="showRaw()">📋 生データを表示</button>
+
+<div class="box" id="raw" style="display:none"></div>
+
+<script>
+function checkData(){
+  var result = document.getElementById('result');
+  var keys = [];
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      keys.push(localStorage.key(i));
+    }
+  }catch(e){ result.innerHTML='<span class="ng">localStorageにアクセスできません：'+e.message+'</span>'; return; }
+
+  var html = '<b>localStorage内のキー一覧：</b><br>';
+  if(keys.length===0){
+    html += '<span class="ng">データが見つかりません（空です）</span>';
+  } else {
+    keys.forEach(function(k){
+      html += '• '+k+'<br>';
+    });
+  }
+
+  var d = null;
+  try{ var raw=localStorage.getItem('yuuta_q2'); d=raw?JSON.parse(raw):null; }catch(e){}
+
+  if(d){
+    html += '<br><span class="ok">✅ yuuta_q2 が見つかりました！</span><br>';
+    var mon = d.monsters||{};
+    html += '• 総正解数(EXP用)：'+(mon.totalCorrect||0)+'<br>';
+    html += '• アクティブモンスター：'+mon.active+'<br>';
+    html += '• 所持モンスター：'+(mon.owned||[]).join(', ')+'<br>';
+    html += '• ストリーク：'+(mon.streak||0)+'日<br>';
+    html += '• 解いた問題数(重複なし)：'+Object.keys(mon.solvedKeys||{}).length+'問<br>';
+    html += '• modeCounts：'+JSON.stringify(mon.modeCounts||{})+'<br>';
+  } else {
+    html += '<br><span class="ng">❌ yuuta_q2 が見つかりません</span><br>';
+    html += '<span class="warn">→ 別のURLで開いていたデータかもしれません</span>';
+  }
+
+  result.innerHTML = html;
+}
+
+function showRaw(){
+  var box = document.getElementById('raw');
+  box.style.display='block';
+  try{
+    var raw = localStorage.getItem('yuuta_q2');
+    if(raw){
+      var d = JSON.parse(raw);
+      // solvedKeysは省略（大きすぎる）
+      var mon = d.monsters||{};
+      var display = JSON.parse(JSON.stringify(d));
+      if(display.monsters && display.monsters.solvedKeys){
+        display.monsters.solvedKeys = '('+Object.keys(mon.solvedKeys||{}).length+'問のデータ)';
+      }
+      box.innerHTML = '<b>yuuta_q2 の中身：</b><pre>'+JSON.stringify(display,null,2)+'</pre>';
+    } else {
+      box.innerHTML = '<span class="ng">データなし</span>';
+    }
+  }catch(e){ box.innerHTML='エラー：'+e.message; }
+}
+
+// 自動実行
+checkData();
+</script>
+</body>
+</html>
