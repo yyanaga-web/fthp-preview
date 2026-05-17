@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>データ復元</title>
+<style>
+body{background:#0a0a1a;color:#fff;font-family:sans-serif;padding:20px;max-width:480px;margin:0 auto;text-align:center;}
+h2{color:#f1c40f;margin-bottom:16px;}
+.box{background:#0d1b4b;border:1px solid #333;border-radius:12px;padding:16px;margin:12px 0;font-size:0.85rem;text-align:left;}
+.ok{color:#2ecc71;font-weight:700;}
+.ng{color:#e74c3c;font-weight:700;}
+button{display:block;width:100%;background:linear-gradient(135deg,#f1c40f,#e67e22);color:#0a0a1a;border:none;border-radius:12px;padding:16px;font-size:1.1rem;font-weight:900;cursor:pointer;margin:10px 0;font-family:sans-serif;}
+button:active{opacity:0.85;}
+</style>
+</head>
+<body>
+<h2>🔧 データ復元ツール</h2>
+<div class="box">
+  <b>復元される内容：</b><br><br>
+  🐾 モンスター4体（炎・水・草・電）<br>
+  ⚡ ホノオン Lv.18<br>
+  ⚡ アクアン Lv.12<br>
+  ⚡ クサラン Lv.8<br>
+  ⚡ カミナリン Lv.5<br>
+  🏆 累計正解数：約180問<br>
+  🔥 連続日数：5日<br>
+</div>
+<div class="box" id="status">待機中...</div>
+<button onclick="restoreData()">✅ このデータで復元する</button>
+<button onclick="checkAfter()" style="background:#2ecc71;">🔍 復元後の確認</button>
+<script>
+var RESTORE = {"monsters": {"active": 0, "owned": [0, 1, 2, 3], "levels": {"0": 18, "1": 12, "2": 8, "3": 5}, "exps": {"0": 850, "1": 420, "2": 280, "3": 90}, "totalCorrect": 180, "streak": 5, "modeCounts": {"kanji": 60, "proverb": 50, "mixed": 30, "science": 20, "social": 20}, "solvedKeys": {}}, "streakData": {"lastDate": "", "streak": 5, "doneDates": []}, "reviewQueue": {}};
+
+function restoreData(){
+  try{
+    localStorage.setItem('yuuta_q2', JSON.stringify(RESTORE));
+    document.getElementById('status').innerHTML = '<span class="ok">✅ 復元完了！ゲームを開いてください。</span>';
+  }catch(e){
+    document.getElementById('status').innerHTML = '<span class="ng">❌ エラー：' + e.message + '</span>';
+  }
+}
+
+function checkAfter(){
+  try{
+    var d = JSON.parse(localStorage.getItem('yuuta_q2'));
+    if(d && d.monsters){
+      document.getElementById('status').innerHTML = '<span class="ok">✅ データ確認OK！<br>総正解数：' + d.monsters.totalCorrect + '<br>モンスター：' + d.monsters.owned.join(',') + '</span>';
+    } else {
+      document.getElementById('status').innerHTML = '<span class="ng">データなし。まず復元ボタンを押してください</span>';
+    }
+  }catch(e){
+    document.getElementById('status').innerHTML = '<span class="ng">エラー：' + e.message + '</span>';
+  }
+}
+</script>
+</body>
+</html>
