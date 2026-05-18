@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="theme-color" content="#0d9488">
+<meta name="description" content="コロナ後遺症の症状と生活習慣の因果関係を記録・可視化する個人向けトラッカー">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="体調トラッカー">
+<title>体調管理トラッカー</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root {
+    --teal: #0d9488;
+    --teal-light: #14b8a6;
+    --teal-bg: #f0fdfa;
+    --slate-900: #0f172a;
+    --slate-700: #334155;
+    --slate-500: #64748b;
+    --slate-300: #cbd5e1;
+    --slate-100: #f1f5f9;
+    --white: #ffffff;
+    --red: #ef4444;
+    --orange: #f97316;
+    --amber: #f59e0b;
+    --font: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'YuGothic', 'Yu Gothic', sans-serif;
+    /* chart colors */
+    --c-headache: #1d4ed8;
+    --c-gum: #be185d;
+    --c-shoulder: #047857;
+    --c-back: #c2410c;
+    --c-steps: #6366f1;
+    --c-fatigue: #7c3aed;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: linear-gradient(135deg, #f8fbf9 0%, #eef7f4 46%, #f7f1eb 100%);
+    min-height: 100vh;
+    color: var(--slate-900);
+    font-size: 14px;
+  }
+
+  /* ── Header ── */
+  .app-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    min-height: 52px;
+    display: flex; align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    overflow: visible;
+  }
+  .app-header-icon {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 16px; flex-shrink: 0;
+  }
+  .app-header-title {
+    font-weight: 700; font-size: 15px; color: var(--slate-900);
+    flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* ── Stats bar ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 12px 12px 0;
+    max-width: 680px; margin: 0 auto;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 16px;
+    padding: 10px 12px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    text-align: center;
+  }
+  .stat-label { font-size: 10px; color: var(--slate-500); margin-bottom: 2px; }
+  .stat-value { font-size: 22px; font-weight: 700; color: var(--teal); line-height: 1.1; }
+  .stat-sub { font-size: 9px; color: var(--slate-500); margin-top: 2px; }
+
+  /* ── Tabs ── */
+  .tabs-wrapper { padding: 10px 12px 0; max-width: 680px; margin: 0 auto; }
+  .tab-list {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 14px;
+    padding: 4px;
+    gap: 3px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .tab-btn {
+    border: none; background: transparent; cursor: pointer;
+    border-radius: 10px; padding: 7px 2px;
+    font-family: var(--font); font-size: 11px; font-weight: 500;
+    color: var(--slate-500);
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    transition: all 0.18s;
+  }
+  .tab-btn.active {
+    background: white;
+    color: var(--teal);
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  }
+  .tab-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* ── Tab panels ── */
+  .tab-panel { display: none; padding: 10px 12px 80px; max-width: 680px; margin: 0 auto; }
+  .tab-panel.active { display: block; }
+
+  /* ── Card ── */
+  .card {
+    background: rgba(255,255,255,0.82);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 20px;
+    padding: 18px 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    backdrop-filter: blur(8px);
+    margin-bottom: 10px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 700; color: var(--slate-900);
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .card-title svg { width: 16px; height: 16px; color: var(--teal); flex-shrink: 0; }
+  .card-desc { font-size: 11px; color: var(--slate-500); margin-bottom: 14px; }
+
+  /* ── Form ── */
+  .form-row { margin-bottom: 14px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; display: block; }
+  .form-date {
+    width: 100%; border: 1.5px solid var(--slate-300); border-radius: 10px;
+    padding: 9px 12px; font-family: var(--font); font-size: 13px;
+    background: white; color: var(--slate-900); outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-date:focus { border-color: var(--teal); }
+
+  .symptom-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .symptom-name {
+    font-size: 12px; font-weight: 600; width: 88px; flex-shrink: 0;
+    color: var(--slate-700);
+  }
+  .symptom-slider {
+    flex: 1;
+    -webkit-appearance: none; appearance: none;
+    height: 6px; border-radius: 3px;
+    background: linear-gradient(to right, var(--teal) 0%, var(--teal) var(--pct, 0%), var(--slate-200, #e2e8f0) var(--pct, 0%), #e2e8f0 100%);
+    outline: none; cursor: pointer;
+  }
+  .symptom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px;
+    border-radius: 50%; background: var(--teal);
+    border: 3px solid white; box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+    cursor: pointer;
+  }
+  .symptom-value {
+    width: 28px; text-align: center; font-weight: 700; font-size: 15px;
+    color: var(--teal); flex-shrink: 0;
+  }
+
+  .form-steps {
+    width: 100%; border: 1.5px solid var(--slate-300); border-radius: 10px;
+    padding: 9px 12px; font-family: var(--font); font-size: 13px;
+    background: white; color: var(--slate-900); outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-steps:focus { border-color: var(--teal); }
+
+  .form-textarea {
+    width: 100%; border: 1.5px solid var(--slate-300); border-radius: 10px;
+    padding: 9px 12px; font-family: var(--font); font-size: 13px;
+    background: white; color: var(--slate-900); outline: none;
+    resize: vertical; min-height: 64px;
+    transition: border-color 0.15s;
+  }
+  .form-textarea:focus { border-color: var(--teal); }
+
+  /* factor tags */
+  .factor-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .factor-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--teal-bg); border: 1.5px solid rgba(13,148,136,0.2);
+    border-radius: 20px; padding: 4px 10px;
+    font-size: 11px; font-weight: 600; color: var(--teal); cursor: pointer;
+    transition: all 0.15s; user-select: none;
+  }
+  .factor-tag:hover { background: rgba(13,148,136,0.15); }
+  .factor-tag.selected { background: var(--teal); color: white; border-color: var(--teal); }
+  .factor-tag svg { width: 10px; height: 10px; }
+
+  .save-btn {
+    width: 100%; padding: 13px; border: none; border-radius: 12px;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    color: white; font-family: var(--font); font-size: 14px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(13,148,136,0.35);
+    transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .save-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(13,148,136,0.4); }
+  .save-btn:active { transform: translateY(0); }
+
+  /* ── Calendar ── */
+  .cal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cal-nav-btn {
+    border: 1.5px solid var(--slate-300); background: white; border-radius: 8px;
+    width: 32px; height: 32px; cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .cal-nav-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .cal-month-label { font-weight: 700; font-size: 15px; }
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+  }
+  .cal-day-header {
+    text-align: center; font-size: 10px; font-weight: 600;
+    color: var(--slate-500); padding: 4px 0;
+  }
+  .cal-day-header.sun { color: #ef4444; }
+  .cal-day-header.sat { color: #3b82f6; }
+  .cal-cell {
+    aspect-ratio: 1; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    transition: all 0.15s; position: relative;
+    background: transparent;
+    border: 1.5px solid transparent;
+  }
+  .cal-cell:hover { background: var(--teal-bg); }
+  .cal-cell.other-month { color: var(--slate-300); }
+  .cal-cell.today { border-color: var(--teal); font-weight: 700; }
+  .cal-cell.has-record { background: var(--teal-bg); }
+  .cal-cell.selected { background: var(--teal); color: white; border-color: var(--teal); }
+  .cal-cell.selected .cal-dot { background: white; }
+  .cal-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--teal); margin-top: 2px;
+  }
+  .cal-cell.pain-low .cal-dot { background: #22c55e; }
+  .cal-cell.pain-mid .cal-dot { background: var(--amber); }
+  .cal-cell.pain-high .cal-dot { background: var(--red); }
+
+  .cal-detail {
+    margin-top: 12px; padding: 14px;
+    background: var(--teal-bg); border-radius: 14px;
+    border: 1.5px solid rgba(13,148,136,0.15);
+    font-size: 12px;
+  }
+  .cal-detail-date { font-weight: 700; font-size: 13px; color: var(--teal); margin-bottom: 6px; }
+  .cal-detail-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .cal-detail-label { color: var(--slate-700); }
+  .cal-detail-value { font-weight: 600; }
+  .cal-detail-empty { color: var(--slate-500); text-align: center; padding: 8px 0; }
+
+  /* ── Graph ── */
+  .month-selector {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  }
+  .month-input {
+    border: 1.5px solid var(--slate-300); border-radius: 10px;
+    padding: 7px 10px; font-family: var(--font); font-size: 13px;
+    background: white; outline: none; transition: border-color 0.15s; flex: 1;
+  }
+  .month-input:focus { border-color: var(--teal); }
+  .month-label { font-size: 12px; font-weight: 600; color: var(--slate-700); flex-shrink: 0; }
+
+  .chart-wrap {
+    margin-bottom: 10px;
+    background: rgba(255,255,255,0.82);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 16px;
+    padding: 14px 12px 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    backdrop-filter: blur(6px);
+  }
+  .chart-title {
+    font-size: 12px; font-weight: 700; color: var(--slate-700);
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .chart-title-dot {
+    width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
+  }
+  .chart-canvas-container { height: 120px; position: relative; }
+
+  /* ── Records list ── */
+  .record-item {
+    background: rgba(255,255,255,0.82);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  }
+  .record-item-info { flex: 1; min-width: 0; }
+  .record-item-date { font-weight: 700; font-size: 13px; color: var(--slate-900); margin-bottom: 3px; }
+  .record-item-symptoms { font-size: 11px; color: var(--slate-600); line-height: 1.5; }
+  .record-item-memo { font-size: 11px; color: var(--teal); margin-top: 3px; font-style: italic; }
+  .record-item-actions { display: flex; gap: 6px; flex-shrink: 0; padding-top: 2px; }
+  .btn-edit, .btn-delete {
+    border: 1.5px solid; border-radius: 8px; padding: 5px 10px;
+    font-family: var(--font); font-size: 11px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .btn-edit {
+    border-color: var(--slate-300); background: white; color: var(--slate-700);
+  }
+  .btn-edit:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-bg); }
+  .btn-delete {
+    border-color: rgba(239,68,68,0.3); background: white; color: var(--red);
+  }
+  .btn-delete:hover { background: #fff1f2; border-color: var(--red); }
+  .btn-edit svg, .btn-delete svg { width: 12px; height: 12px; }
+
+  /* ── Factor manager ── */
+  .factor-list-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px; background: white; border-radius: 10px;
+    border: 1.5px solid var(--slate-100); margin-bottom: 6px;
+  }
+  .factor-list-name { font-size: 12px; font-weight: 600; color: var(--slate-700); }
+  .factor-list-actions { display: flex; gap: 6px; }
+  .factor-list-actions button {
+    border: 1.5px solid var(--slate-200); background: white; border-radius: 7px;
+    padding: 4px 9px; font-family: var(--font); font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .factor-list-actions .btn-factor-edit { color: var(--slate-600); }
+  .factor-list-actions .btn-factor-edit:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-bg); }
+  .factor-list-actions .btn-factor-delete { color: var(--red); }
+  .factor-list-actions .btn-factor-delete:hover { border-color: var(--red); background: #fff1f2; }
+  .factor-list-actions button svg { width: 11px; height: 11px; }
+
+  .factor-add-row { display: flex; gap: 8px; margin-top: 10px; }
+  .factor-add-input {
+    flex: 1; border: 1.5px solid var(--slate-300); border-radius: 10px;
+    padding: 8px 12px; font-family: var(--font); font-size: 12px;
+    background: white; outline: none; transition: border-color 0.15s;
+  }
+  .factor-add-input:focus { border-color: var(--teal); }
+  .factor-add-btn {
+    border: none; background: var(--teal); color: white; border-radius: 10px;
+    padding: 8px 14px; font-family: var(--font); font-size: 12px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; transition: all 0.15s;
+  }
+  .factor-add-btn:hover { background: #0b7a71; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--slate-900); color: white; border-radius: 12px;
+    padding: 10px 20px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 200; white-space: nowrap; pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── Section header ── */
+  .section-header {
+    font-size: 11px; font-weight: 700; color: var(--slate-500); letter-spacing: 0.05em;
+    text-transform: uppercase; margin: 16px 0 8px;
+  }
+  .section-header:first-child { margin-top: 0; }
+
+  /* edit mode banner */
+  .edit-banner {
+    display: none;
+    background: rgba(13,148,136,0.1); border: 1.5px solid rgba(13,148,136,0.3);
+    border-radius: 12px; padding: 10px 14px; margin-bottom: 12px;
+    font-size: 12px; color: var(--teal); font-weight: 600;
+    align-items: center; gap: 8px;
+  }
+  .edit-banner.show { display: flex; }
+  .edit-banner-cancel {
+    margin-left: auto; border: 1.5px solid var(--teal); background: white;
+    color: var(--teal); border-radius: 7px; padding: 3px 10px;
+    font-family: var(--font); font-size: 11px; font-weight: 700; cursor: pointer;
+  }
+
+  /* empty state */
+  .empty-state { text-align: center; padding: 32px 16px; color: var(--slate-400); }
+  .empty-state-icon { font-size: 36px; margin-bottom: 8px; }
+  .empty-state-text { font-size: 13px; }
+
+  /* ── Google Fit ── */
+  .gfit-btn {
+    flex-shrink: 0;
+    margin-left: auto;
+    display: flex; align-items: center; gap: 6px;
+    border: 1.5px solid var(--slate-200); border-radius: 20px;
+    padding: 5px 10px 5px 8px;
+    font-family: var(--font); font-size: 11px; font-weight: 700;
+    cursor: pointer; background: white; color: var(--slate-700);
+    transition: all 0.18s; white-space: nowrap;
+  }
+  .gfit-btn:hover { border-color: #4285F4; color: #4285F4; }
+  .gfit-btn.connected { border-color: #34a853; color: #34a853; background: #f0fdf4; }
+  .gfit-btn.syncing { opacity: 0.7; pointer-events: none; }
+  .gfit-logo { width: 16px; height: 16px; flex-shrink: 0; }
+  .gfit-sync-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #34a853;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ── Settings modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white; border-radius: 20px; padding: 24px 20px;
+    width: 100%; max-width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal-title {
+    font-size: 16px; font-weight: 700; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .modal-desc { font-size: 12px; color: var(--slate-500); margin-bottom: 16px; line-height: 1.6; }
+  .modal-label { font-size: 12px; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; display: block; }
+  .modal-input {
+    width: 100%; border: 1.5px solid var(--slate-300); border-radius: 10px;
+    padding: 9px 12px; font-family: var(--font); font-size: 12px;
+    background: white; outline: none; margin-bottom: 12px;
+    transition: border-color 0.15s;
+  }
+  .modal-input:focus { border-color: #4285F4; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+  .modal-cancel {
+    border: 1.5px solid var(--slate-200); background: white; border-radius: 10px;
+    padding: 9px 16px; font-family: var(--font); font-size: 13px; font-weight: 600;
+    cursor: pointer; color: var(--slate-600); transition: all 0.15s;
+  }
+  .modal-cancel:hover { border-color: var(--slate-400); }
+  .modal-ok {
+    border: none; background: #4285F4; color: white; border-radius: 10px;
+    padding: 9px 18px; font-family: var(--font); font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .modal-ok:hover { background: #3b75d9; }
+
+  .gfit-status-card {
+    background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px;
+    padding: 12px 14px; margin-bottom: 10px;
+    display: none;
+  }
+  .gfit-status-card.show { display: block; }
+  .gfit-status-row { display: flex; align-items: center; justify-content: space-between; }
+  .gfit-status-label { font-size: 12px; font-weight: 700; color: #15803d; }
+  .gfit-status-sub { font-size: 11px; color: #166534; margin-top: 3px; }
+  .gfit-disconnect-btn {
+    border: 1.5px solid #86efac; background: white; border-radius: 8px;
+    padding: 4px 10px; font-family: var(--font); font-size: 11px; font-weight: 600;
+    cursor: pointer; color: #15803d; transition: all 0.15s;
+  }
+  .gfit-disconnect-btn:hover { border-color: #ef4444; color: #ef4444; }
+
+  .steps-auto-row {
+    display: flex; align-items: center; gap: 8px;
+    background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px;
+    padding: 8px 12px; margin-top: 8px; font-size: 11px; color: #1e40af;
+  }
+  .steps-auto-row svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  @media (prefers-color-scheme: dark) {
+    /* minimal dark mode - keep as is for now */
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="app-header-icon">♥</div>
+  <span class="app-header-title">体調トラッカー</span>
+  <button class="gfit-btn" id="gfitBtn" onclick="gfitButtonClick()">
+    <!-- Google Fit logo SVG -->
+    <svg class="gfit-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#EA4335"/>
+      <path d="M12 2v10l7.07-7.07C17.36 3.27 14.83 2 12 2z" fill="#FBBC04"/>
+      <path d="M19.07 4.93L12 12l8 2.93C20.63 13.55 21 12.82 21 12c0-2.76-1.12-5.26-2.93-7.07z" fill="#34A853"/>
+      <path d="M20 14.93l-8-2.93-7.07 7.07C6.64 20.73 9.17 22 12 22c4.41 0 8.18-2.85 9.56-6.83L20 14.93z" fill="#4285F4"/>
+      <path d="M2 12c0 2.76 1.12 5.26 2.93 7.07L12 12 4.93 4.93C3.27 6.64 2 9.17 2 12z" fill="#EA4335" opacity="0.7"/>
+    </svg>
+    <span id="gfitBtnLabel">Fit 連携</span>
+    <div class="gfit-sync-dot" id="gfitSyncDot" style="display:none"></div>
+  </button>
+</header>
+
+<!-- Google Fit Settings Modal -->
+<div class="modal-overlay" id="gfitModal">
+  <div class="modal">
+    <div class="modal-title">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#EA4335"/><path d="M12 2v10l7.07-7.07C17.36 3.27 14.83 2 12 2z" fill="#FBBC04"/><path d="M19.07 4.93L12 12l8 2.93C20.63 13.55 21 12.82 21 12c0-2.76-1.12-5.26-2.93-7.07z" fill="#34A853"/><path d="M20 14.93l-8-2.93-7.07 7.07C6.64 20.73 9.17 22 12 22c4.41 0 8.18-2.85 9.56-6.83L20 14.93z" fill="#4285F4"/></svg>
+      Google Fit 連携設定
+    </div>
+    <p class="modal-desc">
+      Google Cloud Console で OAuth 2.0 クライアント ID を取得し、承認済みオリジンに
+      このページのURLを追加してください。<br>
+      <a href="https://console.cloud.google.com/apis/credentials" target="_blank"
+         style="color:#4285F4;font-size:11px">→ Google Cloud Console を開く</a>
+    </p>
+    <label class="modal-label" for="clientIdInput">OAuth 2.0 クライアント ID</label>
+    <input type="text" class="modal-input" id="clientIdInput"
+      placeholder="xxxxxxxx.apps.googleusercontent.com">
+    <label class="modal-label" for="syncDaysInput">同期する日数（過去）</label>
+    <input type="number" class="modal-input" id="syncDaysInput"
+      placeholder="30" min="1" max="365" value="30">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeGfitModal()">キャンセル</button>
+      <button class="modal-ok" onclick="saveGfitSettings()">保存して接続</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stats bar -->
+<div class="stats-bar" id="statsBar">
+  <div class="stat-card">
+    <div class="stat-label">今月の平均</div>
+    <div class="stat-value" id="statAvg">—</div>
+    <div class="stat-sub">4症状の平均強度</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">最新記録</div>
+    <div class="stat-value" id="statLatest">—</div>
+    <div class="stat-sub" id="statLatestDate">—</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">活動記録</div>
+    <div class="stat-value" id="statFactors">—</div>
+    <div class="stat-sub">今月の悪化要因メモ</div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs-wrapper">
+  <div class="tab-list" role="tablist">
+    <button class="tab-btn" id="tab-record" onclick="switchTab('record')" role="tab">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      記録
+    </button>
+    <button class="tab-btn" id="tab-factor" onclick="switchTab('factor')" role="tab">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      要因
+    </button>
+    <button class="tab-btn" id="tab-calendar" onclick="switchTab('calendar')" role="tab">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      暦
+    </button>
+    <button class="tab-btn active" id="tab-graph" onclick="switchTab('graph')" role="tab">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      グラフ
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB: 記録 ═══════════════ -->
+<div class="tab-panel" id="panel-record">
+
+  <!-- Edit banner -->
+  <div class="edit-banner" id="editBanner">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    <span id="editBannerText">編集モード</span>
+    <button class="edit-banner-cancel" onclick="cancelEdit()">キャンセル</button>
+  </div>
+
+  <!-- 日付 -->
+  <div class="card">
+    <div class="card-title">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      日付
+    </div>
+    <div class="form-row">
+      <input type="date" class="form-date" id="inputDate">
+    </div>
+  </div>
+
+  <!-- 症状強度 -->
+  <div class="card">
+    <div class="card-title">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      症状強度（0〜10）
+    </div>
+    <div class="card-desc">各症状の強さをスライダーで入力してください</div>
+
+    <div class="symptom-row">
+      <span class="symptom-name" style="color:var(--c-headache)">頭痛</span>
+      <input type="range" class="symptom-slider" id="s-headache" min="0" max="10" value="0" oninput="updateSlider(this,'v-headache')" style="--pct:0%">
+      <span class="symptom-value" id="v-headache">0</span>
+    </div>
+    <div class="symptom-row">
+      <span class="symptom-name" style="color:var(--c-gum)">歯茎痛</span>
+      <input type="range" class="symptom-slider" id="s-gum" min="0" max="10" value="0" oninput="updateSlider(this,'v-gum')" style="--pct:0%">
+      <span class="symptom-value" id="v-gum">0</span>
+    </div>
+    <div class="symptom-row">
+      <span class="symptom-name" style="color:var(--c-shoulder)">肩の筋肉痛</span>
+      <input type="range" class="symptom-slider" id="s-shoulder" min="0" max="10" value="0" oninput="updateSlider(this,'v-shoulder')" style="--pct:0%">
+      <span class="symptom-value" id="v-shoulder">0</span>
+    </div>
+    <div class="symptom-row">
+      <span class="symptom-name" style="color:var(--c-back)">腰痛</span>
+      <input type="range" class="symptom-slider" id="s-back" min="0" max="10" value="0" oninput="updateSlider(this,'v-back')" style="--pct:0%">
+      <span class="symptom-value" id="v-back">0</span>
+    </div>
+    <div class="symptom-row">
+      <span class="symptom-name" style="color:var(--c-fatigue)">疲労感</span>
+      <input type="range" class="symptom-slider" id="s-fatigue" min="0" max="10" value="0" oninput="updateSlider(this,'v-fatigue')" style="--pct:0%">
+      <span class="symptom-value" id="v-fatigue">0</span>
+    </div>
+  </div>
+
+  <!-- 歩数 -->
+  <div class="card">
+    <div class="card-title">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      歩数
+    </div>
+    <input type="number" class="form-steps" id="inputSteps" placeholder="例: 3500" min="0">
+    <div class="steps-auto-row" id="stepsAutoRow" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Google Fit から自動取得済み（手動入力で上書き可）
+    </div>
+  </div>
+
+  <!-- メモ -->
+  <div class="card">
+    <div class="card-title">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      メモ
+    </div>
+    <textarea class="form-textarea" id="inputMemo" placeholder="体調の変化や気づいたことを記録..."></textarea>
+  </div>
+
+  <button class="save-btn" onclick="saveRecord()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    <span id="saveBtnLabel">記録を保存</span>
+  </button>
+
+  <!-- 過去記録 -->
+  <div class="section-header" style="margin-top:24px">症状記録の編集・削除</div>
+  <p style="font-size:11px;color:var(--slate-500);margin-bottom:10px">過去の症状記録は、編集ボタンで入力フォームに戻して修正できます。</p>
+  <div id="recordList"></div>
+</div>
+
+<!-- ═══════════════ TAB: 要因 ═══════════════ -->
+<div class="tab-panel" id="panel-factor">
+
+  <!-- 要因編集バナー -->
+  <div class="edit-banner" id="factorEditBanner">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    <span id="factorEditBannerText">編集モード</span>
+    <button class="edit-banner-cancel" onclick="cancelFactorLog()">キャンセル</button>
+  </div>
+
+  <!-- 日付 -->
+  <div class="card">
+    <div class="card-title">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      日付
+    </div>
+    <input type="date" class="form-date" id="factorDate">
+  </div>
+
+  <!-- 要因チェック -->
+  <div class="card">
+    <div class="card-title">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      その日にあったこと
+    </div>
+    <div class="card-desc">当てはまるものをタップ（複数選択可）</div>
+    <div class="factor-tags" id="factorTagsLog"></div>
+  </div>
+
+  <!-- メモ -->
+  <div class="card">
+    <div class="card-title">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      メモ
+    </div>
+    <textarea class="form-textarea" id="factorMemo" placeholder="詳細や気づいたことを記録..."></textarea>
+  </div>
+
+  <button class="save-btn" onclick="saveFactorLog()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    <span id="factorSaveBtnLabel">要因を記録</span>
+  </button>
+
+  <!-- 過去の要因ログ -->
+  <div class="section-header" style="margin-top:24px">過去の要因記録</div>
+  <div id="factorLogList"></div>
+
+  <!-- 要因リスト管理 -->
+  <div class="section-header" style="margin-top:24px">要因リストの管理</div>
+  <div class="card">
+    <div class="card-desc">要因の項目を追加・編集・削除できます</div>
+    <div id="factorListManager"></div>
+    <div class="factor-add-row">
+      <input type="text" class="factor-add-input" id="factorAddInput" placeholder="新しい要因を入力..." maxlength="20"
+        onkeydown="if(event.key==='Enter')addFactor()">
+      <button class="factor-add-btn" onclick="addFactor()">追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB: カレンダー ═══════════════ -->
+<div class="tab-panel" id="panel-calendar">
+  <div class="card">
+    <div class="cal-header">
+      <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+      <span class="cal-month-label" id="calMonthLabel"></span>
+      <button class="cal-nav-btn" onclick="calNav(1)">›</button>
+    </div>
+    <div class="cal-grid">
+      <div class="cal-day-header sun">日</div>
+      <div class="cal-day-header">月</div>
+      <div class="cal-day-header">火</div>
+      <div class="cal-day-header">水</div>
+      <div class="cal-day-header">木</div>
+      <div class="cal-day-header">金</div>
+      <div class="cal-day-header sat">土</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-detail" id="calDetail" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB: グラフ ═══════════════ -->
+<div class="tab-panel active" id="panel-graph">
+
+  <!-- Google Fit status card -->
+  <div class="gfit-status-card" id="gfitStatusCard">
+    <div class="gfit-status-row">
+      <div>
+        <div class="gfit-status-label">✓ Google Fit 連携中</div>
+        <div class="gfit-status-sub" id="gfitStatusSub">最終同期: —</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="gfit-disconnect-btn" onclick="gfitSync()" style="border-color:#86efac;color:#15803d">
+          再同期
+        </button>
+        <button class="gfit-disconnect-btn" onclick="gfitDisconnect()">切断</button>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+    <label class="month-label" for="graphMonth">表示月</label>
+    <input type="month" class="month-input" id="graphMonth" onchange="renderCharts()">
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title"><div class="chart-title-dot" style="background:var(--c-headache)"></div>頭痛</div>
+    <div class="chart-canvas-container"><canvas id="chart-headache"></canvas></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title"><div class="chart-title-dot" style="background:var(--c-gum)"></div>歯茎痛</div>
+    <div class="chart-canvas-container"><canvas id="chart-gum"></canvas></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title"><div class="chart-title-dot" style="background:var(--c-shoulder)"></div>肩の筋肉痛</div>
+    <div class="chart-canvas-container"><canvas id="chart-shoulder"></canvas></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title"><div class="chart-title-dot" style="background:var(--c-back)"></div>腰痛</div>
+    <div class="chart-canvas-container"><canvas id="chart-back"></canvas></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title"><div class="chart-title-dot" style="background:var(--c-fatigue)"></div>疲労感</div>
+    <div class="chart-canvas-container"><canvas id="chart-fatigue"></canvas></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title"><div class="chart-title-dot" style="background:var(--c-steps)"></div>歩数</div>
+    <div class="chart-canvas-container"><canvas id="chart-steps"></canvas></div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA LAYER  (localStorage)
+// ═══════════════════════════════════════════
+const RECORDS_KEY  = 'ht_records';
+const FACTORS_KEY  = 'ht_factors';
+const FLOGS_KEY    = 'ht_flogs';   // 要因ログ（症状記録とは独立）
+
+const DEFAULT_FACTORS = ['飲酒','運動','薬飲み忘れ','入浴'];
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; }
+  catch { return []; }
+}
+function saveRecords(arr) { localStorage.setItem(RECORDS_KEY, JSON.stringify(arr)); }
+
+function loadFlogs() {
+  try { return JSON.parse(localStorage.getItem(FLOGS_KEY)) || []; }
+  catch { return []; }
+}
+function saveFlogs(arr) { localStorage.setItem(FLOGS_KEY, JSON.stringify(arr)); }
+
+function loadFactors() {
+  const f = localStorage.getItem(FACTORS_KEY);
+  if (!f) {
+    localStorage.setItem(FACTORS_KEY, JSON.stringify(DEFAULT_FACTORS));
+    return [...DEFAULT_FACTORS];
+  }
+  try {
+    const saved = JSON.parse(f);
+    // マイグレーション: 旧リスト（片付け等）が残っていたら新リストに置換
+    const oldItems = ['片付け','外出','仕事','ストレス','睡眠不足','食事','天気'];
+    if (oldItems.some(o => saved.includes(o))) {
+      localStorage.setItem(FACTORS_KEY, JSON.stringify(DEFAULT_FACTORS));
+      return [...DEFAULT_FACTORS];
+    }
+    return saved;
+  } catch { return [...DEFAULT_FACTORS]; }
+}
+function saveFactors(arr) { localStorage.setItem(FACTORS_KEY, JSON.stringify(arr)); }
+
+// ═══════════════════════════════════════════
+//  SEED: import existing data from app
+// ═══════════════════════════════════════════
+(function seedIfEmpty() {
+  if (loadRecords().length > 0) return;
+  const seed = [
+    { date:'2026-05-17', headache:3, gum:3, shoulder:6, back:4, fatigue:0, steps:0,  factors:[], memo:'' },
+    { date:'2026-05-16', headache:0, gum:2, shoulder:3, back:2, fatigue:0, steps:0,  factors:[], memo:'' },
+    { date:'2026-05-14', headache:2, gum:4, shoulder:6, back:1, fatigue:0, steps:0,  factors:[], memo:'' },
+    { date:'2026-05-13', headache:2, gum:0, shoulder:5, back:1, fatigue:0, steps:0,  factors:[], memo:'頭ビリつき' },
+    { date:'2026-05-12', headache:7, gum:0, shoulder:6, back:2, fatigue:0, steps:0,  factors:[], memo:'電気走る頭痛' },
+    { date:'2026-05-11', headache:0, gum:0, shoulder:3, back:0, fatigue:0, steps:0,  factors:[], memo:'' },
+    { date:'2026-05-10', headache:3, gum:0, shoulder:3, back:0, fatigue:0, steps:0,  factors:[], memo:'午後片付け後に急激悪化' },
+    { date:'2026-05-09', headache:0, gum:2, shoulder:6, back:2, fatigue:0, steps:0,  factors:[], memo:'' },
+    { date:'2026-05-08', headache:0, gum:0, shoulder:4, back:0, fatigue:0, steps:3500, factors:[], memo:'' },
+    { date:'2026-05-07', headache:0, gum:1, shoulder:6, back:2, fatigue:0, steps:0,  factors:[], memo:'' },
+    { date:'2026-05-06', headache:1, gum:1, shoulder:6, back:0, fatigue:0, steps:0,  factors:['片付け'], memo:'片付け' },
+    { date:'2026-05-05', headache:0, gum:0, shoulder:6, back:3, fatigue:0, steps:0,  factors:[], memo:'' },
+  ];
+  saveRecords(seed);
+})();
+
+// ═══════════════════════════════════════════
+//  SEED: factor logs from original app
+// ═══════════════════════════════════════════
+(function seedFlogs() {
+  const fullSeed = [
+    { date: '2026-05-16', factors: ['飲酒'],           memo: '深酒' },
+    { date: '2026-05-14', factors: ['薬飲み忘れ'],      memo: '朝の薬飲み忘れて夕方から歯茎痛悪化' },
+    { date: '2026-05-10', factors: ['運動', '飲酒'],    memo: '片付け後に飲酒→悪化' },
+    { date: '2026-05-09', factors: ['運動'],            memo: '銀座散歩' },
+    { date: '2026-05-08', factors: [],                  memo: '大晴入院手続き' },
+    { date: '2026-05-06', factors: ['運動', '飲酒'],    memo: 'ベッド下の片付けで午後から悪化・ビール3缶' },
+  ];
+  const existing = loadFlogs();
+  // シードデータの日付で既存を上書き、それ以外の日付（ユーザーが新たに追加）は保持
+  const merged = [...existing.filter(e => !fullSeed.find(s => s.date === e.date)), ...fullSeed];
+  saveFlogs(merged);
+})();
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let editingDate = null;          // date string being edited
+let calYear, calMonth;           // calendar display
+let chartInstances = {};         // Chart.js instances
+let selectedCalDate = null;
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  document.getElementById('inputDate').value = toDateStr(today);
+
+  // Calendar init
+  calYear = today.getFullYear();
+  calMonth = today.getMonth();
+
+  // Graph month
+  const ym = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('graphMonth').value = ym;
+
+  // Date input → auto-fill steps from Fit cache
+  document.getElementById('inputDate').addEventListener('change', e => {
+    gfitAutoFillSteps(e.target.value);
+  });
+  document.getElementById('factorDate').value = toDateStr(today);
+
+  renderAll();
+  gfitUpdateUI();
+
+  // Auto-sync if token valid and >1h since last sync
+  if (gfitIsConnected()) {
+    const last = +localStorage.getItem(GFIT_LASTSYNC) || 0;
+    if (Date.now() - last > 60 * 60 * 1000) {
+      setTimeout(gfitSync, 1500);
+    }
+  }
+});
+
+function renderAll() {
+  renderStats();
+  renderFactorTagsLog();
+  renderFactorListManager();
+  renderFactorLogList();
+  renderRecordList();
+  renderCalendar();
+  renderCharts();
+}
+
+// ═══════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════
+function toDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function avgSymptoms(r) {
+  return (r.headache + r.gum + r.shoulder + r.back + r.fatigue) / 5;
+}
+function showToast(msg, color) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color || '#0f172a';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  if (name === 'graph') renderCharts();
+  if (name === 'calendar') renderCalendar();
+}
+
+// ═══════════════════════════════════════════
+//  STATS BAR
+// ═══════════════════════════════════════════
+function renderStats() {
+  const records = loadRecords();
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const thisMonth = records.filter(r => r.date.startsWith(ym));
+
+  if (thisMonth.length > 0) {
+    const avg = thisMonth.reduce((s,r) => s + avgSymptoms(r), 0) / thisMonth.length;
+    document.getElementById('statAvg').textContent = avg.toFixed(1);
+  } else {
+    document.getElementById('statAvg').textContent = '—';
+  }
+
+  const sorted = [...records].sort((a,b) => b.date.localeCompare(a.date));
+  if (sorted.length > 0) {
+    const latest = sorted[0];
+    const avgL = ((latest.headache + latest.gum + latest.shoulder + latest.back) / 4).toFixed(1);
+    document.getElementById('statLatest').textContent = avgL;
+    document.getElementById('statLatestDate').textContent = latest.date;
+  } else {
+    document.getElementById('statLatest').textContent = '—';
+    document.getElementById('statLatestDate').textContent = '—';
+  }
+
+  const flogCount = loadFlogs().filter(f => f.date.startsWith(ym)).length;
+  document.getElementById('statFactors').textContent = flogCount || '—';
+}
+
+// ═══════════════════════════════════════════
+//  SLIDER
+// ═══════════════════════════════════════════
+function updateSlider(el, valueId) {
+  document.getElementById(valueId).textContent = el.value;
+  el.style.setProperty('--pct', (el.value / 10 * 100) + '%');
+}
+
+// ═══════════════════════════════════════════
+//  FACTOR LOG (独立した要因記録)
+// ═══════════════════════════════════════════
+let selectedFactorLogItems = [];
+let editingFactorLogDate = null;   // 編集中の要因ログの日付
+
+function renderFactorTagsLog() {
+  const factors = loadFactors();
+  const container = document.getElementById('factorTagsLog');
+  if (!container) return;
+  container.innerHTML = '';
+  factors.forEach(f => {
+    const tag = document.createElement('div');
+    tag.className = 'factor-tag' + (selectedFactorLogItems.includes(f) ? ' selected' : '');
+    tag.innerHTML = `<span>${f}</span>`;
+    tag.onclick = () => {
+      if (selectedFactorLogItems.includes(f)) {
+        selectedFactorLogItems = selectedFactorLogItems.filter(x => x !== f);
+        tag.classList.remove('selected');
+      } else {
+        selectedFactorLogItems.push(f);
+        tag.classList.add('selected');
+      }
+    };
+    container.appendChild(tag);
+  });
+}
+
+function saveFactorLog() {
+  const date = document.getElementById('factorDate').value;
+  if (!date) { showToast('日付を選択してください', '#ef4444'); return; }
+  if (selectedFactorLogItems.length === 0 && !document.getElementById('factorMemo').value.trim()) {
+    showToast('要因またはメモを入力してください', '#f97316'); return;
+  }
+
+  const log = {
+    date,
+    factors: [...selectedFactorLogItems],
+    memo: document.getElementById('factorMemo').value.trim(),
+  };
+
+  let flogs = loadFlogs();
+
+  if (editingFactorLogDate) {
+    const idx = flogs.findIndex(f => f.date === editingFactorLogDate);
+    if (idx !== -1) flogs[idx] = log; else flogs.push(log);
+    editingFactorLogDate = null;
+    document.getElementById('factorEditBanner').classList.remove('show');
+    document.getElementById('factorSaveBtnLabel').textContent = '要因を記録';
+    showToast('✓ 要因記録を更新しました');
+  } else {
+    const existing = flogs.findIndex(f => f.date === date);
+    if (existing !== -1) {
+      if (!confirm(`${date} の要因記録を上書きしますか？`)) return;
+      flogs[existing] = log;
+    } else {
+      flogs.push(log);
+    }
+    showToast('✓ 要因を記録しました');
+  }
+
+  saveFlogs(flogs);
+  resetFactorLogForm();
+  renderAll();
+}
+
+function resetFactorLogForm() {
+  document.getElementById('factorDate').value = toDateStr(new Date());
+  document.getElementById('factorMemo').value = '';
+  selectedFactorLogItems = [];
+  renderFactorTagsLog();
+}
+
+function editFactorLog(date) {
+  const flogs = loadFlogs();
+  const log = flogs.find(f => f.date === date);
+  if (!log) return;
+
+  editingFactorLogDate = date;
+  document.getElementById('factorDate').value = log.date;
+  document.getElementById('factorMemo').value = log.memo || '';
+  selectedFactorLogItems = [...(log.factors || [])];
+
+  renderFactorTagsLog();
+  document.getElementById('factorEditBannerText').textContent = `編集中: ${date}`;
+  document.getElementById('factorEditBanner').classList.add('show');
+  document.getElementById('factorSaveBtnLabel').textContent = '変更を保存';
+
+  switchTab('factor');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelFactorLog() {
+  editingFactorLogDate = null;
+  document.getElementById('factorEditBanner').classList.remove('show');
+  document.getElementById('factorSaveBtnLabel').textContent = '要因を記録';
+  resetFactorLogForm();
+}
+
+function deleteFactorLog(date) {
+  if (!confirm(`${date} の要因記録を削除しますか？`)) return;
+  saveFlogs(loadFlogs().filter(f => f.date !== date));
+  showToast('要因記録を削除しました', '#334155');
+  renderAll();
+}
+
+function renderFactorLogList() {
+  const flogs = loadFlogs().sort((a,b) => b.date.localeCompare(a.date));
+  const container = document.getElementById('factorLogList');
+  if (!container) return;
+
+  if (flogs.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">要因の記録がありません</div></div>';
+    return;
+  }
+
+  container.innerHTML = flogs.map(f => `
+    <div class="record-item">
+      <div class="record-item-info">
+        <div class="record-item-date">${f.date}</div>
+        ${f.factors && f.factors.length > 0
+          ? `<div class="record-item-symptoms">${f.factors.map(x => `<span style="display:inline-block;background:var(--teal-bg);border:1px solid rgba(13,148,136,0.2);border-radius:20px;padding:2px 8px;font-size:11px;color:var(--teal);margin:1px 2px">${escHtml(x)}</span>`).join('')}</div>`
+          : ''}
+        ${f.memo ? `<div class="record-item-memo">${escHtml(f.memo)}</div>` : ''}
+      </div>
+      <div class="record-item-actions">
+        <button class="btn-edit" onclick="editFactorLog('${f.date}')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          編集
+        </button>
+        <button class="btn-delete" onclick="deleteFactorLog('${f.date}')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          削除
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── 旧：症状フォーム内の要因タグ（互換用・空実装）──
+function renderFactorTagsForm() {}
+let selectedFactors = [];
+
+// ═══════════════════════════════════════════
+//  SAVE RECORD
+// ═══════════════════════════════════════════
+function saveRecord() {
+  const date = document.getElementById('inputDate').value;
+  if (!date) { showToast('日付を選択してください', '#ef4444'); return; }
+
+  const rec = {
+    date,
+    headache: +document.getElementById('s-headache').value,
+    gum:      +document.getElementById('s-gum').value,
+    shoulder: +document.getElementById('s-shoulder').value,
+    back:     +document.getElementById('s-back').value,
+    fatigue:  +document.getElementById('s-fatigue').value,
+    steps:    +document.getElementById('inputSteps').value || 0,
+    memo:     document.getElementById('inputMemo').value.trim(),
+  };
+
+  let records = loadRecords();
+
+  if (editingDate) {
+    const idx = records.findIndex(r => r.date === editingDate);
+    if (idx !== -1) records[idx] = rec;
+    else records.push(rec);
+    editingDate = null;
+    document.getElementById('editBanner').classList.remove('show');
+    document.getElementById('saveBtnLabel').textContent = '記録を保存';
+    showToast('✓ 記録を更新しました');
+  } else {
+    const existing = records.findIndex(r => r.date === date);
+    if (existing !== -1) {
+      if (!confirm(`${date} の記録を上書きしますか？`)) return;
+      records[existing] = rec;
+    } else {
+      records.push(rec);
+    }
+    showToast('✓ 記録を保存しました');
+  }
+
+  saveRecords(records);
+  resetForm();
+  renderAll();
+}
+
+function resetForm() {
+  const today = new Date();
+  document.getElementById('inputDate').value = toDateStr(today);
+  ['headache','gum','shoulder','back','fatigue'].forEach(k => {
+    const sl = document.getElementById('s-'+k);
+    sl.value = 0;
+    sl.style.setProperty('--pct','0%');
+    document.getElementById('v-'+k).textContent = '0';
+  });
+  document.getElementById('inputSteps').value = '';
+  document.getElementById('inputMemo').value = '';
+}
+
+// ═══════════════════════════════════════════
+//  EDIT / DELETE RECORD
+// ═══════════════════════════════════════════
+function editRecord(date) {
+  const records = loadRecords();
+  const rec = records.find(r => r.date === date);
+  if (!rec) return;
+
+  editingDate = date;
+  document.getElementById('inputDate').value = rec.date;
+
+  ['headache','gum','shoulder','back','fatigue'].forEach(k => {
+    const sl = document.getElementById('s-'+k);
+    sl.value = rec[k];
+    sl.style.setProperty('--pct', (rec[k]/10*100)+'%');
+    document.getElementById('v-'+k).textContent = rec[k];
+  });
+  document.getElementById('inputSteps').value = rec.steps || '';
+  document.getElementById('inputMemo').value = rec.memo || '';
+
+  document.getElementById('editBannerText').textContent = `編集中: ${date}`;
+  document.getElementById('editBanner').classList.add('show');
+  document.getElementById('saveBtnLabel').textContent = '変更を保存';
+
+  switchTab('record');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelEdit() {
+  editingDate = null;
+  document.getElementById('editBanner').classList.remove('show');
+  document.getElementById('saveBtnLabel').textContent = '記録を保存';
+  resetForm();
+}
+
+function deleteRecord(date) {
+  if (!confirm(`${date} の記録を削除しますか？`)) return;
+  let records = loadRecords().filter(r => r.date !== date);
+  saveRecords(records);
+  showToast('記録を削除しました', '#334155');
+  renderAll();
+}
+
+// ═══════════════════════════════════════════
+//  RECORD LIST
+// ═══════════════════════════════════════════
+function renderRecordList() {
+  const records = loadRecords().sort((a,b) => b.date.localeCompare(a.date));
+  const container = document.getElementById('recordList');
+
+  if (records.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">記録がありません</div></div>';
+    return;
+  }
+
+  container.innerHTML = records.map(r => `
+    <div class="record-item">
+      <div class="record-item-info">
+        <div class="record-item-date">${r.date}</div>
+        <div class="record-item-symptoms">
+          頭痛 ${r.headache} / 歯茎 ${r.gum} / 肩 ${r.shoulder} / 腰 ${r.back}${r.fatigue ? ` / 疲労 ${r.fatigue}` : ''}${r.steps ? ` / 歩数 ${r.steps.toLocaleString()}` : ''}
+        </div>
+        ${r.memo ? `<div class="record-item-memo">${escHtml(r.memo)}</div>` : ''}
+        ${r.factors && r.factors.length > 0 ? `<div class="record-item-memo" style="color:var(--c-back)">要因: ${r.factors.join('・')}</div>` : ''}
+      </div>
+      <div class="record-item-actions">
+        <button class="btn-edit" onclick="editRecord('${r.date}')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          編集
+        </button>
+        <button class="btn-delete" onclick="deleteRecord('${r.date}')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          削除
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════
+//  CALENDAR
+// ═══════════════════════════════════════════
+function calNav(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('calMonthLabel').textContent = `${calYear}年 ${months[calMonth]}`;
+
+  const records = loadRecords();
+  const recMap = {};
+  records.forEach(r => { recMap[r.date] = r; });
+
+  const today = toDateStr(new Date());
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const prevDays = new Date(calYear, calMonth, 0).getDate();
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const total = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+
+  for (let i = 0; i < total; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell';
+
+    let dateStr;
+    if (i < firstDay) {
+      const d = prevDays - firstDay + i + 1;
+      dateStr = `${calYear}-${String(calMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      cell.classList.add('other-month');
+      cell.textContent = d;
+    } else if (i < firstDay + daysInMonth) {
+      const d = i - firstDay + 1;
+      dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      cell.textContent = d;
+      if (dateStr === today) cell.classList.add('today');
+      if (dateStr === selectedCalDate) cell.classList.add('selected');
+      if (recMap[dateStr]) {
+        cell.classList.add('has-record');
+        const avg = (recMap[dateStr].headache + recMap[dateStr].gum + recMap[dateStr].shoulder + recMap[dateStr].back) / 4;
+        const dot = document.createElement('div');
+        dot.className = 'cal-dot' + (avg <= 2 ? ' pain-low' : avg <= 5 ? ' pain-mid' : ' pain-high');
+        if (dateStr !== selectedCalDate) {
+          cell.classList.remove('has-record');
+          cell.classList.add(avg <= 2 ? 'pain-low' : avg <= 5 ? 'pain-mid' : 'pain-high');
+          cell.classList.add('has-record');
+        }
+        cell.appendChild(dot);
+      }
+    } else {
+      const d = i - firstDay - daysInMonth + 1;
+      dateStr = `${calYear}-${String(calMonth+2).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      cell.classList.add('other-month');
+      cell.textContent = d;
+    }
+
+    cell.dataset.date = dateStr;
+    cell.onclick = () => selectCalDate(dateStr);
+    grid.appendChild(cell);
+  }
+}
+
+function selectCalDate(dateStr) {
+  selectedCalDate = dateStr;
+  renderCalendar();
+
+  const records = loadRecords();
+  const rec = records.find(r => r.date === dateStr);
+  const detail = document.getElementById('calDetail');
+
+  if (rec) {
+    detail.style.display = 'block';
+    const flog = loadFlogs().find(f => f.date === dateStr);
+    detail.innerHTML = `
+      <div class="cal-detail-date">${dateStr}</div>
+      ${[['頭痛', rec.headache, 'var(--c-headache)'],
+         ['歯茎痛', rec.gum, 'var(--c-gum)'],
+         ['肩の筋肉痛', rec.shoulder, 'var(--c-shoulder)'],
+         ['腰痛', rec.back, 'var(--c-back)'],
+         ['疲労感', rec.fatigue, 'var(--c-fatigue)']].map(([label, val, color]) => `
+        <div class="cal-detail-row">
+          <span class="cal-detail-label" style="color:${color}">${label}</span>
+          <span class="cal-detail-value">${val} / 10</span>
+        </div>`).join('')}
+      ${rec.steps ? `<div class="cal-detail-row"><span class="cal-detail-label">歩数</span><span class="cal-detail-value">${rec.steps.toLocaleString()} 歩</span></div>` : ''}
+      ${rec.memo ? `<div style="margin-top:6px;font-size:11px;color:var(--slate-700);font-style:italic">${escHtml(rec.memo)}</div>` : ''}
+      ${flog && flog.factors.length > 0 ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(13,148,136,0.15)"><div style="font-size:10px;font-weight:700;color:var(--slate-500);margin-bottom:4px">悪化要因</div>${flog.factors.map(x=>`<span style="display:inline-block;background:var(--teal-bg);border:1px solid rgba(13,148,136,0.2);border-radius:20px;padding:2px 8px;font-size:11px;color:var(--teal);margin:1px 2px">${escHtml(x)}</span>`).join('')}${flog.memo?`<div style="font-size:11px;color:var(--slate-600);margin-top:4px;font-style:italic">${escHtml(flog.memo)}</div>`:''}</div>` : ''}
+    `;
+  } else {
+    // No symptom record - check for factor log only
+    const flog = loadFlogs().find(f => f.date === dateStr);
+    detail.style.display = 'block';
+    if (flog) {
+      detail.innerHTML = `
+        <div class="cal-detail-date">${dateStr}</div>
+        <div style="font-size:11px;color:var(--slate-500);margin-bottom:6px">症状記録なし</div>
+        <div style="font-size:10px;font-weight:700;color:var(--slate-500);margin-bottom:4px">悪化要因</div>
+        ${flog.factors.map(x=>`<span style="display:inline-block;background:var(--teal-bg);border:1px solid rgba(13,148,136,0.2);border-radius:20px;padding:2px 8px;font-size:11px;color:var(--teal);margin:1px 2px">${escHtml(x)}</span>`).join('')}
+        ${flog.memo?`<div style="font-size:11px;color:var(--slate-600);margin-top:4px;font-style:italic">${escHtml(flog.memo)}</div>`:''}
+      `;
+    } else {
+      detail.innerHTML = `<div class="cal-detail-date">${dateStr}</div><div class="cal-detail-empty">記録なし</div>`;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+//  CHARTS
+// ═══════════════════════════════════════════
+function renderCharts() {
+  const ym = document.getElementById('graphMonth').value;
+  if (!ym) return;
+
+  const records = loadRecords()
+    .filter(r => r.date.startsWith(ym))
+    .sort((a,b) => a.date.localeCompare(b.date));
+
+  const labels = records.map(r => {
+    const d = new Date(r.date);
+    return `${d.getMonth()+1}/${d.getDate()}`;
+  });
+
+  const chartDefs = [
+    { id:'headache', key:'headache', color:'#1d4ed8' },
+    { id:'gum',      key:'gum',     color:'#be185d' },
+    { id:'shoulder', key:'shoulder',color:'#047857' },
+    { id:'back',     key:'back',    color:'#c2410c' },
+    { id:'fatigue',  key:'fatigue', color:'#7c3aed' },
+    { id:'steps',    key:'steps',   color:'#6366f1', isSteps: true },
+  ];
+
+  chartDefs.forEach(def => {
+    const canvas = document.getElementById('chart-'+def.id);
+    if (!canvas) return;
+
+    if (chartInstances[def.id]) {
+      chartInstances[def.id].destroy();
+    }
+
+    const data = records.map(r => r[def.key] || 0);
+
+    chartInstances[def.id] = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          borderColor: def.color,
+          backgroundColor: def.color + '18',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: def.color,
+          pointBorderWidth: 2,
+          pointRadius: data.length <= 15 ? 4 : 3,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.35,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#fff',
+            borderColor: def.color,
+            borderWidth: 1.5,
+            titleColor: '#334155',
+            bodyColor: def.color,
+            titleFont: { size: 11, family: 'inherit' },
+            bodyFont: { size: 13, weight: '700', family: 'inherit' },
+            padding: 8,
+            callbacks: {
+              label: ctx => def.isSteps
+                ? ` ${ctx.parsed.y.toLocaleString()} 歩`
+                : ` ${ctx.parsed.y} / 10`,
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: { font: { size: 10, family: 'inherit' }, color: '#64748b', maxTicksLimit: 10 },
+          },
+          y: {
+            min: 0,
+            max: def.isSteps ? undefined : 10,
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: {
+              font: { size: 10, family: 'inherit' }, color: '#64748b',
+              stepSize: def.isSteps ? undefined : 2,
+              maxTicksLimit: 6,
+            },
+          }
+        },
+        interaction: { intersect: false, mode: 'index' },
+        animation: { duration: 300 },
+      }
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+//  GOOGLE FIT
+// ═══════════════════════════════════════════
+const GFIT_KEY       = 'ht_gfit_token';
+const GFIT_EXPIRY    = 'ht_gfit_expiry';
+const GFIT_CLIENTID  = 'ht_gfit_clientid';
+const GFIT_SYNCDAYS  = 'ht_gfit_syncdays';
+const GFIT_LASTSYNC  = 'ht_gfit_lastsync';
+const GFIT_SCOPE     = 'https://www.googleapis.com/auth/fitness.activity.read';
+
+let gfitTokenClient = null;
+
+// ── State helpers ──────────────────────────
+function gfitGetToken()    { return localStorage.getItem(GFIT_KEY); }
+function gfitGetExpiry()   { return +localStorage.getItem(GFIT_EXPIRY) || 0; }
+function gfitGetClientId() { return localStorage.getItem(GFIT_CLIENTID) || ''; }
+function gfitGetSyncDays() { return +localStorage.getItem(GFIT_SYNCDAYS) || 30; }
+function gfitIsConnected() {
+  const t = gfitGetToken();
+  const e = gfitGetExpiry();
+  return !!t && Date.now() < e;
+}
+
+// ── UI helpers ────────────────────────────
+function gfitUpdateUI() {
+  const btn     = document.getElementById('gfitBtn');
+  const label   = document.getElementById('gfitBtnLabel');
+  const dot     = document.getElementById('gfitSyncDot');
+  const card    = document.getElementById('gfitStatusCard');
+  const subText = document.getElementById('gfitStatusSub');
+
+  if (gfitIsConnected()) {
+    btn.className = 'gfit-btn connected';
+    label.textContent = '同期済み';
+    dot.style.display = 'inline-block';
+    card.classList.add('show');
+    const last = localStorage.getItem(GFIT_LASTSYNC);
+    if (last) {
+      const d = new Date(+last);
+      subText.textContent = `最終同期: ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+  } else {
+    btn.className = 'gfit-btn';
+    label.textContent = 'Fit 連携';
+    dot.style.display = 'none';
+    card.classList.remove('show');
+  }
+}
+
+// ── Button click entry ────────────────────
+function gfitButtonClick() {
+  if (gfitIsConnected()) {
+    // Already connected: open graph tab and show status
+    switchTab('graph');
+    return;
+  }
+  // Check if client ID is saved
+  const cid = gfitGetClientId();
+  if (!cid) {
+    openGfitModal();
+    return;
+  }
+  gfitConnect(cid);
+}
+
+// ── Modal ────────────────────────────────
+function openGfitModal() {
+  document.getElementById('clientIdInput').value = gfitGetClientId();
+  document.getElementById('syncDaysInput').value = gfitGetSyncDays();
+  document.getElementById('gfitModal').classList.add('show');
+}
+function closeGfitModal() {
+  document.getElementById('gfitModal').classList.remove('show');
+}
+function saveGfitSettings() {
+  const cid = document.getElementById('clientIdInput').value.trim();
+  const days = +document.getElementById('syncDaysInput').value || 30;
+  if (!cid) { alert('クライアント ID を入力してください'); return; }
+  localStorage.setItem(GFIT_CLIENTID, cid);
+  localStorage.setItem(GFIT_SYNCDAYS, days);
+  closeGfitModal();
+  gfitConnect(cid);
+}
+
+// ── OAuth2 connect ────────────────────────
+function gfitConnect(clientId) {
+  const btn   = document.getElementById('gfitBtn');
+  const label = document.getElementById('gfitBtnLabel');
+  btn.classList.add('syncing');
+  label.textContent = '接続中...';
+
+  // Use GIS token client
+  try {
+    gfitTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: GFIT_SCOPE,
+      callback: (resp) => {
+        if (resp.error) {
+          showToast('認証エラー: ' + (resp.error_description || resp.error), '#ef4444');
+          btn.classList.remove('syncing');
+          gfitUpdateUI();
+          return;
+        }
+        // Save token (expires_in is seconds)
+        localStorage.setItem(GFIT_KEY, resp.access_token);
+        localStorage.setItem(GFIT_EXPIRY, Date.now() + (resp.expires_in - 60) * 1000);
+        gfitSync();
+      },
+    });
+    gfitTokenClient.requestAccessToken();
+  } catch(e) {
+    showToast('Google Identity Services の読み込みに失敗しました', '#ef4444');
+    btn.classList.remove('syncing');
+    label.textContent = 'Fit 連携';
+  }
+}
+
+// ── Disconnect ────────────────────────────
+function gfitDisconnect() {
+  if (!confirm('Google Fit との連携を解除しますか？\n（取得済みの歩数データはそのまま残ります）')) return;
+  const token = gfitGetToken();
+  if (token) {
+    try { google.accounts.oauth2.revoke(token, () => {}); } catch(e) {}
+  }
+  localStorage.removeItem(GFIT_KEY);
+  localStorage.removeItem(GFIT_EXPIRY);
+  localStorage.removeItem(GFIT_LASTSYNC);
+  gfitUpdateUI();
+  showToast('Google Fit との連携を解除しました', '#334155');
+}
+
+// ── Sync steps from Fitness API ───────────
+async function gfitSync() {
+  const token = gfitGetToken();
+  if (!token || Date.now() >= gfitGetExpiry()) {
+    // Token expired - need to re-connect
+    showToast('トークンが期限切れです。再接続してください', '#f97316');
+    localStorage.removeItem(GFIT_KEY);
+    localStorage.removeItem(GFIT_EXPIRY);
+    gfitUpdateUI();
+    return;
+  }
+
+  const btn   = document.getElementById('gfitBtn');
+  const label = document.getElementById('gfitBtnLabel');
+  btn.classList.add('syncing');
+  label.textContent = '同期中...';
+
+  try {
+    const days     = gfitGetSyncDays();
+    const endMs    = Date.now();
+    const startMs  = endMs - days * 24 * 60 * 60 * 1000;
+
+    const body = {
+      aggregateBy: [{ dataTypeName: 'com.google.step_count.delta' }],
+      bucketByTime: { durationMillis: 86400000 }, // 1 day
+      startTimeMillis: startMs,
+      endTimeMillis: endMs,
+    };
+
+    const res = await fetch(
+      'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const stepsMap = {};
+
+    (data.bucket || []).forEach(bucket => {
+      const dateStr = msToDateStr(+bucket.startTimeMillis);
+      let steps = 0;
+      (bucket.dataset || []).forEach(ds => {
+        (ds.point || []).forEach(pt => {
+          (pt.value || []).forEach(v => { steps += v.intVal || 0; });
+        });
+      });
+      if (steps > 0) stepsMap[dateStr] = steps;
+    });
+
+    // Merge into records
+    let records  = loadRecords();
+    let updated  = 0;
+    let created  = 0;
+
+    Object.entries(stepsMap).forEach(([date, steps]) => {
+      const idx = records.findIndex(r => r.date === date);
+      if (idx !== -1) {
+        if (records[idx].steps !== steps) {
+          records[idx].steps = steps;
+          updated++;
+        }
+      } else {
+        // Create a stub record with steps only
+        records.push({
+          date, headache:0, gum:0, shoulder:0, back:0, fatigue:0,
+          steps, factors:[], memo:'', stepsOnly: true,
+        });
+        created++;
+      }
+    });
+
+    saveRecords(records);
+    localStorage.setItem(GFIT_LASTSYNC, Date.now());
+
+    gfitUpdateUI();
+    renderAll();
+    showToast(`✓ 歩数を同期しました（更新${updated}件・追加${created}件）`);
+  } catch(e) {
+    console.error('Google Fit sync error:', e);
+    showToast('同期エラー: ' + e.message, '#ef4444');
+    btn.classList.remove('syncing');
+    label.textContent = '同期済み';
+  }
+}
+
+// ── Auto-fill steps when date changes ────
+function gfitAutoFillSteps(date) {
+  if (!gfitIsConnected()) return;
+  const records = loadRecords();
+  const rec = records.find(r => r.date === date);
+  const row = document.getElementById('stepsAutoRow');
+  if (rec && rec.steps > 0) {
+    document.getElementById('inputSteps').value = rec.steps;
+    row.style.display = 'flex';
+  } else {
+    row.style.display = 'none';
+  }
+}
+
+function msToDateStr(ms) {
+  const d = new Date(ms);
+  // Use UTC to avoid timezone shifts (Fitness API returns bucket start in UTC midnight)
+  const y  = d.getUTCFullYear();
+  const mo = String(d.getUTCMonth()+1).padStart(2,'0');
+  const da = String(d.getUTCDate()).padStart(2,'0');
+  return `${y}-${mo}-${da}`;
+}
+
+// ── Init on load ──────────────────────────
+// (integrated into main DOMContentLoaded above)
+function renderFactorListManager() {
+  const factors = loadFactors();
+  const container = document.getElementById('factorListManager');
+  if (factors.length === 0) {
+    container.innerHTML = '<div style="color:var(--slate-400);font-size:12px;text-align:center;padding:8px 0">要因がありません</div>';
+    return;
+  }
+  container.innerHTML = factors.map((f, i) => `
+    <div class="factor-list-item">
+      <span class="factor-list-name">${escHtml(f)}</span>
+      <div class="factor-list-actions">
+        <button class="btn-factor-edit" onclick="editFactor(${i})">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          編集
+        </button>
+        <button class="btn-factor-delete" onclick="deleteFactor(${i})">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          削除
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addFactor() {
+  const input = document.getElementById('factorAddInput');
+  const name = input.value.trim();
+  if (!name) return;
+  const factors = loadFactors();
+  if (factors.includes(name)) { showToast('同じ要因がすでにあります', '#f97316'); return; }
+  factors.push(name);
+  saveFactors(factors);
+  input.value = '';
+  renderFactorListManager();
+  renderFactorTagsLog();
+  showToast(`「${name}」を追加しました`);
+}
+
+function editFactor(index) {
+  const factors = loadFactors();
+  const newName = prompt('要因名を編集:', factors[index]);
+  if (!newName || !newName.trim() || newName.trim() === factors[index]) return;
+  const trimmed = newName.trim();
+  if (factors.includes(trimmed)) { showToast('同じ要因がすでにあります', '#f97316'); return; }
+  factors[index] = trimmed;
+  saveFactors(factors);
+  renderFactorListManager();
+  renderFactorTagsLog();
+  showToast('要因を更新しました');
+}
+
+function deleteFactor(index) {
+  const factors = loadFactors();
+  if (!confirm(`「${factors[index]}」を削除しますか？`)) return;
+  factors.splice(index, 1);
+  saveFactors(factors);
+  renderFactorListManager();
+  renderFactorTagsLog();
+  showToast('要因を削除しました', '#334155');
+}
+</script>
+</body>
+</html>
