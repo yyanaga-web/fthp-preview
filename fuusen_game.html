@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ふうせんゲーム 👀</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            user-select: none; -webkit-user-select: none;
+        }
+
+        /* ===== 共通画面 ===== */
+        .screen {
+            position: fixed; inset: 0;
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            gap: 24px; z-index: 500;
+            padding: 32px; text-align: center;
+        }
+        .screen.active { display: flex; }
+
+        /* ===== タップスタート ===== */
+        #s-tap { background: #E3F2FD; }
+        #s-tap .big-emoji { font-size: 80px; }
+        #s-tap h1 { font-size: 28px; color: #1565C0; }
+        #s-tap .sub { font-size: 15px; color: #888; line-height: 1.8; }
+        .tap-btn {
+            padding: 20px 48px;
+            font-size: 22px; font-weight: bold;
+            background: #1E88E5; color: white;
+            border: none; border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(30,136,229,0.4);
+            cursor: pointer;
+            animation: btnpulse 1.5s ease-in-out infinite;
+        }
+        @keyframes btnpulse {
+            0%,100% { transform: scale(1); }
+            50%      { transform: scale(1.05); }
+        }
+
+        /* ===== レイアウト選択 ===== */
+        #s-layout { background: #E3F2FD; }
+        #s-layout h2 { font-size: 22px; color: #1565C0; }
+        #s-layout .sub { font-size: 14px; color: #888; }
+        .layout-options { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+        .layout-btn {
+            width: 150px; padding: 22px 14px;
+            background: white; border: 5px solid #90CAF9; border-radius: 20px;
+            cursor: pointer; display: flex; flex-direction: column;
+            align-items: center; gap: 14px;
+            font-size: 15px; font-weight: bold; color: #1565C0;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+            transition: transform 0.15s, border-color 0.15s;
+        }
+        .layout-btn:active { transform: scale(0.95); border-color: #1E88E5; }
+        .layout-icon { font-size: 42px; }
+
+        /* ===== 読み込み ===== */
+        #s-loading { background: #E3F2FD; }
+        .spinner {
+            width: 56px; height: 56px;
+            border: 7px solid #BBDEFB; border-top-color: #1E88E5;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #load-msg { font-size: 20px; font-weight: bold; color: #1565C0; }
+        .load-sub { font-size: 14px; color: #888; }
+
+        /* ===== キャリブレーション ===== */
+        #calib-area {
+            position: fixed; inset: 0;
+            display: none; z-index: 600;
+            background: rgba(20,20,40,0.90);
+        }
+        .cdot {
+            position: absolute;
+            transform: translate(-50%,-50%);
+            cursor: pointer;
+        }
+        .cdot-inner {
+            width: 88px; height: 88px;
+            background: #FF5252; border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 0 0 0 rgba(255,82,82,0.6);
+            animation: dotpulse 1.2s ease-in-out infinite;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px;
+        }
+        @keyframes dotpulse {
+            0%   { box-shadow:0 0 0 0 rgba(255,82,82,0.6); transform:scale(1); }
+            50%  { box-shadow:0 0 0 26px rgba(255,82,82,0); transform:scale(1.09); }
+            100% { box-shadow:0 0 0 0 rgba(255,82,82,0); transform:scale(1); }
+        }
+        .cdot.done .cdot-inner { background:#4CAF50; animation:none; }
+        #calib-label {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 18px 20px; background: rgba(0,0,0,0.55);
+            text-align: center; font-size: 16px; font-weight: bold; color: white;
+            z-index: 700; line-height: 1.7;
+        }
+        #calib-prog {
+            position: fixed; bottom: 30px; left: 0; width: 100%;
+            text-align: center; font-size: 16px; color: rgba(255,255,255,0.85);
+            z-index: 700;
+        }
+        #calib-sample-bar-wrap {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 10px;
+            background: rgba(255,255,255,0.15); z-index: 700;
+        }
+        #calib-sample-bar { height:100%; width:0%; background:#4CAF50; transition:width 0.08s linear; }
+
+        /* ===== ゲーム画面 ===== */
+        #game-canvas {
+            position: fixed; inset: 0;
+            display: none;
+            background: linear-gradient(180deg, #87CEEB 0%, #B0E0FF 60%, #E0F4FF 100%);
+        }
+        #game-canvas.active { display: block; }
+
+        /* 風船 */
+        .balloon {
+            position: absolute;
+            display: flex; flex-direction: column; align-items: center;
+            cursor: none;
+            transition: transform 0.1s ease;
+        }
+        .balloon-body {
+            border-radius: 50%;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset -6px -6px 14px rgba(0,0,0,0.15),
+                        inset 4px 4px 10px rgba(255,255,255,0.45);
+        }
+        .balloon-body::after {
+            content: "";
+            position: absolute; bottom: -8px; left: 50%;
+            transform: translateX(-50%);
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+        }
+        .balloon-string {
+            width: 2px; height: 40px;
+            background: rgba(100,100,100,0.5);
+            border-radius: 1px;
+        }
+        /* 視線ゲージ（風船の外周リング） */
+        .balloon-ring {
+            position: absolute; inset: -8px;
+            border-radius: 50%;
+            border: 6px solid rgba(255,255,255,0.0);
+            transition: border-color 0.1s;
+        }
+        .balloon.gazing .balloon-ring {
+            border-color: rgba(255,255,255,0.85);
+            animation: ringpulse 0.5s ease-in-out infinite;
+        }
+        @keyframes ringpulse {
+            0%,100% { transform: scale(1); }
+            50%      { transform: scale(1.06); }
+        }
+
+        /* 割れエフェクト */
+        .pop-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: popfly 0.55s ease-out forwards;
+        }
+        @keyframes popfly {
+            0%   { transform: translate(0,0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+        }
+
+        /* スコア */
+        #score-display {
+            position: fixed; top: 14px; left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(20px,5vw,32px); font-weight: bold;
+            color: white; text-shadow: 0 2px 8px rgba(0,0,80,0.35);
+            z-index: 100; pointer-events: none;
+            letter-spacing: 2px;
+        }
+
+        /* 視線カーソル */
+        #cursor {
+            position: fixed; width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            border: 3px solid rgba(255,255,255,0.85);
+            pointer-events: none; z-index: 300;
+            transform: translate(-50%,-50%); display: none;
+        }
+
+        /* カメラ */
+        #cam-wrap {
+            position: fixed; bottom: 12px; right: 12px;
+            width: 88px; height: 66px;
+            border: 3px solid rgba(255,255,255,0.5); border-radius: 10px;
+            overflow: hidden; background: #000; z-index: 200;
+        }
+        #video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); display:block; }
+
+        /* エラー */
+        #s-error { background: #fff3f3; color: #c00; }
+        .err-sub { font-size: 14px; color: #e57373; line-height:1.7; max-width:320px; }
+        .err-btn {
+            padding:14px 32px; font-size:18px;
+            background:#FF5252; color:white;
+            border:none; border-radius:14px; cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- タップスタート -->
+<div class="screen active" id="s-tap">
+    <div class="big-emoji">🎈🎈🎈</div>
+    <h1>ふうせんゲーム</h1>
+    <p class="sub">見つめると風船が割れるよ！<br>はじめにカメラの準備をします</p>
+    <button class="tap-btn" id="btn-tap">タップしてスタート 👆</button>
+</div>
+
+<!-- レイアウト選択 -->
+<div class="screen" id="s-layout">
+    <h2>画面の向きを選んでください</h2>
+    <p class="sub">使う端末に合わせてね</p>
+    <div class="layout-options">
+        <div class="layout-btn" id="btn-vertical">
+            <div class="layout-icon">📱</div>
+            <span>たて<br>（スマホ）</span>
+        </div>
+        <div class="layout-btn" id="btn-horizontal">
+            <div class="layout-icon">📺</div>
+            <span>よこ<br>（タブレット）</span>
+        </div>
+    </div>
+</div>
+
+<!-- 読み込み -->
+<div class="screen" id="s-loading">
+    <div class="spinner"></div>
+    <div id="load-msg">読み込み中...</div>
+    <div class="load-sub">初回は20〜30秒かかります</div>
+</div>
+
+<!-- キャリブレーション -->
+<div id="calib-area">
+    <div id="calib-label">
+        👁️ 子どもに赤い点を見せてください<br>
+        目線が合ったら　大人の方がタップして登録
+    </div>
+    <div id="calib-prog"></div>
+    <div id="calib-sample-bar-wrap">
+        <div id="calib-sample-bar"></div>
+    </div>
+</div>
+
+<!-- ゲーム -->
+<div id="game-canvas"></div>
+<div id="score-display">🎈 0</div>
+<div id="cursor"></div>
+<div id="cam-wrap"><video id="video" autoplay playsinline muted></video></div>
+
+<!-- エラー -->
+<div class="screen" id="s-error">
+    <div style="font-size:52px">⚠️</div>
+    <div id="err-title">エラーが発生しました</div>
+    <div class="err-sub" id="err-msg"></div>
+    <button class="err-btn" onclick="location.reload()">もう一度試す</button>
+</div>
+
+<script type="module">
+import { FaceLandmarker, FilesetResolver }
+    from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/vision_bundle.mjs";
+
+// ============================================================
+//  パラメーター
+// ============================================================
+const L_IRIS      = 468;
+const R_IRIS      = 473;
+const SMOOTH_K    = 0.14;
+const GAZE_RADIUS = 80;   // 風船への視線判定半径(px)
+const POP_MS      = 1200; // 見続けると割れるまでの時間(ms)
+
+const CALIB_PTS = [
+    [50,12],[15,12],[85,12],
+    [50,50],[15,50],[85,50],
+    [50,88],[15,88],[85,88],
+];
+const MIN_SAMPLES = 8;
+const MAX_SAMPLES = 40;
+
+// 風船の色リスト
+const BALLOON_COLORS = [
+    "#FF5252","#FF9800","#FFEB3B","#4CAF50",
+    "#2196F3","#9C27B0","#E91E63","#00BCD4",
+];
+
+// ============================================================
+//  状態
+// ============================================================
+const video  = document.getElementById("video");
+const cursor = document.getElementById("cursor");
+const canvas = document.getElementById("game-canvas");
+
+let landmarker = null;
+let calibIdx=0, calibData=[], calibBuf=[], calibCollecting=false, calibDone=false;
+let regX=null, regY=null;
+let gazeX = window.innerWidth/2, gazeY = window.innerHeight/2;
+let gameReady = false;
+let score = 0;
+let balloons = [];   // {el, x, y, vy, r, color, gazeStart, progress, popped}
+let lastVideoTime = -1;
+let animFrame = null;
+let isVertical = true;
+
+// ============================================================
+//  画面切替
+// ============================================================
+function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    if (id) document.getElementById(id)?.classList.add("active");
+}
+
+// ============================================================
+//  音（AudioContext — タップ後に初期化）
+// ============================================================
+let ac = null;
+function initAudio() {
+    if (ac) return;
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+// 風船が割れた時の「パン！＋キラキラ」音
+function playPop(pitch = 1.0) {
+    if (!ac) return;
+    if (ac.state === "suspended") ac.resume();
+
+    // 破裂音（ノイズバースト）
+    const bufSize = ac.sampleRate * 0.12;
+    const buf = ac.createBuffer(1, bufSize, ac.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random()*2-1) * (1 - i/bufSize);
+    const noise = ac.createBufferSource();
+    noise.buffer = buf;
+    const noiseGain = ac.createGain();
+    noiseGain.gain.setValueAtTime(0.6, ac.currentTime);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.12);
+    noise.connect(noiseGain); noiseGain.connect(ac.destination);
+    noise.start(); noise.stop(ac.currentTime+0.13);
+
+    // キラキラ音（高い音が2〜3個鳴る）
+    const notes = [880*pitch, 1100*pitch, 1320*pitch];
+    notes.forEach((freq, i) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = "sine";
+        o.connect(g); g.connect(ac.destination);
+        o.frequency.setValueAtTime(freq, ac.currentTime + i*0.06);
+        g.gain.setValueAtTime(0.35, ac.currentTime + i*0.06);
+        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + i*0.06 + 0.22);
+        o.start(ac.currentTime + i*0.06);
+        o.stop(ac.currentTime + i*0.06 + 0.23);
+    });
+}
+
+function playStart() {
+    if (!ac) return;
+    if (ac.state === "suspended") ac.resume();
+    [440,550,660].forEach((f,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);
+        o.frequency.value=f;
+        g.gain.setValueAtTime(0.25,ac.currentTime+i*0.1);
+        g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+i*0.1+0.18);
+        o.start(ac.currentTime+i*0.1);o.stop(ac.currentTime+i*0.1+0.19);
+    });
+}
+
+// ============================================================
+//  線形回帰
+// ============================================================
+function fitLinear(data, key) {
+    const n=data.length; if(n<4) return null;
+    let sx=0,sy=0,sz=0,sx2=0,sy2=0,sxy=0,sxz=0,syz=0;
+    data.forEach(d=>{const x=d.eyeX,y=d.eyeY,z=d[key];
+        sx+=x;sy+=y;sz+=z;sx2+=x*x;sy2+=y*y;sxy+=x*y;sxz+=x*z;syz+=y*z;});
+    const A=[[sx2,sxy,sx,sxz],[sxy,sy2,sy,syz],[sx,sy,n,sz]];
+    for(let c=0;c<3;c++){
+        let mx=c;
+        for(let r=c+1;r<3;r++) if(Math.abs(A[r][c])>Math.abs(A[mx][c])) mx=r;
+        [A[c],A[mx]]=[A[mx],A[c]];
+        if(Math.abs(A[c][c])<1e-10) return null;
+        for(let r=c+1;r<3;r++){const f=A[r][c]/A[c][c];for(let k=c;k<4;k++)A[r][k]-=f*A[c][k];}
+    }
+    const cc=A[2][3]/A[2][2],b=(A[1][3]-A[1][2]*cc)/A[1][1],a=(A[0][3]-A[0][2]*cc-A[0][1]*b)/A[0][0];
+    return {a,b,c:cc};
+}
+function predictGaze(ex,ey){
+    if(!regX||!regY) return null;
+    return {x:regX.a*ex+regX.b*ey+regX.c, y:regY.a*ex+regY.b*ey+regY.c};
+}
+
+// ============================================================
+//  キャリブレーション
+// ============================================================
+function showCalibDot(idx) {
+    const area = document.getElementById("calib-area");
+    area.querySelectorAll(".cdot").forEach(d=>d.remove());
+    document.getElementById("calib-sample-bar").style.width = "0%";
+
+    if (idx >= CALIB_PTS.length) {
+        regX = fitLinear(calibData,"screenX");
+        regY = fitLinear(calibData,"screenY");
+        calibDone = true;
+        area.style.display = "none";
+        startGame();
+        return;
+    }
+
+    const [px,py] = CALIB_PTS[idx];
+    const sx = window.innerWidth*px/100, sy = window.innerHeight*py/100;
+
+    const dot = document.createElement("div");
+    dot.className = "cdot";
+    dot.style.left = `${px}%`; dot.style.top = `${py}%`;
+    dot.innerHTML = `<div class="cdot-inner">👁️</div>`;
+    area.appendChild(dot);
+    document.getElementById("calib-prog").textContent = `${idx+1} / ${CALIB_PTS.length}`;
+
+    calibBuf=[]; calibCollecting=true;
+
+    let registered=false;
+    const onTap=(e)=>{
+        e.preventDefault();
+        if(registered||calibBuf.length<MIN_SAMPLES) return;
+        registered=true; finishDot(dot,sx,sy);
+    };
+    dot.addEventListener("pointerdown",onTap);
+    area.addEventListener("pointerdown",onTap);
+}
+
+function finishDot(dot,sx,sy){
+    calibCollecting=false;
+    const area=document.getElementById("calib-area");
+    const newArea=area.cloneNode(true);
+    area.parentNode.replaceChild(newArea,area);
+    const nd=newArea.querySelector(".cdot");
+    if(nd) nd.classList.add("done");
+    if(calibBuf.length>=MIN_SAMPLES){
+        const ex=calibBuf.reduce((s,d)=>s+d.x,0)/calibBuf.length;
+        const ey=calibBuf.reduce((s,d)=>s+d.y,0)/calibBuf.length;
+        calibData.push({eyeX:ex,eyeY:ey,screenX:sx,screenY:sy});
+    }
+    setTimeout(()=>{calibIdx++;showCalibDot(calibIdx);},450);
+}
+
+// ============================================================
+//  風船生成
+// ============================================================
+function randomColor() {
+    return BALLOON_COLORS[Math.floor(Math.random()*BALLOON_COLORS.length)];
+}
+
+function spawnBalloon() {
+    const W = window.innerWidth, H = window.innerHeight;
+    // 風船サイズ：画面幅の15〜22%
+    const r = W * (0.075 + Math.random()*0.05);
+    const color = randomColor();
+    const x = r + Math.random() * (W - r*2);
+    const vy = -(1.2 + Math.random()*1.4); // 上昇速度(px/frame)
+
+    const el = document.createElement("div");
+    el.className = "balloon";
+    el.style.cssText = `left:${x}px; top:${H + r*2 + 40}px; position:absolute;`;
+
+    // 風船本体
+    const tip = document.createElement("div");
+    tip.className = "balloon-body";
+    tip.style.cssText = `width:${r*2}px; height:${r*2.1}px; background:${color};`;
+    tip.style.setProperty("--color", color);
+
+    // 先端の三角
+    tip.style.cssText += ``;
+    const after = document.createElement("div");
+    after.style.cssText = `
+        position:absolute; bottom:-10px; left:50%; transform:translateX(-50%);
+        width:0; height:0;
+        border-left:8px solid transparent;
+        border-right:8px solid transparent;
+        border-top:14px solid ${color};
+    `;
+    tip.appendChild(after);
+
+    // 視線ゲージリング
+    const ring = document.createElement("div");
+    ring.className = "balloon-ring";
+    tip.appendChild(ring);
+
+    // 糸
+    const str = document.createElement("div");
+    str.className = "balloon-string";
+
+    el.appendChild(tip);
+    el.appendChild(str);
+    canvas.appendChild(el);
+
+    // SVGで糸をゆらゆらにする代わりにCSSアニメ
+    const swayDur = 1.8 + Math.random()*1.2;
+    const swayAmp = 6 + Math.random()*8;
+    el.style.animation = `sway${Math.random()>0.5?'L':'R'} ${swayDur}s ease-in-out infinite`;
+
+    return { el, x, y: H + r*2 + 40, vy, r, color, gazeStart: null, progress: 0, popped: false };
+}
+
+// ゆらゆらアニメ（CSS keyframesを動的に追加）
+(function addSwayAnim(){
+    const style=document.createElement("style");
+    style.textContent=`
+        @keyframes swayL {
+            0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)}
+        }
+        @keyframes swayR {
+            0%,100%{transform:rotate(3deg)} 50%{transform:rotate(-3deg)}
+        }
+    `;
+    document.head.appendChild(style);
+})();
+
+// ============================================================
+//  風船を割る
+// ============================================================
+function popBalloon(balloon) {
+    balloon.popped = true;
+    const {el, x, y, r, color} = balloon;
+
+    // パーティクル
+    const count = 10;
+    for (let i=0; i<count; i++){
+        const angle = (i/count)*Math.PI*2;
+        const dist  = r*(0.8+Math.random()*0.8);
+        const p = document.createElement("div");
+        p.className = "pop-particle";
+        const size = r*0.22 + Math.random()*r*0.18;
+        p.style.cssText = `
+            width:${size}px; height:${size}px;
+            background:${color};
+            left:${x}px; top:${y}px;
+            --dx:${Math.cos(angle)*dist}px;
+            --dy:${Math.sin(angle)*dist - r*0.5}px;
+        `;
+        canvas.appendChild(p);
+        setTimeout(()=>p.remove(), 600);
+    }
+
+    // 風船を消す
+    el.remove();
+
+    // 音
+    const pitch = 0.8 + Math.random()*0.7;
+    playPop(pitch);
+
+    // スコア
+    score++;
+    document.getElementById("score-display").textContent = `🎈 ${score}`;
+
+    balloons = balloons.filter(b=>b!==balloon);
+}
+
+// ============================================================
+//  ゲームループ
+// ============================================================
+let lastSpawn = 0;
+const SPAWN_INTERVAL_MS = 2200; // 新しい風船が出る間隔
+
+function gameLoop(ts) {
+    if (!gameReady) return;
+
+    const W = window.innerWidth, H = window.innerHeight;
+
+    // 風船を生成
+    if (ts - lastSpawn > SPAWN_INTERVAL_MS || balloons.length === 0) {
+        // 画面に最大4個まで
+        if (balloons.length < 4) {
+            balloons.push(spawnBalloon());
+            lastSpawn = ts;
+        }
+    }
+
+    // 風船を動かす & 視線判定
+    balloons.forEach(balloon => {
+        if (balloon.popped) return;
+
+        // 上昇
+        balloon.y += balloon.vy;
+        balloon.el.style.top = `${balloon.y}px`;
+
+        // 画面外に出たら削除
+        if (balloon.y < -balloon.r*3) {
+            balloon.el.remove();
+            balloons = balloons.filter(b=>b!==balloon);
+            return;
+        }
+
+        // 視線が当たっているか
+        const bx = balloon.x;
+        const by = balloon.y - balloon.r; // 風船の中心（糸の付け根が底なのでr分上）
+        const dist = Math.hypot(gazeX - bx, gazeY - by);
+        const hit  = dist < balloon.r + GAZE_RADIUS;
+
+        if (hit) {
+            if (!balloon.gazeStart) balloon.gazeStart = ts;
+            balloon.progress = Math.min((ts - balloon.gazeStart) / POP_MS, 1);
+            balloon.el.classList.add("gazing");
+
+            // プログレスをリングの太さで表現
+            const ring = balloon.el.querySelector(".balloon-ring");
+            if (ring) {
+                const w = Math.round(6 + balloon.progress * 14);
+                ring.style.borderWidth = `${w}px`;
+                ring.style.borderColor = `rgba(255,255,255,${0.5 + balloon.progress*0.5})`;
+            }
+
+            if (balloon.progress >= 1) popBalloon(balloon);
+        } else {
+            balloon.gazeStart = null;
+            balloon.progress  = 0;
+            balloon.el.classList.remove("gazing");
+            const ring = balloon.el.querySelector(".balloon-ring");
+            if (ring) { ring.style.borderWidth="6px"; ring.style.borderColor="rgba(255,255,255,0)"; }
+        }
+    });
+
+    animFrame = requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
+    cursor.style.display = "block";
+    gameReady = true;
+    canvas.classList.add("active");
+    playStart();
+    requestAnimationFrame(gameLoop);
+}
+
+// ============================================================
+//  検出ループ
+// ============================================================
+function detect() {
+    if (video.readyState<2||video.currentTime===lastVideoTime){requestAnimationFrame(detect);return;}
+    lastVideoTime=video.currentTime;
+
+    const results=landmarker.detectForVideo(video,performance.now());
+    if(results.faceLandmarks&&results.faceLandmarks.length>0){
+        const lms=results.faceLandmarks[0];
+        const L=lms[L_IRIS],R=lms[R_IRIS];
+        if(L&&R){
+            const eyeX=(L.x+R.x)/2, eyeY=(L.y+R.y)/2;
+            if(calibCollecting){
+                calibBuf.push({x:eyeX,y:eyeY});
+                const pct=Math.min(calibBuf.length/MAX_SAMPLES*100,100);
+                const bar=document.getElementById("calib-sample-bar");
+                if(bar) bar.style.width=`${pct}%`;
+            } else if(calibDone&&gameReady){
+                const pred=predictGaze(eyeX,eyeY);
+                const px=pred?pred.x:eyeX*window.innerWidth;
+                const py=pred?pred.y:eyeY*window.innerHeight;
+                gazeX+=(px-gazeX)*SMOOTH_K;
+                gazeY+=(py-gazeY)*SMOOTH_K;
+                cursor.style.left=`${gazeX}px`;
+                cursor.style.top =`${gazeY}px`;
+            }
+        }
+    }
+    requestAnimationFrame(detect);
+}
+
+// ============================================================
+//  フロー
+// ============================================================
+document.getElementById("btn-tap").addEventListener("pointerdown",()=>{
+    initAudio(); playStart();
+    showScreen("s-layout");
+});
+
+document.getElementById("btn-vertical").addEventListener("pointerdown",()=>{
+    isVertical=true; startLoading();
+});
+document.getElementById("btn-horizontal").addEventListener("pointerdown",()=>{
+    isVertical=false; startLoading();
+});
+
+async function startLoading(){
+    showScreen("s-loading");
+    try {
+        document.getElementById("load-msg").textContent="カメラを起動中...";
+        const stream=await navigator.mediaDevices.getUserMedia({
+            video:{facingMode:"user",width:{ideal:640},height:{ideal:480}}
+        });
+        video.srcObject=stream;
+        await new Promise(r=>{video.onloadeddata=r;});
+
+        document.getElementById("load-msg").textContent="AIモデルを読み込み中...";
+        const vision=await FilesetResolver.forVisionTasks(
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+        );
+        landmarker=await FaceLandmarker.createFromOptions(vision,{
+            baseOptions:{
+                modelAssetPath:"https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+                delegate:"GPU"
+            },
+            outputFaceBlendshapes:false,
+            runningMode:"VIDEO",
+            numFaces:1
+        });
+
+        showScreen(null);
+        document.getElementById("calib-area").style.display="block";
+        showCalibDot(0);
+        detect();
+    } catch(e){
+        document.getElementById("err-title").textContent=
+            e.name==="NotAllowedError"?"カメラの許可が必要です":"読み込みに失敗しました";
+        document.getElementById("err-msg").textContent=e.message||String(e);
+        showScreen("s-error");
+    }
+}
+</script>
+</body>
+</html>
