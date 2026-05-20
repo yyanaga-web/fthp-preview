@@ -185,13 +185,26 @@
             letter-spacing: 2px;
         }
 
-        /* 視線カーソル */
+        /* 視線カーソル — 赤い丸 */
         #cursor {
-            position: fixed; width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(255,255,255,0.25);
-            border: 3px solid rgba(255,255,255,0.85);
+            position: fixed; width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255, 50, 50, 0.8);
+            border: 3px solid rgba(255,255,255,0.95);
+            box-shadow: 0 0 12px rgba(255,0,0,0.55);
             pointer-events: none; z-index: 300;
             transform: translate(-50%,-50%); display: none;
+        }
+
+        /* 最初に戻るボタン */
+        #btn-reset {
+            position: fixed; top: 14px; left: 14px;
+            padding: 10px 18px;
+            font-size: 15px; font-weight: bold;
+            background: rgba(0,0,0,0.38);
+            color: white; border: 2px solid rgba(255,255,255,0.65);
+            border-radius: 24px; cursor: pointer;
+            z-index: 400; display: none;
+            backdrop-filter: blur(4px);
         }
 
         /* カメラ */
@@ -261,6 +274,7 @@
 <!-- ゲーム -->
 <div id="game-canvas"></div>
 <div id="score-display">🎈 0</div>
+<button id="btn-reset">↩ 最初に戻る</button>
 <div id="cursor"></div>
 <div id="cam-wrap"><video id="video" autoplay playsinline muted></video></div>
 
@@ -638,11 +652,36 @@ function gameLoop(ts) {
 
 function startGame() {
     cursor.style.display = "block";
+    document.getElementById("btn-reset").style.display = "block";
     gameReady = true;
     canvas.classList.add("active");
     playStart();
     requestAnimationFrame(gameLoop);
 }
+
+// 最初に戻るボタン
+document.getElementById("btn-reset").addEventListener("click", () => {
+    // ゲーム停止
+    gameReady = false;
+    if (animFrame) cancelAnimationFrame(animFrame);
+    // 風船を全部削除
+    balloons.forEach(b => b.el.remove());
+    balloons = [];
+    // スコアリセット
+    score = 0;
+    document.getElementById("score-display").textContent = "🎈 0";
+    // キャリブデータリセット
+    calibIdx=0; calibData=[]; calibBuf=[];
+    calibCollecting=false; calibDone=false;
+    regX=null; regY=null;
+    // UI隠す
+    canvas.classList.remove("active");
+    cursor.style.display = "none";
+    document.getElementById("btn-reset").style.display = "none";
+    document.getElementById("calib-area").style.display = "none";
+    // タップスタートへ
+    showScreen("s-tap");
+});
 
 // ============================================================
 //  検出ループ
