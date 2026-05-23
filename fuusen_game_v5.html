@@ -702,12 +702,24 @@ function gameLoop(ts) {
     const W = window.innerWidth, H = window.innerHeight;
 
     // 風船を生成
+    const normalCount = balloons.filter(b => !b.isFace).length;
+    const faceCount   = balloons.filter(b => b.isFace).length;
+
     if (ts - lastSpawn > SPAWN_INTERVAL_MS || balloons.length === 0) {
-        // 画面に最大4個まで
-        if (balloons.length < 4) {
+        // 通常風船は最大3個まで
+        if (normalCount < 3) {
             balloons.push(spawnBalloon());
             lastSpawn = ts;
         }
+    }
+    // 顔風船は画面に1個まで、通常カウントとは別枠
+    // balloonCountが3の倍数になったら出す（最初3個目から）
+    if (faceCount === 0 && balloonCount > 0 && balloonCount % 3 === 0) {
+        // isFaceを強制的にtrueにして生成
+        const savedCount = balloonCount;
+        balloonCount = 10; // % 10 === 0 にする
+        balloons.push(spawnBalloon());
+        balloonCount = savedCount + 1;
     }
 
     // 風船を動かす & 視線判定
@@ -718,8 +730,9 @@ function gameLoop(ts) {
         balloon.y += balloon.vy;
         balloon.el.style.top = `${balloon.y}px`;
 
-        // 画面外に出たら削除
-        if (balloon.y < -balloon.r*3) {
+        // 画面外に出たら削除（顔風船は大きいので余裕を持たせる）
+        const outThreshold = balloon.isFace ? -balloon.r * 1.5 : -balloon.r * 3;
+        if (balloon.y < outThreshold) {
             balloon.el.remove();
             balloons = balloons.filter(b=>b!==balloon);
             return;
