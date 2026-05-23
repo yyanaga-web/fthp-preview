@@ -558,12 +558,17 @@ function spawnBalloon(forceFace = false) {
     tip.className = "balloon-body";
 
     if (isFace) {
-        // 顔風船：画像に糸込み、そのままimgタグで表示するだけ
         const faceImg = FACE_IMGS[faceImgIdx % FACE_IMGS.length];
         faceImgIdx++;
 
-        const faceW = r * 10.0; // さらに大きく
+        // 画面幅の75%を上限にする（はみ出し防止）
+        const faceW = Math.min(r * 10.0, W * 0.75);
         const faceH = faceW * 1.35;
+
+        // 画面内に必ず収まるx位置
+        const maxLeft = Math.max(0, W - faceW);
+        const faceLeft = Math.random() * maxLeft;
+        const faceX = faceLeft + faceW / 2; // 中心x
 
         const img = document.createElement("img");
         img.src = faceImg;
@@ -572,15 +577,16 @@ function spawnBalloon(forceFace = false) {
             object-fit:contain; display:block;
             filter:drop-shadow(0 4px 16px rgba(0,0,0,0.3));
         `;
-        el.style.cssText = `left:${x}px; top:${H + faceH + 40}px; position:absolute;`;
+        el.style.cssText = `left:${faceLeft}px; top:${H + faceH + 40}px; position:absolute;`;
         el.appendChild(img);
         canvas.appendChild(el);
 
         const swayDur = 2.2 + Math.random()*1.0;
         el.style.animation = `sway${Math.random()>0.5?'L':'R'} ${swayDur}s ease-in-out infinite`;
 
-        const hitR = faceW * 0.28; // 顔部分だけの当たり判定（画像幅の約28%）
-        return { el, x, y: H + faceH + 40, vy: vy*0.65, r: hitR, color, isFace, gazeStart:null, progress:0, popped:false };
+        // 当たり判定は顔部分のみ（画像上部40%）、適度な大きさ
+        const hitR = faceW * 0.22;
+        return { el, x: faceX, y: H + faceH + 40, vy: vy*0.65, r: hitR, faceW, faceH, color, isFace, gazeStart:null, progress:0, popped:false };
     } else {
         tip.style.cssText = `width:${r*2}px; height:${r*2.1}px; background:${color};`;
         // 先端の三角
@@ -726,18 +732,20 @@ function gameLoop(ts) {
         balloon.y += balloon.vy;
         balloon.el.style.top = `${balloon.y}px`;
 
-        // 画面外に出たら削除（顔風船は縦長画像なのでfaceHで判定）
-        const outThreshold = balloon.isFace ? -(balloon.r * 2 + 200) : -balloon.r * 3;
-        if (balloon.y < outThreshold) {
+        // 画面外に出たら削除
+        const outH = balloon.isFace ? (balloon.faceH || 400) : balloon.r * 3;
+        if (balloon.y < -outH) {
             balloon.el.remove();
             balloons = balloons.filter(b=>b!==balloon);
             return;
         }
 
         // 視線が当たっているか
-        // ③ 瞬間座標 OR 滞在分布重心のどちらかがヒットしていれば反応
         const bx = balloon.x;
-        const by = balloon.y - balloon.r;
+        // 顔風船は画像上部に顔があるので、yから画像高さの約25%上が顔の中心
+        const by = balloon.isFace
+            ? balloon.y - (balloon.faceH || balloon.r * 4) * 0.75
+            : balloon.y - balloon.r;
         const distInstant = Math.hypot(gazeX - bx, gazeY - by);
         const hitInstant  = distInstant < balloon.r + GAZE_RADIUS;
 
