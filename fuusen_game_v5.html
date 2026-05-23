@@ -579,7 +579,8 @@ function spawnBalloon(forceFace = false) {
         const swayDur = 2.2 + Math.random()*1.0;
         el.style.animation = `sway${Math.random()>0.5?'L':'R'} ${swayDur}s ease-in-out infinite`;
 
-        return { el, x, y: H + faceH + 40, vy: vy*0.65, r: faceW*0.5, color, isFace, gazeStart:null, progress:0, popped:false };
+        const hitR = faceW * 0.28; // 顔部分だけの当たり判定（画像幅の約28%）
+        return { el, x, y: H + faceH + 40, vy: vy*0.65, r: hitR, color, isFace, gazeStart:null, progress:0, popped:false };
     } else {
         tip.style.cssText = `width:${r*2}px; height:${r*2.1}px; background:${color};`;
         // 先端の三角
@@ -725,8 +726,8 @@ function gameLoop(ts) {
         balloon.y += balloon.vy;
         balloon.el.style.top = `${balloon.y}px`;
 
-        // 画面外に出たら削除（顔風船は大きいので余裕を持たせる）
-        const outThreshold = balloon.isFace ? -balloon.r * 1.5 : -balloon.r * 3;
+        // 画面外に出たら削除（顔風船は縦長画像なのでfaceHで判定）
+        const outThreshold = balloon.isFace ? -(balloon.r * 2 + 200) : -balloon.r * 3;
         if (balloon.y < outThreshold) {
             balloon.el.remove();
             balloons = balloons.filter(b=>b!==balloon);
