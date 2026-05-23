@@ -554,24 +554,36 @@ function spawnBalloon() {
     tip.className = "balloon-body";
 
     if (isFace) {
-        // お兄ちゃん顔風船：背景なしPNG、大きく表示
-        const faceW = r * 4.0;  // 通常風船の2倍サイズ
-        const faceH = faceW * 0.95; // 顔画像の縦横比
+        // お兄ちゃん顔風船：背景なしPNG、大きく・糸を顔の下中央に直接くっつける
+        const faceW = r * 6.5;  // さらに大きく（通常の約3倍）
+        const faceH = faceW * 0.95;
         const img = document.createElement("img");
         img.src = FACE_B64;
         img.style.cssText = `
             width:${faceW}px; height:${faceH}px;
             object-fit: contain;
             display: block;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));
+            filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4));
         `;
         tip.style.cssText = `
             width:${faceW}px; height:${faceH}px;
-            background: none;
-            border: none;
-            box-shadow: none;
+            background: none; border: none; box-shadow: none;
+            position: relative;
         `;
         tip.appendChild(img);
+
+        // 糸を顔の下中央にピッタリくっつける（tipの内部に配置）
+        const faceStr = document.createElement("div");
+        faceStr.style.cssText = `
+            position: absolute;
+            bottom: -42px; left: 50%;
+            transform: translateX(-50%);
+            width: 3px; height: 44px;
+            background: rgba(80,80,80,0.6);
+            border-radius: 2px;
+        `;
+        tip.appendChild(faceStr);
+
     } else {
         tip.style.cssText = `width:${r*2}px; height:${r*2.1}px; background:${color};`;
         // 先端の三角
@@ -594,7 +606,8 @@ function spawnBalloon() {
     // 糸
     const str = document.createElement("div");
     str.className = "balloon-string";
-    if (isFace) str.style.background = "#FFD700";
+    // 顔風船は糸をtipの内部に持つので非表示
+    if (isFace) str.style.display = "none";
 
     el.appendChild(tip);
     el.appendChild(str);
@@ -604,8 +617,8 @@ function spawnBalloon() {
     el.style.animation = `sway${Math.random()>0.5?'L':'R'} ${swayDur}s ease-in-out infinite`;
 
     // 顔風船は当たり判定も大きめ、サイズも大きい
-    const hitR = isFace ? r * 2.0 : r;
-    return { el, x, y: H + r*2 + 40, vy: isFace ? vy*0.7 : vy, r: hitR, color, isFace, gazeStart: null, progress: 0, popped: false };
+    const hitR = isFace ? r * 3.2 : r;
+    return { el, x, y: H + r*2 + 40, vy: isFace ? vy*0.65 : vy, r: hitR, color, isFace, gazeStart: null, progress: 0, popped: false };
 }
 
 // ゆらゆらアニメ（CSS keyframesを動的に追加）
