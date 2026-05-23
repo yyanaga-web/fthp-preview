@@ -562,8 +562,8 @@ function spawnBalloon() {
         const faceImg = FACE_IMGS[faceImgIdx % FACE_IMGS.length];
         faceImgIdx++;
 
-        const faceW = r * 6.0; // 大きめ
-        const faceH = faceW * 1.35; // 縦横比(300x400)
+        const faceW = r * 10.0; // さらに大きく
+        const faceH = faceW * 1.35;
 
         const img = document.createElement("img");
         img.src = faceImg;
