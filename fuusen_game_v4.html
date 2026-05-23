@@ -554,26 +554,17 @@ function spawnBalloon() {
     tip.className = "balloon-body";
 
     if (isFace) {
-        // お兄ちゃん顔風船：写真を円形にクリップ
+        // お兄ちゃん顔風船：顔写真そのまま大きく、角丸で糸をつけるだけ
+        const faceW = r * 3.6;           // 通常の約1.8倍の大きさ
+        const faceH = faceW * 0.82;      // 写真の縦横比 (400x325)
         tip.style.cssText = `
-            width:${r*2}px; height:${r*2}px;
-            background: url(${FACE_B64}) center/cover;
-            border-radius: 50%;
-            border: 6px solid #FFD700;
-            box-shadow: 0 0 20px rgba(255,215,0,0.8),
-                        inset 0 0 0 3px rgba(255,255,255,0.4);
+            width:${faceW}px; height:${faceH}px;
+            background: url(${FACE_B64}) center top/cover;
+            border-radius: 16px;
+            border: 3px solid rgba(255,255,255,0.8);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
             overflow: hidden;
         `;
-        // キラキラ感
-        const shine = document.createElement("div");
-        shine.style.cssText = `
-            position:absolute; top:8%; left:15%;
-            width:28%; height:22%;
-            background: rgba(255,255,255,0.35);
-            border-radius: 50%;
-            transform: rotate(-30deg);
-        `;
-        tip.appendChild(shine);
     } else {
         tip.style.cssText = `width:${r*2}px; height:${r*2.1}px; background:${color};`;
         // 先端の三角
@@ -605,7 +596,9 @@ function spawnBalloon() {
     const swayDur = 1.8 + Math.random()*1.2;
     el.style.animation = `sway${Math.random()>0.5?'L':'R'} ${swayDur}s ease-in-out infinite`;
 
-    return { el, x, y: H + r*2 + 40, vy, r, color, isFace, gazeStart: null, progress: 0, popped: false };
+    // 顔風船は当たり判定も大きめに
+    const hitR = isFace ? r * 1.8 : r;
+    return { el, x, y: H + r*2 + 40, vy, r: hitR, color, isFace, gazeStart: null, progress: 0, popped: false };
 }
 
 // ゆらゆらアニメ（CSS keyframesを動的に追加）
