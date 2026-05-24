@@ -729,12 +729,12 @@ function onResults(results) {
   }
 }
 
-async function initFaceMesh() {
+function initFaceMesh() {
   faceMesh = new FaceMesh({ locateFile: f =>
     `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${f}` });
   faceMesh.setOptions({
     maxNumFaces: 1,
-    refineLandmarks: true,  // enables iris tracking!
+    refineLandmarks: true,
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5,
   });
@@ -843,11 +843,18 @@ async function startMonitor() {
     return;
   }
 
-  if (!faceMesh) await initFaceMesh();
-  await faceMesh.initialize();
+  // initialize FaceMesh without awaiting (hangs on mobile)
+  if (!faceMesh) initFaceMesh();
 
+  // Start sending frames immediately; faceMesh will process when ready
+  let sending = false;
   mpCam = new Camera(videoEl, {
-    onFrame: async () => { await faceMesh.send({ image: videoEl }); },
+    onFrame: async () => {
+      if (!faceMesh || sending) return;
+      sending = true;
+      try { await faceMesh.send({ image: videoEl }); } catch(e) {}
+      sending = false;
+    },
     width: 640, height: 480
   });
   mpCam.start();
