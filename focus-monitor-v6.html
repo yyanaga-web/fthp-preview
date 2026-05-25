@@ -197,8 +197,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:radial
     <div class="calib-status">
       <div class="calib-icon" id="calibIcon">📐</div>
       <div class="calib-info">
-        <div class="calib-label" id="calibLabel">集中姿勢を登録しよう</div>
-        <div class="calib-sub" id="calibSub">カメラON後に、いつも通りに座って登録ボタンを押してね</div>
+        <div class="calib-label" id="calibLabel">手元を見ている姿勢を登録しよう</div>
+        <div class="calib-sub" id="calibSub">カメラON後に、テキストを読むときのように手元を見た状態で登録してね</div>
       </div>
     </div>
     <div class="calib-values" id="calibValues" style="display:none">
@@ -255,7 +255,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:radial
       <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
     </div>
     <div class="countdown-overlay hidden" id="countdownOverlay">
-      <div class="countdown-msg" id="countdownMsg">集中してる姿勢で座ってね 😊</div>
+      <div class="countdown-msg" id="countdownMsg">テキストを見るときのように<br>手元を見た状態で待ってね 📖</div>
       <div class="countdown-ring">
         <svg viewBox="0 0 80 80">
           <circle class="cr-track" cx="40" cy="40" r="35"/>
@@ -380,6 +380,7 @@ const S = {
   pomoTimer:null, pomoCycles:0,
   prevFrameData:null, motionStillSec:0, lastMotionScore:0,
   motionCanvas:null, motionCtx:null, motionAlertCooldown:false,
+  cameraCooldown:false, // カメラ目線の警告クールダウン
 };
 
 const FOCUS_ALERTS = [
@@ -607,34 +608,44 @@ function analyzeFace(det){
   let faceScore=100;
   const reasons=[];
 
-  if(BASELINE.ready){
-    // キャリブレーション済み: ベースラインからのズレで判定
-    const pitchDev = feat.pitch - BASELINE.pitch;
-    const rollDev  = Math.abs(feat.roll  - BASELINE.roll);
-    const yawDev   = Math.abs(feat.yaw   - BASELINE.yaw);
+  // 正しい定義：
+  //   集中している = 手元・テキストを見ている = 下を向いている（pitch大きい）
+  //   おかしい     = 正面向き（タブレット・カメラを見ている）= pitchが基準より少しでも上
+  let lookingAtCamera = false;
 
-    // 上を向く: pitchが基準より大幅に小さい（頭が上がる→nose比率が小さくなる）
-    if(pitchDev < -(TOLERANCE.pitch)){
-      faceScore-=65; reasons.push('上を向いてるよ 👆');
+  if(BASELINE.ready){
+    const pitchDev = feat.pitch - BASELINE.pitch; // 正 = より下向き、負 = より上向き
+    const rollDev  = Math.abs(feat.roll - BASELINE.roll);
+    const yawDev   = Math.abs(feat.yaw  - BASELINE.yaw);
+
+    // 基準より少しでも上 = タブレット（カメラ）を見ている → 即ブー
+    if(pitchDev < -(TOLERANCE.pitch * 0.3)){
+      lookingAtCamera = true;
+      faceScore -= 70;
+      reasons.push('タブレットを見てるよ！📱');
     }
-    // 極端にうつぶせ: pitchが基準より大幅に大きい（頭がかなり下がる）
-    if(pitchDev > TOLERANCE.pitch*1.5){
-      faceScore-=45; reasons.push('うつぶせになってるよ 😴');
+    // うつぶせ（極端に下）
+    if(pitchDev > TOLERANCE.pitch * 2.0){
+      faceScore -= 45; reasons.push('うつぶせになってるよ 😴');
     }
     // 頭の傾き
     if(rollDev > TOLERANCE.roll){
-      faceScore-=50; reasons.push('頭が傾いてるよ 😪');
+      faceScore -= 50; reasons.push('頭が傾いてるよ 😪');
     }
     // 横向き
     if(yawDev > TOLERANCE.yaw){
-      faceScore-=55; reasons.push('横を向いてるよ 👉');
+      faceScore -= 55; reasons.push('横を向いてるよ 👉');
     }
-  }else{
-    // キャリブレーション未実施: デフォルト閾値で判定
-    if(feat.pitch<0.40){faceScore-=65;reasons.push('上を向いてるよ 👆');}
-    if(feat.pitch>0.85){faceScore-=45;reasons.push('うつぶせになってるよ 😴');}
-    if(feat.roll>0.20){faceScore-=50;reasons.push('頭が傾いてるよ 😪');}
-    if(feat.yaw>0.25){faceScore-=55;reasons.push('横を向いてるよ 👉');}
+  } else {
+    // キャリブレーション未実施: 正面〜上（pitch < 0.60）をNG扱い
+    if(feat.pitch < 0.60){
+      lookingAtCamera = feat.pitch < 0.52;
+      faceScore -= 65;
+      reasons.push(lookingAtCamera ? 'タブレットを見てるよ！📱' : '顔が上がってるよ 👆');
+    }
+    if(feat.pitch > 0.88){ faceScore -= 45; reasons.push('うつぶせになってるよ 😴'); }
+    if(feat.roll  > 0.20){ faceScore -= 50; reasons.push('頭が傾いてるよ 😪'); }
+    if(feat.yaw   > 0.25){ faceScore -= 55; reasons.push('横を向いてるよ 👉'); }
   }
   faceScore=Math.max(0,faceScore);
 
@@ -647,7 +658,7 @@ function analyzeFace(det){
   else if(earRatio<0.75||sleepy){eyeScore=38;reasons.push('眠そうだよ 🥱');}
   eyeScore=Math.max(0,eyeScore);
 
-  return {faceScore,eyeScore,reasons,feat};
+  return {faceScore,eyeScore,reasons,feat,lookingAtCamera};
 }
 
 // =============================================
@@ -738,15 +749,23 @@ async function detectionLoop(){
     const motionScore=calcMotionScore();S.lastMotionScore=motionScore;
     if(dets&&dets.length>0){
       const det=dets[0];
-      const {faceScore,eyeScore,reasons}=analyzeFace(det);
+      const {faceScore,eyeScore,reasons,lookingAtCamera}=analyzeFace(det);
       const overall=Math.round(faceScore*.45+eyeScore*.35+Math.min(motionScore*1.5,100)*.20);
       const focused=overall>=55;
       drawFaceOverlay(det,faceScore);
       updateMainUI(overall,focused,reasons);
-      updateDetectCard('face',faceScore,faceScore>=70?'◎ 正面向き':faceScore>=40?'△ 注意':'× NG');
+      updateDetectCard('face',faceScore,faceScore>=70?'◎ 手元向き':faceScore>=40?'△ 注意':'× NG');
       updateDetectCard('eyes',eyeScore,eyeScore>=70?'◎ 開いてる':eyeScore>=40?'△ 眠い':'× 閉じ');
       updateDetectCard('motion',Math.min(100,motionScore*3),motionScore>=15?'◎ 動いてる':motionScore>=5?'△ 少し':'× 止まり');
       S.lastFocused=focused;
+
+      // カメラ目線 → 即ブー音
+      if(lookingAtCamera && !S.cameraCooldown){
+        S.cameraCooldown=true;
+        buzz();
+        addLog('📷 カメラを見てる！',true);
+        setTimeout(()=>{ S.cameraCooldown=false; },3000);
+      }
     }else{
       ctx.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
       updateNoFace(motionScore);S.lastFocused=false;
@@ -818,6 +837,24 @@ function speak(text){
   const v=speechSynthesis.getVoices().find(v=>v.lang.startsWith('ja'));
   if(v)u.voice=v;speechSynthesis.speak(u);
 }
+
+// ブー音（Web Audio API で生成）
+let audioCtx=null;
+function buzz(){
+  try{
+    if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.connect(gain);gain.connect(audioCtx.destination);
+    osc.type='sawtooth';
+    osc.frequency.setValueAtTime(120,audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(60,audioCtx.currentTime+0.3);
+    gain.gain.setValueAtTime(S.volume*0.6,audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.35);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime+0.35);
+  }catch(e){}
+}
 function celebrate(){
   const wrap=document.getElementById('confettiWrap');
   const cols=['#f87171','#fbbf24','#4ade80','#60a5fa','#a78bfa','#fb923c'];
@@ -867,6 +904,7 @@ async function startMonitor(){
 }
 function stopMonitor(){
   S.running=false;if(S.mainTimer)clearInterval(S.mainTimer);
+  S.cameraCooldown=false;
   if(videoEl.srcObject){videoEl.srcObject.getTracks().forEach(t=>t.stop());videoEl.srcObject=null;}
   ctx.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
   camPlaceholder.style.display='flex';alertPop.className='alert-pop';
