@@ -343,8 +343,663 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:radial
 </div>
 <div class="confetti-wrap" id="confettiWrap"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1632667962/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1620248257/drawing_utils.js" crossorigin="anonymous"></script>
 <script>
+// =============================================
+// MediaPipe landmark indices
+// =============================================
+const IDX = {
+  NOSE_TIP:1, FOREHEAD:10, CHIN:152,
+  L_EAR:234, R_EAR:454,
+  L_EYE:[33,160,158,133,153,144],   // 6点
+  R_EYE:[362,385,387,263,373,380],  // 6点
+  L_IRIS:468, R_IRIS:473,           // refineLandmarks=true で有効
+  L_EYE_INNER:133, L_EYE_OUTER:33,
+  R_EYE_INNER:362, R_EYE_OUTER:263,
+  UPPER_LIP:13, LOWER_LIP:14,
+};
+
+// =============================================
+// CALIBRATION
+// =============================================
+const BASELINE = {
+  pitch:null, roll:null, yaw:null,
+  irisL:null, irisR:null, // キャリブレーション時の虹彩位置（手元向き）
+  ear:null,
+  ready:false,
+};
+const TOLERANCE = { pitch:0.15, roll:0.10, yaw:0.14 };
+
+// =============================================
+// STATE
+// =============================================
+const S = {
+  running:false, mpReady:false,
+  lastFocused:false, unfocusedSec:0, focusedSec:0,
+  focusSec:0, totalSec:0, alertCount:0, alertCooldown:false,
+  mainTimer:null,
+  thresh:10, motionThreshSec:30, volume:0.8,
+  pomoRunning:false, pomoIsBreak:false,
+  pomoWorkSec:25*60, pomoBreakSec:5*60,
+  pomoRemaining:25*60, pomoTotal:25*60,
+  pomoTimer:null, pomoCycles:0,
+  prevFrameData:null, motionStillSec:0, lastMotionScore:0,
+  motionCanvas:null, motionCtx:null, motionAlertCooldown:false,
+  cameraCooldown:false,
+  gazeCooldown:false,   // 目線ズレのブー音クールダウン
+  mpCamera:null, faceMesh:null,
+  lastLM:null,          // キャリブレーション用に最新ランドマークを保持
+};
+
+const FOCUS_ALERTS = [
+  {emoji:'😊',title:'集中しよう！',msg:'勉強がんばれ！きみならできる！'},
+  {emoji:'💪',title:'もうひとふんばり！',msg:'あとすこしで終わるよ！'},
+  {emoji:'👀',title:'教材を見てみよう！',msg:'目線を本に戻してね！'},
+  {emoji:'🌟',title:'集中モード、オン！',msg:'深呼吸して集中しよう！'},
+  {emoji:'🚀',title:'ファイト！',msg:'集中パワーを出して！'},
+];
+const MOTION_ALERTS = [
+  {emoji:'✍️',title:'えんぴつ動かそう！',msg:'すこし書いてみてね！'},
+  {emoji:'📝',title:'書いてる？',msg:'手が止まってるみたいだよ！'},
+];
+
+// =============================================
+// DOM
+// =============================================
+const videoEl        = document.getElementById('videoEl');
+const overlayCanvas  = document.getElementById('overlayCanvas');
+const ctx            = overlayCanvas.getContext('2d');
+const camPlaceholder = document.getElementById('camPlaceholder');
+const loadingOverlay = document.getElementById('loadingOverlay');
+const loadText       = document.getElementById('loadText');
+const loadBar        = document.getElementById('loadBar');
+const scoreCard      = document.getElementById('scoreCard');
+const scoreFace      = document.getElementById('scoreFace');
+const scoreLabel     = document.getElementById('scoreLabel');
+const scoreSub       = document.getElementById('scoreSub');
+const gaugeFill      = document.getElementById('gaugeFill');
+const detectDot      = document.getElementById('detectDot');
+const detectText     = document.getElementById('detectText');
+const alertPop       = document.getElementById('alertPop');
+const mainBtn        = document.getElementById('mainBtn');
+const logList        = document.getElementById('logList');
+const calibBtn       = document.getElementById('calibBtn');
+const countdownOverlay = document.getElementById('countdownOverlay');
+const countdownNum   = document.getElementById('countdownNum');
+const countdownMsg   = document.getElementById('countdownMsg');
+const flashOverlay   = document.getElementById('flashOverlay');
+const crFill         = document.getElementById('crFill');
+
+// Settings
+document.getElementById('threshSlider').addEventListener('input',e=>{S.thresh=+e.target.value;document.getElementById('threshVal').textContent=e.target.value+'秒';});
+document.getElementById('motionThresh').addEventListener('input',e=>{S.motionThreshSec=+e.target.value;document.getElementById('motionThreshVal').textContent=e.target.value+'秒';});
+document.getElementById('volSlider').addEventListener('input',e=>{S.volume=+e.target.value;document.getElementById('volVal').textContent=Math.round(S.volume*100)+'%';});
+document.getElementById('pomoWorkMin').addEventListener('input',e=>{S.pomoWorkSec=+e.target.value*60;document.getElementById('pomoWorkVal').textContent=e.target.value+'分';if(!S.pomoRunning&&!S.pomoIsBreak)resetPomo();});
+document.getElementById('pomoBreakMin').addEventListener('input',e=>{S.pomoBreakSec=+e.target.value*60;document.getElementById('pomoBreakVal').textContent=e.target.value+'分';});
+
+// =============================================
+// POMODORO
+// =============================================
+function resetPomo(){S.pomoRemaining=S.pomoWorkSec;S.pomoTotal=S.pomoWorkSec;S.pomoIsBreak=false;updatePomoUI();}
+function updatePomoUI(){
+  const m=Math.floor(S.pomoRemaining/60),s=S.pomoRemaining%60;
+  document.getElementById('pomoTime').textContent=m+':'+String(s).padStart(2,'0');
+  const pct=S.pomoTotal>0?(S.pomoRemaining/S.pomoTotal)*100:100;
+  document.getElementById('pomoBar').style.width=pct+'%';
+  const isBreak=S.pomoIsBreak,urgent=!isBreak&&S.pomoRemaining<=60;
+  document.getElementById('pomoTime').className='pomo-time'+(isBreak?' break':urgent?' urgent':'');
+  document.getElementById('pomoMode').textContent=isBreak?'休憩タイム ☕':'集中タイム 📚';
+  document.getElementById('pomoMode').className='pomo-mode'+(isBreak?' break':'');
+  document.getElementById('pomoBar').className='pomo-bar'+(isBreak?' break':'');
+  document.getElementById('pomoSub').textContent=S.pomoRunning?(isBreak?'ゆっくり休んでね':urgent?'あと少し！ファイト！':'がんばって勉強しよう！'):'スタートボタンで始めよう';
+  for(let i=0;i<4;i++)document.getElementById('pd'+i).className='pomo-dot'+(i<S.pomoCycles?' done':'');
+  document.getElementById('statPomos').textContent=S.pomoCycles;
+}
+function tickPomo(){
+  if(!S.pomoRunning)return;
+  S.pomoRemaining--;updatePomoUI();
+  if(S.pomoRemaining<=0){
+    if(!S.pomoIsBreak){
+      S.pomoCycles++;S.pomoIsBreak=true;S.pomoRemaining=S.pomoBreakSec;S.pomoTotal=S.pomoBreakSec;
+      updatePomoUI();showAlert({emoji:'☕',title:'休憩タイム！',msg:'よくがんばった！ゆっくり休んでね。'},'break');
+      addLog('☕ 休憩タイム！',false,false,true);celebrate();
+    }else{
+      S.pomoIsBreak=false;S.pomoRemaining=S.pomoWorkSec;S.pomoTotal=S.pomoWorkSec;
+      updatePomoUI();showAlert({emoji:'📚',title:'さあ、また始めよう！',msg:'次の集中タイムのスタートだよ！'},'break');
+      addLog('📚 集中タイム再開！',false,true,false);
+    }
+  }
+}
+document.getElementById('pomoStartBtn').addEventListener('click',()=>{
+  if(S.pomoRunning){S.pomoRunning=false;clearInterval(S.pomoTimer);document.getElementById('pomoStartBtn').textContent='▶ スタート';}
+  else{S.pomoRunning=true;S.pomoTimer=setInterval(tickPomo,1000);document.getElementById('pomoStartBtn').textContent='⏸ 一時停止';updatePomoUI();}
+});
+document.getElementById('pomoResetBtn').addEventListener('click',()=>{S.pomoRunning=false;clearInterval(S.pomoTimer);resetPomo();document.getElementById('pomoStartBtn').textContent='▶ スタート';});
+
+// =============================================
+// FEATURE EXTRACTION from MediaPipe landmarks
+// =============================================
+function extractFeatures(lm){
+  const nose=lm[IDX.NOSE_TIP], fore=lm[IDX.FOREHEAD], chin=lm[IDX.CHIN];
+  const lEar=lm[IDX.L_EAR], rEar=lm[IDX.R_EAR];
+
+  // Pitch（上下）
+  const faceH=chin.y-fore.y;
+  const pitch=faceH>0.001?(nose.y-fore.y)/faceH:0.55;
+
+  // Roll（傾き）
+  const dx=rEar.x-lEar.x, dy=rEar.y-lEar.y;
+  const roll=Math.abs(dy)/(Math.sqrt(dx*dx+dy*dy)+0.001);
+
+  // Yaw（左右）
+  const faceCx=(lEar.x+rEar.x)/2;
+  const faceW=Math.abs(rEar.x-lEar.x);
+  const yaw=faceW>0.001?Math.abs(nose.x-faceCx)/(faceW/2):0;
+
+  // EAR（目の開き）
+  function ear(pts){
+    const h1=Math.abs(pts[1].y-pts[5].y), h2=Math.abs(pts[2].y-pts[4].y);
+    const w=Math.abs(pts[0].x-pts[3].x);
+    return w>0?(h1+h2)/(2*w):0.3;
+  }
+  const lPts=IDX.L_EYE.map(i=>lm[i]), rPts=IDX.R_EYE.map(i=>lm[i]);
+  const earVal=(ear(lPts)+ear(rPts))/2;
+
+  // 虹彩の相対位置（目の横幅に対してどこにあるか 0〜1）
+  // 0.5=目の中央、0=左端、1=右端
+  let irisL=0.5, irisR=0.5;
+  if(lm.length>478){
+    const lIris=lm[IDX.L_IRIS];
+    const rIris=lm[IDX.R_IRIS];
+    const lOuter=lm[IDX.L_EYE_OUTER], lInner=lm[IDX.L_EYE_INNER];
+    const rOuter=lm[IDX.R_EYE_OUTER], rInner=lm[IDX.R_EYE_INNER];
+    const lW=Math.abs(lInner.x-lOuter.x);
+    const rW=Math.abs(rInner.x-rOuter.x);
+    if(lW>0.001) irisL=(lIris.x-lOuter.x)/lW;
+    if(rW>0.001) irisR=(rIris.x-rOuter.x)/rW;
+  }
+
+  return {pitch,roll,yaw,earVal,irisL,irisR};
+}
+
+// =============================================
+// ANALYSIS
+// =============================================
+function analyzeLandmarks(lm){
+  const f=extractFeatures(lm);
+  let faceScore=100, eyeScore=100;
+  const reasons=[];
+  let lookingAtTablet=false, gazeOff=false;
+
+  // --- 頭の向き判定 ---
+  if(BASELINE.ready){
+    const pitchDev=f.pitch-BASELINE.pitch;
+    const rollDev=Math.abs(f.roll-BASELINE.roll);
+    const yawDev=Math.abs(f.yaw-BASELINE.yaw);
+
+    // 手元より顔が少しでも上がる = タブレットを見ている
+    if(pitchDev < -(TOLERANCE.pitch*0.3)){
+      lookingAtTablet=true; faceScore-=70;
+      reasons.push('タブレットを見てるよ！📱');
+    }
+    // 極端なうつぶせ
+    if(pitchDev > TOLERANCE.pitch*2.0){ faceScore-=45; reasons.push('うつぶせだよ 😴'); }
+    if(rollDev > TOLERANCE.roll){ faceScore-=50; reasons.push('頭が傾いてるよ 😪'); }
+    if(yawDev > TOLERANCE.yaw){ faceScore-=55; reasons.push('横を向いてるよ 👉'); }
+  } else {
+    if(f.pitch<0.60){ lookingAtTablet=f.pitch<0.52; faceScore-=65; reasons.push(lookingAtTablet?'タブレットを見てるよ！📱':'顔が上がってるよ 👆'); }
+    if(f.pitch>0.88){ faceScore-=45; reasons.push('うつぶせだよ 😴'); }
+    if(f.roll>0.20){ faceScore-=50; reasons.push('頭が傾いてるよ 😪'); }
+    if(f.yaw>0.25){ faceScore-=55; reasons.push('横を向いてるよ 👉'); }
+  }
+  faceScore=Math.max(0,faceScore);
+
+  // --- 虹彩（目線）判定 ---
+  // キャリブレーション済み: 手元を見ていた時の虹彩位置からのズレを検知
+  // 手元を見るとき目線は下かつ正面寄り → 上や横に目線を向けると虹彩がズレる
+  if(lm.length>478 && BASELINE.ready && BASELINE.irisL!==null){
+    const irisLDev=Math.abs(f.irisL - BASELINE.irisL);
+    const irisRDev=Math.abs(f.irisR - BASELINE.irisR);
+    const irisDev=(irisLDev+irisRDev)/2;
+    // 0.12以上ずれたら目線が外れている（横のテレビ、タブレット画面など）
+    if(irisDev > 0.12 && !lookingAtTablet){
+      gazeOff=true; faceScore-=50;
+      reasons.push('目線が外れてるよ 👀');
+    }
+  } else if(lm.length>478 && !BASELINE.ready){
+    // キャリブレーション未実施でも虹彩が端に寄ったら警告
+    const avgIris=(f.irisL+f.irisR)/2;
+    if(avgIris<0.25||avgIris>0.78){ gazeOff=true; faceScore-=40; reasons.push('目線が横に向いてるよ 👀'); }
+  }
+  faceScore=Math.max(0,faceScore);
+
+  // --- 目の開き ---
+  const earBase=BASELINE.ready&&BASELINE.ear ? BASELINE.ear : 0.27;
+  const earRatio=f.earVal/earBase;
+  if(earRatio<0.55){ eyeScore=5; reasons.push('目が閉じてるよ 😴'); }
+  else if(earRatio<0.72){ eyeScore=38; reasons.push('眠そうだよ 🥱'); }
+  eyeScore=Math.max(0,eyeScore);
+
+  return {faceScore,eyeScore,reasons,feat:f,lookingAtTablet,gazeOff};
+}
+
+// =============================================
+// DRAW OVERLAY
+// =============================================
+function drawOverlay(lm, result){
+  overlayCanvas.width=videoEl.videoWidth||overlayCanvas.clientWidth;
+  overlayCanvas.height=videoEl.videoHeight||overlayCanvas.clientHeight;
+  ctx.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
+  const W=overlayCanvas.width, H=overlayCanvas.height;
+
+  const focused=result.faceScore>=60&&result.eyeScore>=60;
+  const col=focused?'rgba(76,175,130,.6)':'rgba(232,93,93,.6)';
+
+  // 目の輪郭
+  [IDX.L_EYE, IDX.R_EYE].forEach(indices=>{
+    ctx.beginPath();
+    indices.forEach((idx,i)=>{
+      const p=lm[idx];
+      i===0?ctx.moveTo(p.x*W,p.y*H):ctx.lineTo(p.x*W,p.y*H);
+    });
+    ctx.closePath(); ctx.strokeStyle=col; ctx.lineWidth=2; ctx.stroke();
+  });
+
+  // 虹彩
+  if(lm.length>478){
+    [IDX.L_IRIS, IDX.R_IRIS].forEach(idx=>{
+      const p=lm[idx];
+      const gazeCol=result.gazeOff?'rgba(248,113,113,.9)':result.lookingAtTablet?'rgba(251,191,36,.9)':'rgba(76,175,130,.9)';
+      ctx.beginPath(); ctx.arc(p.x*W,p.y*H,5,0,Math.PI*2);
+      ctx.fillStyle=gazeCol; ctx.fill();
+    });
+  }
+
+  // 鼻
+  const nose=lm[IDX.NOSE_TIP];
+  ctx.beginPath(); ctx.arc(nose.x*W,nose.y*H,4,0,Math.PI*2);
+  ctx.fillStyle=col; ctx.fill();
+
+  // キャリブレーション済みの場合: ズレ表示
+  if(BASELINE.ready&&result.feat){
+    const dev=(result.feat.pitch-BASELINE.pitch).toFixed(2);
+    ctx.fillStyle='rgba(255,255,255,.65)'; ctx.font='11px sans-serif';
+    ctx.fillText('Δpitch:'+dev, 8, H-10);
+  }
+}
+
+// =============================================
+// MEDIAPIPE SETUP
+// =============================================
+function initFaceMesh(){
+  const fm=new FaceMesh({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${f}`});
+  fm.setOptions({maxNumFaces:1, refineLandmarks:true, minDetectionConfidence:0.5, minTrackingConfidence:0.5});
+  fm.onResults(onResults);
+  S.faceMesh=fm;
+}
+
+let sending=false;
+function startMpCamera(){
+  S.mpCamera=new Camera(videoEl,{
+    onFrame:async()=>{
+      if(!S.faceMesh||sending||!S.running)return;
+      sending=true;
+      try{ await S.faceMesh.send({image:videoEl}); }catch(e){}
+      sending=false;
+    },
+    width:640, height:480
+  });
+  S.mpCamera.start();
+}
+
+function onResults(results){
+  if(!S.running)return;
+  camPlaceholder.style.display='none';
+
+  if(results.multiFaceLandmarks&&results.multiFaceLandmarks.length>0){
+    const lm=results.multiFaceLandmarks[0];
+    S.lastLM=lm; // キャリブレーション用に保持
+
+    if(!S.mpReady){
+      S.mpReady=true;
+      loadingOverlay.classList.add('hidden');
+      calibBtn.disabled=false; calibBtn.className='calib-btn ready';
+      calibBtn.textContent=BASELINE.ready?'✅ 登録済み（もう一度登録し直す）':'🎯 集中姿勢を登録する（3秒）';
+      addLog('✅ 顔の検出開始！',false,true);
+    }
+
+    const result=analyzeLandmarks(lm);
+    drawOverlay(lm,result);
+
+    const overall=Math.round(result.faceScore*.5+result.eyeScore*.3+Math.min(S.lastMotionScore*1.5,100)*.2);
+    const focused=overall>=55;
+    S.lastFocused=focused;
+
+    updateMainUI(overall,focused,result.reasons);
+    updateDetectCard('face',result.faceScore,result.faceScore>=70?'◎ 手元向き':result.faceScore>=40?'△ 注意':'× NG');
+    updateDetectCard('eyes',result.eyeScore,result.eyeScore>=70?'◎ 開いてる':result.eyeScore>=40?'△ 眠い':'× 閉じ');
+
+    // タブレット注視 → 即ブー
+    if(result.lookingAtTablet&&!S.cameraCooldown){
+      S.cameraCooldown=true; buzz();
+      addLog('📱 タブレットを見てる！',true);
+      setTimeout(()=>{S.cameraCooldown=false;},2500);
+    }
+    // 目線ズレ（横のテレビなど）→ 即ブー（少し高め）
+    if(result.gazeOff&&!S.gazeCooldown){
+      S.gazeCooldown=true; buzzHigh();
+      addLog('👀 目線が外れてる！',true);
+      setTimeout(()=>{S.gazeCooldown=false;},2500);
+    }
+  } else {
+    S.lastLM=null; S.lastFocused=false;
+    ctx.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
+    updateNoFace();
+  }
+}
+
+// =============================================
+// CALIBRATION
+// =============================================
+function startCalibration(){
+  if(!S.running||!S.mpReady)return;
+  calibBtn.className='calib-btn counting'; calibBtn.textContent='姿勢をキープしてね…';
+  countdownOverlay.classList.remove('hidden');
+  let count=3; countdownNum.textContent=count;
+  crFill.style.strokeDashoffset='0';
+  setTimeout(()=>{crFill.style.strokeDashoffset='220';},50);
+  const iv=setInterval(()=>{
+    count--;
+    if(count>0){
+      countdownNum.textContent=count;
+      crFill.style.strokeDashoffset='0';
+      setTimeout(()=>{crFill.style.strokeDashoffset='220';},50);
+    }else{
+      clearInterval(iv);
+      flashOverlay.classList.add('flash');
+      setTimeout(()=>flashOverlay.classList.remove('flash'),300);
+      countdownOverlay.classList.add('hidden');
+      finishCalibration();
+    }
+  },1000);
+}
+
+function finishCalibration(){
+  // 現在のランドマークから複数回サンプリングして平均を取る
+  const samples=[];
+  const sample=()=>{
+    if(S.lastLM) samples.push(extractFeatures(S.lastLM));
+  };
+  sample();
+  const iv=setInterval(()=>{
+    sample();
+    if(samples.length>=5){
+      clearInterval(iv);
+      if(samples.length<2){
+        calibBtn.className='calib-btn ready'; calibBtn.textContent='もう一度登録する';
+        addLog('⚠️ キャリブレーション失敗'); return;
+      }
+      BASELINE.pitch=samples.reduce((s,x)=>s+x.pitch,0)/samples.length;
+      BASELINE.roll =samples.reduce((s,x)=>s+x.roll, 0)/samples.length;
+      BASELINE.yaw  =samples.reduce((s,x)=>s+x.yaw,  0)/samples.length;
+      BASELINE.ear  =samples.reduce((s,x)=>s+x.earVal,0)/samples.length;
+      BASELINE.irisL=samples.reduce((s,x)=>s+x.irisL,0)/samples.length;
+      BASELINE.irisR=samples.reduce((s,x)=>s+x.irisR,0)/samples.length;
+      BASELINE.ready=true;
+      document.getElementById('calibCard').classList.add('done');
+      document.getElementById('calibIcon').textContent='✅';
+      document.getElementById('calibLabel').textContent='キャリブレーション完了！';
+      document.getElementById('calibSub').textContent='この子の手元を見る姿勢・目線を登録しました';
+      document.getElementById('calibValues').style.display='grid';
+      document.getElementById('cv-pitch').textContent=BASELINE.pitch.toFixed(3);
+      document.getElementById('cv-roll').textContent=BASELINE.roll.toFixed(3);
+      document.getElementById('cv-ear').textContent=BASELINE.ear.toFixed(3);
+      document.getElementById('cv-yaw').textContent='虹彩L:'+BASELINE.irisL.toFixed(2)+' R:'+BASELINE.irisR.toFixed(2);
+      calibBtn.className='calib-btn done-btn';
+      calibBtn.textContent='✅ 登録済み（もう一度登録し直す）';
+      addLog('✅ キャリブレーション完了！虹彩位置も登録しました',false,true);
+      speak('登録できたよ！これがベースラインです。');
+    }
+  },150);
+}
+calibBtn.addEventListener('click',startCalibration);
+
+// =============================================
+// MOTION DETECTION
+// =============================================
+function initMotionCanvas(){
+  S.motionCanvas=document.createElement('canvas');
+  S.motionCanvas.width=80; S.motionCanvas.height=60;
+  S.motionCtx=S.motionCanvas.getContext('2d');
+}
+function calcMotionScore(){
+  if(!S.motionCanvas||!videoEl.videoWidth)return 50;
+  const mc=S.motionCanvas,mctx=S.motionCtx;
+  mctx.drawImage(videoEl,0,videoEl.videoHeight*.5,videoEl.videoWidth,videoEl.videoHeight*.5,0,0,mc.width,mc.height);
+  const curr=mctx.getImageData(0,0,mc.width,mc.height).data;
+  if(!S.prevFrameData){S.prevFrameData=curr.slice();return 50;}
+  let diff=0;
+  for(let i=0;i<curr.length;i+=4)diff+=Math.abs(curr[i]-S.prevFrameData[i])+Math.abs(curr[i+1]-S.prevFrameData[i+1])+Math.abs(curr[i+2]-S.prevFrameData[i+2]);
+  S.prevFrameData=curr.slice();
+  return Math.min(100,Math.round(diff/(mc.width*mc.height*3)*6));
+}
+
+// =============================================
+// UI UPDATE
+// =============================================
+function updateDetectCard(id,score,label){
+  const col=score>=70?'var(--good)':score>=40?'var(--warn)':'var(--bad)';
+  const cls=score>=70?'ok':score>=40?'warn':'bad';
+  document.getElementById('dc-'+id).className='detect-card '+cls;
+  const v=document.getElementById('dv-'+id); v.textContent=label; v.style.color=col;
+  const b=document.getElementById('db-'+id); b.style.width=score+'%'; b.style.background=col;
+}
+function updateMainUI(score,focused,reasons){
+  scoreCard.className='score-card '+(focused?'ok':score>=40?'warn':'bad');
+  scoreFace.textContent=focused?'😊':score>=40?'😕':'😵';
+  scoreLabel.textContent=focused?'集中してるね！すごい！':(reasons[0]||'集中が切れてるかも？');
+  scoreSub.textContent=focused?'✨ このちょうしでがんばれ！':reasons.slice(1).join(' ')||'';
+  gaugeFill.style.width=score+'%';
+  gaugeFill.style.background=score>=70?'var(--good)':score>=40?'var(--warn)':'var(--bad)';
+  detectDot.className='detect-dot '+(focused?'live':'bad');
+  detectText.textContent=focused?'集中しているよ！':(reasons[0]||'ちょっと集中が切れてる');
+}
+function updateNoFace(){
+  scoreCard.className='score-card warn'; scoreFace.textContent='🔍';
+  scoreLabel.textContent='顔が見えないよ…'; scoreSub.textContent='カメラの前に座ってね';
+  gaugeFill.style.width='0%'; gaugeFill.style.background='var(--muted)';
+  detectDot.className='detect-dot warn'; detectText.textContent='顔を探してるよ…';
+  updateDetectCard('face',0,'未検出'); updateDetectCard('eyes',0,'--');
+  const ms=S.lastMotionScore;
+  updateDetectCard('motion',Math.min(100,ms*3),ms>=15?'◎ 動いてる':ms>=5?'△ 少し':'× 止まり');
+}
+
+// =============================================
+// MAIN TIMER
+// =============================================
+function startMainTimer(){
+  if(S.mainTimer)clearInterval(S.mainTimer);
+  S.mainTimer=setInterval(()=>{
+    if(!S.running)return;
+    S.totalSec++;
+    const ms=calcMotionScore(); S.lastMotionScore=ms;
+    updateDetectCard('motion',Math.min(100,ms*3),ms>=15?'◎ 動いてる':ms>=5?'△ 少し':'× 止まり');
+    if(S.lastFocused){
+      S.focusSec++; S.focusedSec++; S.unfocusedSec=0;
+      if(S.focusedSec===300)celebrate();
+    }else{
+      S.unfocusedSec++; S.focusedSec=0;
+      if(S.unfocusedSec>=S.thresh&&!S.alertCooldown)triggerAlert('focus');
+    }
+    if(!S.pomoIsBreak){
+      if(ms<4){S.motionStillSec++;if(S.motionStillSec>=S.motionThreshSec&&!S.motionAlertCooldown)triggerAlert('motion');}
+      else S.motionStillSec=0;
+    }
+    const m=Math.floor(S.focusSec/60),sec=S.focusSec%60;
+    document.getElementById('statFocus').textContent=m+':'+String(sec).padStart(2,'0');
+  },1000);
+}
+
+// =============================================
+// ALERTS
+// =============================================
+function triggerAlert(type){
+  if(type==='focus'){
+    S.alertCooldown=true; S.alertCount++;
+    document.getElementById('statAlerts').textContent=S.alertCount;
+    const a=FOCUS_ALERTS[S.alertCount%FOCUS_ALERTS.length];
+    showAlert(a,'bad'); addLog(a.emoji+' '+a.title,true);
+    setTimeout(()=>{S.unfocusedSec=0;setTimeout(()=>{S.alertCooldown=false;},S.thresh*1200);},4000);
+  }else{
+    S.motionAlertCooldown=true;
+    const a=MOTION_ALERTS[Math.floor(Math.random()*MOTION_ALERTS.length)];
+    showAlert(a,'bad'); addLog(a.emoji+' '+a.title,true);
+    setTimeout(()=>{S.motionStillSec=0;setTimeout(()=>{S.motionAlertCooldown=false;},S.motionThreshSec*1000);},4000);
+  }
+}
+function showAlert(a,type){
+  document.getElementById('apEmoji').textContent=a.emoji;
+  document.getElementById('apTitle').textContent=a.title;
+  document.getElementById('apTitle').className='alert-pop-title '+(type==='break'?'good-col':'bad-col');
+  document.getElementById('apReason').textContent=a.reason||'';
+  document.getElementById('apMsg').textContent=a.msg;
+  alertPop.className='alert-pop show'+(type==='break'?' break-alert':'');
+  speak(a.title+'。'+a.msg);
+  setTimeout(()=>{alertPop.className='alert-pop';},4000);
+}
+
+// =============================================
+// SOUND
+// =============================================
+function speak(text){
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ja-JP'; u.rate=0.92; u.pitch=1.1; u.volume=S.volume;
+  const v=speechSynthesis.getVoices().find(v=>v.lang.startsWith('ja'));
+  if(v)u.voice=v; speechSynthesis.speak(u);
+}
+let audioCtx=null;
+function getBuzzCtx(){
+  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+// 低いブー音（タブレット注視）
+function buzz(){
+  try{
+    const ac=getBuzzCtx(), osc=ac.createOscillator(), gain=ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.type='sawtooth';
+    osc.frequency.setValueAtTime(130,ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(60,ac.currentTime+0.35);
+    gain.gain.setValueAtTime(S.volume*.7,ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.4);
+    osc.start(ac.currentTime); osc.stop(ac.currentTime+0.4);
+  }catch(e){}
+}
+// 高めのビー音（目線ズレ）
+function buzzHigh(){
+  try{
+    const ac=getBuzzCtx(), osc=ac.createOscillator(), gain=ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.type='square';
+    osc.frequency.setValueAtTime(880,ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(440,ac.currentTime+0.2);
+    gain.gain.setValueAtTime(S.volume*.5,ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.25);
+    osc.start(ac.currentTime); osc.stop(ac.currentTime+0.25);
+  }catch(e){}
+}
+
+// =============================================
+// CELEBRATE / LOG
+// =============================================
+function celebrate(){
+  const wrap=document.getElementById('confettiWrap');
+  const cols=['#f87171','#fbbf24','#4ade80','#60a5fa','#a78bfa','#fb923c'];
+  for(let i=0;i<80;i++){
+    const el=document.createElement('div'); el.className='confetti-p';
+    const sz=6+Math.random()*10;
+    el.style.cssText=`left:${Math.random()*100}%;top:-15px;background:${cols[~~(Math.random()*cols.length)]};width:${sz}px;height:${sz}px;animation-duration:${1.5+Math.random()*2.5}s;animation-delay:${Math.random()*0.5}s;`;
+    wrap.appendChild(el); setTimeout(()=>el.remove(),5000);
+  }
+  speak('すごい！5分間よく集中できたね！さいこう！');
+  addLog('🎉 5分間集中達成！',false,true);
+}
+function addLog(text,isAlert=false,isGood=false,isPomo=false){
+  const n=new Date();
+  const t=n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  const d=document.createElement('div');
+  d.className='log-item'+(isAlert?' is-alert':isGood?' is-good':isPomo?' is-pomo':'');
+  d.innerHTML=`<span class="log-time">${t}</span><span class="log-txt">${text}</span>`;
+  logList.prepend(d); if(logList.children.length>50)logList.removeChild(logList.lastChild);
+}
+
+// =============================================
+// START / STOP
+// =============================================
+async function startMonitor(){
+  mainBtn.disabled=true; mainBtn.textContent='起動中…';
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:640,height:480}});
+    videoEl.srcObject=stream; await videoEl.play();
+    camPlaceholder.style.display='none';
+  }catch(e){
+    addLog('❌ カメラエラー: '+e.message);
+    mainBtn.disabled=false; mainBtn.textContent='📷 カメラをスタート'; mainBtn.className='btn-main start'; return;
+  }
+
+  // MediaPipe初期化（awaitしない → モバイルで固まらない）
+  loadingOverlay.classList.remove('hidden');
+  loadText.textContent='顔検出を初期化中…\n少し待ってね';
+  loadBar.style.width='60%';
+  initFaceMesh();
+  initMotionCanvas();
+
+  S.running=true; S.mpReady=false;
+  S.focusSec=0; S.totalSec=0; S.alertCount=0;
+  S.unfocusedSec=0; S.focusedSec=0; S.motionStillSec=0;
+  S.alertCooldown=false; S.motionAlertCooldown=false;
+  S.cameraCooldown=false; S.gazeCooldown=false;
+  S.lastFocused=false; S.prevFrameData=null; S.lastLM=null;
+  logList.innerHTML=''; document.getElementById('statAlerts').textContent='0';
+
+  mainBtn.disabled=false; mainBtn.className='btn-main stop'; mainBtn.textContent='⏹ ストップ';
+  detectDot.className='detect-dot warn'; detectText.textContent='顔を検出中…';
+  addLog('📷 モニタリング開始',false,true);
+  startMainTimer();
+  startMpCamera();
+}
+
+function stopMonitor(){
+  S.running=false; S.mpReady=false;
+  if(S.mainTimer)clearInterval(S.mainTimer);
+  S.cameraCooldown=false; S.gazeCooldown=false;
+  if(S.mpCamera){S.mpCamera.stop();S.mpCamera=null;}
+  if(videoEl.srcObject){videoEl.srcObject.getTracks().forEach(t=>t.stop());videoEl.srcObject=null;}
+  ctx.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
+  camPlaceholder.style.display='flex'; loadingOverlay.classList.add('hidden');
+  alertPop.className='alert-pop';
+  scoreCard.className='score-card'; scoreFace.textContent='😴';
+  scoreLabel.textContent='おつかれさま！';
+  scoreSub.textContent='集中時間: '+document.getElementById('statFocus').textContent;
+  gaugeFill.style.width='0%'; gaugeFill.style.background='var(--muted)';
+  detectDot.className='detect-dot'; detectText.textContent='待機中';
+  mainBtn.className='btn-main start'; mainBtn.textContent='📷 カメラをスタート';
+  calibBtn.disabled=true;
+  if(!BASELINE.ready){calibBtn.className='calib-btn ready';calibBtn.textContent='カメラをONにしてから登録できます';}
+  addLog('⏹ 終了（集中時間: '+document.getElementById('statFocus').textContent+'）');
+  speechSynthesis&&speechSynthesis.cancel();
+}
+
+mainBtn.addEventListener('click',()=>{if(S.running)stopMonitor();else startMonitor();});
+resetPomo();
+window.addEventListener('load',()=>{
+  if(window.speechSynthesis){speechSynthesis.getVoices();speechSynthesis.addEventListener('voiceschanged',()=>speechSynthesis.getVoices());}
+});
+</script>
 // =============================================
 // CALIBRATION DATA
 // =============================================
