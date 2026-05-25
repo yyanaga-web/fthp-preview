@@ -205,6 +205,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:radial
     <div class="setting-row"><span class="setting-lbl">☕ 休憩タイム（分）</span><input type="range" id="pomoBreakMin" min="3" max="15" value="5" step="1"><span class="setting-val" id="pomoBreakVal">5分</span></div>
     <div class="setting-row"><span class="setting-lbl">🔔 声がけまでの時間</span><input type="range" id="threshSlider" min="5" max="30" value="10" step="1"><span class="setting-val" id="threshVal">10秒</span></div>
     <div class="setting-row"><span class="setting-lbl">✍️ 手元静止の警告</span><input type="range" id="motionThresh" min="10" max="60" value="30" step="5"><span class="setting-val" id="motionThreshVal">30秒</span></div>
+    <div class="setting-row"><span class="setting-lbl">📱 タブレット注視の警告</span><input type="range" id="tabletThresh" min="1" max="8" value="3" step="1"><span class="setting-val" id="tabletThreshVal">3秒</span></div>
+    <div class="setting-row"><span class="setting-lbl">👀 目線ズレの警告</span><input type="range" id="gazeThresh" min="1" max="8" value="3" step="1"><span class="setting-val" id="gazeThreshVal">3秒</span></div>
     <div class="setting-row"><span class="setting-lbl">🔊 音量</span><input type="range" id="volSlider" min="0" max="1" value="0.8" step="0.1"><span class="setting-val" id="volVal">80%</span></div>
   </div>
 
@@ -243,6 +245,12 @@ const S = {
   focusSec:0, totalSec:0, alertCount:0,
   alertCooldown:false, motionAlertCooldown:false,
   cameraCooldown:false, gazeCooldown:false,
+  // 即反応をやめて「連続して検出された回数」でカウント
+  // 800ms×カウント数 = 実際の経過時間
+  tabletSec:0,   // タブレット注視の継続カウント（800ms単位）
+  gazeSec:0,     // 目線ズレの継続カウント
+  tabletThresh:3, // 何秒続いたらブー（デフォルト3秒）
+  gazeThresh:3,
   mainTimer:null, detectionLoop:null,
   thresh:10, motionThreshSec:30, volume:0.8,
   pomoRunning:false, pomoIsBreak:false,
@@ -297,6 +305,8 @@ const flashOverlay=document.getElementById('flashOverlay');
 // Settings
 document.getElementById('threshSlider').addEventListener('input',e=>{S.thresh=+e.target.value;document.getElementById('threshVal').textContent=e.target.value+'秒';});
 document.getElementById('motionThresh').addEventListener('input',e=>{S.motionThreshSec=+e.target.value;document.getElementById('motionThreshVal').textContent=e.target.value+'秒';});
+document.getElementById('tabletThresh').addEventListener('input',e=>{S.tabletThresh=+e.target.value;document.getElementById('tabletThreshVal').textContent=e.target.value+'秒';});
+document.getElementById('gazeThresh').addEventListener('input',e=>{S.gazeThresh=+e.target.value;document.getElementById('gazeThreshVal').textContent=e.target.value+'秒';});
 document.getElementById('volSlider').addEventListener('input',e=>{S.volume=+e.target.value;document.getElementById('volVal').textContent=Math.round(S.volume*100)+'%';});
 document.getElementById('pomoWorkMin').addEventListener('input',e=>{S.pomoWorkSec=+e.target.value*60;document.getElementById('pomoWorkVal').textContent=e.target.value+'分';if(!S.pomoRunning&&!S.pomoIsBreak)resetPomo();});
 document.getElementById('pomoBreakMin').addEventListener('input',e=>{S.pomoBreakSec=+e.target.value*60;document.getElementById('pomoBreakVal').textContent=e.target.value+'分';});
@@ -683,21 +693,35 @@ async function runDetection(){
       setCard('gaze',r.gazeScore,r.gazeScore>=70?'◎ 手元向き':r.gazeScore>=40?'△ ズレあり':'× 外れ');
       setCard('eyes',r.eyeScore,r.eyeScore>=70?'◎ 開いてる':r.eyeScore>=40?'△ 眠い':'× 閉じ');
 
-      // タブレット注視 → 即低ブー
-      if(r.lookingAtTablet&&!S.cameraCooldown){
-        S.cameraCooldown=true; buzz(120,0.4,'sawtooth');
-        addLog('📱 タブレットを見てる！',true);
-        setTimeout(()=>{S.cameraCooldown=false;},2500);
+      // タブレット注視カウンター（続いた時間で判定）
+      if(r.lookingAtTablet){
+        S.tabletSec++;
+        if(S.tabletSec>=S.tabletThresh&&!S.cameraCooldown){
+          S.cameraCooldown=true; S.tabletSec=0;
+          buzz(120,0.4,'sawtooth');
+          addLog('📱 タブレットを'+S.tabletThresh+'秒以上見てた！',true);
+          setTimeout(()=>{S.cameraCooldown=false;},3000);
+        }
+      }else{
+        S.tabletSec=0; // 視線が戻ったらリセット
       }
-      // 目線ズレ → 即高ビー
-      if(r.gazeOff&&!S.gazeCooldown){
-        S.gazeCooldown=true; buzz(880,0.25,'square');
-        addLog('👀 目線が外れてる！',true);
-        setTimeout(()=>{S.gazeCooldown=false;},2500);
+
+      // 目線ズレカウンター（続いた時間で判定）
+      if(r.gazeOff){
+        S.gazeSec++;
+        if(S.gazeSec>=S.gazeThresh&&!S.gazeCooldown){
+          S.gazeCooldown=true; S.gazeSec=0;
+          buzz(880,0.25,'square');
+          addLog('👀 目線が'+S.gazeThresh+'秒以上外れてた！',true);
+          setTimeout(()=>{S.gazeCooldown=false;},3000);
+        }
+      }else{
+        S.gazeSec=0; // 目線が戻ったらリセット
       }
     }else{
       oc.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
       updateNoFace(); S.lastFocused=false;
+      S.tabletSec=0; S.gazeSec=0;
     }
   }catch(e){}
 
@@ -853,6 +877,7 @@ function stopMonitor(){
   if(S.mainTimer)clearInterval(S.mainTimer);
   if(S.detectionLoop){clearTimeout(S.detectionLoop); S.detectionLoop=null;}
   S.cameraCooldown=false; S.gazeCooldown=false;
+  S.tabletSec=0; S.gazeSec=0;
   if(videoEl.srcObject){videoEl.srcObject.getTracks().forEach(t=>t.stop());videoEl.srcObject=null;}
   oc.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
   camPlaceholder.style.display='flex';
