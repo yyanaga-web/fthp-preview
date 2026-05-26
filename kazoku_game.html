@@ -123,15 +123,18 @@
             flex-direction: column;
             justify-content: space-around;
             align-items: center;
-            padding: 12px 0;
+            padding: 8px 0;
         }
         #game.vertical .card {
-            width: 88%; height: 44%;
+            width: 92%; height: 44%;
             flex-direction: row;
+            padding: 0;
         }
         #game.vertical .face-img {
-            height: 90%; width: auto;
-            max-width: 45%;
+            height: 100%;
+            width: auto;
+            max-width: 60%;
+            border-radius: 20px 0 0 20px;
         }
 
         /* 横並び */
@@ -139,22 +142,25 @@
             flex-direction: row;
             justify-content: space-around;
             align-items: center;
-            padding: 0 12px;
+            padding: 0 8px;
         }
         #game.horizontal .card {
-            width: 44%; height: 88%;
+            width: 46%; height: 90%;
             flex-direction: column;
+            padding: 0;
         }
         #game.horizontal .face-img {
-            width: 90%; height: auto;
-            max-height: 75%;
+            width: 100%;
+            height: auto;
+            max-height: 82%;
+            border-radius: 20px 20px 0 0;
         }
 
         .card {
             background: white;
             border: 8px solid #ddd; border-radius: 28px;
             display: flex; justify-content: center; align-items: center;
-            gap: 12px;
+            gap: 0;
             position: relative; overflow: hidden;
             box-shadow: 0 8px 24px rgba(0,0,0,0.12);
             transition: border-color 0.15s, transform 0.15s, background 0.15s;
@@ -165,14 +171,16 @@
             background: #FFF3F3;
         }
         .face-img {
-            object-fit: contain;
+            object-fit: cover;
             display: block;
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+            flex-shrink: 0;
         }
         .card .name {
-            font-size: clamp(20px, 5vw, 36px);
+            font-size: clamp(22px, 6vw, 42px);
             font-weight: bold; color: #555;
             white-space: nowrap;
+            flex: 1;
+            text-align: center;
         }
         .dwell {
             position: absolute; bottom: 0; left: 0;
