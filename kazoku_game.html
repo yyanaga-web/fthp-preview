@@ -126,15 +126,17 @@
             padding: 8px 0;
         }
         #game.vertical .card {
-            width: 92%; height: 44%;
+            width: 94%; height: 44%;
             flex-direction: row;
-            padding: 0;
+            padding: 0; gap: 0;
         }
         #game.vertical .face-img {
             height: 100%;
             width: auto;
-            max-width: 60%;
+            max-width: 55%;
+            object-fit: cover;
             border-radius: 20px 0 0 20px;
+            flex-shrink: 0;
         }
 
         /* 横並び */
@@ -145,22 +147,23 @@
             padding: 0 8px;
         }
         #game.horizontal .card {
-            width: 46%; height: 90%;
+            width: 46%; height: 92%;
             flex-direction: column;
-            padding: 0;
+            padding: 0; gap: 0;
         }
         #game.horizontal .face-img {
             width: 100%;
             height: auto;
-            max-height: 82%;
+            max-height: 78%;
+            object-fit: cover;
             border-radius: 20px 20px 0 0;
+            flex-shrink: 0;
         }
 
         .card {
             background: white;
             border: 8px solid #ddd; border-radius: 28px;
             display: flex; justify-content: center; align-items: center;
-            gap: 0;
             position: relative; overflow: hidden;
             box-shadow: 0 8px 24px rgba(0,0,0,0.12);
             transition: border-color 0.15s, transform 0.15s, background 0.15s;
@@ -171,13 +174,11 @@
             background: #FFF3F3;
         }
         .face-img {
-            object-fit: cover;
             display: block;
-            flex-shrink: 0;
         }
         .card .name {
-            font-size: clamp(22px, 6vw, 42px);
-            font-weight: bold; color: #555;
+            font-size: clamp(24px, 7vw, 48px);
+            font-weight: bold; color: #444;
             white-space: nowrap;
             flex: 1;
             text-align: center;
@@ -346,8 +347,8 @@ const MIN_SAMPLES = 8;
 const MAX_SAMPLES = 40;
 
 const VOICES = [
-    { label: "オニイ", status: "オニイ 👦" },
-    { label: "オバア", status: "オバア 👵" },
+    { label: "おにぃ", displayLabel: "オニイ", status: "オニイ 👦" },
+    { label: "おばあ", displayLabel: "オバア", status: "オバア 👵" },
 ];
 
 // ============================================================
