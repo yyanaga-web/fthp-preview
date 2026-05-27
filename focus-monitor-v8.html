@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スイッチじかん銀行 🎮</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Zen+Kaku+Gothic+New:wght@900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F7F3FF;--card:#FFF;--text:#2D2D2D;--muted:#9A9A9A;--good:#4CAF82;--warn:#F5A623;--bad:#E85D5D;--accent:#7C5CBF;--border:#EDE8F5;--shadow:rgba(124,92,191,0.10);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'M PLUS Rounded 1c',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle,#D8CCF0 1.5px,transparent 1.5px);background-size:28px 28px;opacity:.45;pointer-events:none;}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:18px 14px 80px;}
+.header{text-align:center;margin-bottom:16px;}
+.header-inner{display:inline-flex;align-items:center;gap:8px;background:white;border-radius:50px;padding:9px 20px;box-shadow:0 4px 20px var(--shadow);border:2px solid var(--border);}
+.h-icon{font-size:1.5rem;animation:spin-slow 8s linear infinite;}
+@keyframes spin-slow{to{transform:rotate(360deg);}}
+.h-title{font-size:1rem;font-weight:900;}
+.h-title em{color:var(--accent);font-style:normal;}
+.calib-card{background:white;border-radius:24px;padding:20px;box-shadow:0 6px 24px var(--shadow);border:2px solid var(--border);margin-bottom:12px;}
+.calib-card.done{border-color:rgba(76,175,130,.5);background:rgba(76,175,130,.04);}
+.calib-title{font-size:.8rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.calib-status{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.calib-icon{font-size:2.2rem;flex-shrink:0;}
+.calib-label{font-size:.95rem;font-weight:900;margin-bottom:2px;}
+.calib-sub{font-size:.75rem;color:var(--muted);}
+.calib-values{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
+.calib-val-box{background:var(--border);border-radius:12px;padding:8px 10px;}
+.calib-val-name{font-size:.65rem;color:var(--muted);font-weight:700;margin-bottom:2px;}
+.calib-val-num{font-size:.9rem;font-weight:900;color:var(--accent);}
+.calib-btn{width:100%;padding:11px;border:none;border-radius:14px;font-family:inherit;font-size:.9rem;font-weight:900;cursor:pointer;transition:all .2s;}
+.calib-btn.ready{background:linear-gradient(135deg,var(--accent),#5B8DEF);color:white;box-shadow:0 4px 16px rgba(124,92,191,.3);}
+.calib-btn.counting{background:var(--warn);color:white;pointer-events:none;}
+.calib-btn.done-btn{background:rgba(76,175,130,.15);color:var(--good);border:2px solid rgba(76,175,130,.3);}
+.calib-btn:disabled{opacity:.4;cursor:not-allowed;}
+.countdown-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:20;border-radius:19px;}
+.countdown-overlay.hidden{display:none;}
+.countdown-num{font-size:5rem;font-weight:900;color:white;line-height:1;}
+.countdown-msg{font-size:.9rem;color:rgba(255,255,255,.8);text-align:center;line-height:1.5;}
+.flash-overlay{position:absolute;inset:0;background:white;opacity:0;pointer-events:none;z-index:25;border-radius:19px;transition:opacity .1s;}
+.flash-overlay.flash{opacity:.8;}
+.pomo-card{background:white;border-radius:24px;padding:18px 18px 16px;box-shadow:0 6px 24px var(--shadow);border:2px solid var(--border);margin-bottom:12px;}
+.pomo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.pomo-title{font-size:.8rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.pomo-mode{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(124,92,191,.12);color:var(--accent);border:1px solid rgba(124,92,191,.2);}
+.pomo-mode.break{background:rgba(76,175,130,.12);color:var(--good);border-color:rgba(76,175,130,.2);}
+.pomo-time{font-size:3.2rem;font-weight:900;line-height:1;color:var(--accent);letter-spacing:-.02em;text-align:center;transition:color .3s;}
+.pomo-time.break{color:var(--good);}.pomo-time.urgent{color:var(--bad);}
+.pomo-sub{font-size:.75rem;color:var(--muted);margin-top:3px;text-align:center;margin-bottom:12px;}
+.pomo-bar-wrap{background:var(--border);border-radius:20px;height:10px;overflow:hidden;margin-bottom:12px;}
+.pomo-bar{height:100%;border-radius:20px;background:var(--accent);transition:width 1s linear,background .3s;}
+.pomo-bar.break{background:var(--good);}
+.pomo-controls{display:flex;gap:8px;}
+.pomo-btn{flex:1;padding:9px;border:none;border-radius:14px;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.pomo-btn.primary{background:var(--accent);color:white;}.pomo-btn.secondary{background:var(--border);color:var(--text);}
+.pomo-btn:hover{filter:brightness(1.05);}
+.pomo-cycles{text-align:center;font-size:.75rem;color:var(--muted);margin-top:8px;}
+.pomo-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 2px;background:var(--border);transition:background .3s;}
+.pomo-dot.done{background:var(--accent);}
+.score-card{background:white;border-radius:24px;padding:18px 16px 16px;box-shadow:0 6px 24px var(--shadow);border:2px solid var(--border);margin-bottom:12px;transition:border-color .4s;}
+.score-card.ok{border-color:var(--good);}.score-card.warn{border-color:var(--warn);}.score-card.bad{border-color:var(--bad);}
+.score-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.score-face{font-size:3rem;line-height:1;flex-shrink:0;}
+.score-label{font-size:1rem;font-weight:900;margin-bottom:2px;}
+.score-sub{font-size:.75rem;color:var(--muted);min-height:1.2em;}
+.gauge-wrap{background:var(--border);border-radius:20px;height:14px;overflow:hidden;}
+.gauge-fill{height:100%;border-radius:20px;transition:width .6s cubic-bezier(.34,1.56,.64,1),background .4s;}
+.camera-card{background:#1a1a2e;border-radius:22px;overflow:hidden;position:relative;aspect-ratio:4/3;margin-bottom:12px;box-shadow:0 8px 32px rgba(0,0,0,.2);border:3px solid white;}
+#videoEl{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);}
+#overlayCanvas{position:absolute;inset:0;width:100%;height:100%;transform:scaleX(-1);pointer-events:none;}
+#irisCanvas{display:none;}
+.cam-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(255,255,255,.4);}
+.cam-ph-icon{font-size:3rem;}.cam-ph-text{font-size:.82rem;}
+.detect-badge{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border-radius:12px;padding:7px 12px;display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.15);}
+.detect-dot{width:8px;height:8px;border-radius:50%;background:#666;flex-shrink:0;transition:background .3s;}
+.detect-dot.live{background:var(--good);animation:blink 1.2s infinite;box-shadow:0 0 6px var(--good);}
+.detect-dot.warn{background:var(--warn);}.detect-dot.bad{background:var(--bad);animation:blink .6s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.detect-text{font-size:.72rem;color:white;flex:1;}
+.loading-overlay{position:absolute;inset:0;background:rgba(26,26,46,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10;border-radius:19px;}
+.loading-overlay.hidden{display:none;}
+.load-spinner{width:40px;height:40px;border:4px solid rgba(255,255,255,.15);border-top-color:#a78bfa;border-radius:50%;animation:spin .9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-text{color:white;font-size:.82rem;text-align:center;line-height:1.6;}
+.load-bar-wrap{width:150px;height:6px;background:rgba(255,255,255,.15);border-radius:10px;overflow:hidden;}
+.load-bar{height:100%;background:#a78bfa;border-radius:10px;width:0%;transition:width .4s;}
+.detect-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.detect-card{background:white;border-radius:18px;padding:10px 8px 8px;box-shadow:0 4px 16px var(--shadow);border:2px solid var(--border);text-align:center;transition:border-color .3s;}
+.detect-card.ok{border-color:rgba(76,175,130,.4);}.detect-card.warn{border-color:rgba(245,166,35,.4);}.detect-card.bad{border-color:rgba(232,93,93,.4);}
+.dc-icon{font-size:1rem;}.dc-name{font-size:.6rem;font-weight:700;color:var(--muted);margin:3px 0 4px;}
+.dc-val{font-size:.75rem;font-weight:900;transition:color .3s;}
+.dc-mini-bar{height:4px;background:var(--border);border-radius:10px;overflow:hidden;margin-top:4px;}
+.dc-mini-fill{height:100%;border-radius:10px;transition:width .5s ease,background .3s;}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.stat-card{background:white;border-radius:16px;padding:10px 6px;text-align:center;box-shadow:0 4px 16px var(--shadow);border:2px solid var(--border);}
+.stat-icon{font-size:.95rem;}.stat-num{font-size:1.2rem;font-weight:900;margin:1px 0;}.stat-lbl{font-size:.6rem;color:var(--muted);}
+.settings-card{background:white;border-radius:20px;padding:14px;box-shadow:0 4px 16px var(--shadow);border:2px solid var(--border);margin-bottom:12px;}
+.settings-title{font-size:.75rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.setting-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.setting-row:last-child{margin-bottom:0;}
+.setting-lbl{flex:1;font-size:.78rem;}
+.setting-row input[type=range]{width:80px;accent-color:var(--accent);}
+.setting-val{font-weight:900;font-size:.78rem;min-width:34px;text-align:right;color:var(--accent);}
+.btn-main{display:block;width:100%;padding:15px;border:none;border-radius:18px;font-family:inherit;font-size:1rem;font-weight:900;cursor:pointer;transition:all .2s;margin-bottom:12px;}
+.btn-main.start{background:linear-gradient(135deg,#7C5CBF,#5B8DEF);color:white;box-shadow:0 6px 24px rgba(124,92,191,.35);}
+.btn-main.stop{background:linear-gradient(135deg,#E85D5D,#c0392b);color:white;box-shadow:0 6px 24px rgba(232,93,93,.35);}
+.btn-main:hover{transform:translateY(-2px);filter:brightness(1.06);}
+.btn-main:active{transform:translateY(1px);}
+.btn-main:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.alert-pop{position:fixed;bottom:-240px;left:50%;transform:translateX(-50%);width:min(360px,92vw);background:white;border-radius:28px;border:3px solid var(--bad);padding:20px 22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.18);z-index:200;transition:bottom .5s cubic-bezier(0.34,1.56,0.64,1);}
+.alert-pop.show{bottom:20px;}.alert-pop.break-alert{border-color:var(--good);}
+.alert-pop-emoji{font-size:3rem;}
+.alert-pop-title{font-size:1.2rem;font-weight:900;margin:6px 0 4px;}
+.alert-pop-title.bad-col{color:var(--bad);}.alert-pop-title.good-col{color:var(--good);}
+.alert-pop-reason{font-size:.8rem;color:var(--muted);margin-bottom:8px;min-height:1em;}
+.alert-pop-msg{font-size:.9rem;font-weight:700;}
+.log-card{background:white;border-radius:18px;padding:12px 14px;box-shadow:0 4px 16px var(--shadow);border:2px solid var(--border);max-height:150px;overflow-y:auto;}
+.log-title{font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+.log-item{display:flex;gap:7px;padding:3px 0;border-bottom:1px solid var(--border);font-size:.75rem;}
+.log-item:last-child{border:none;}
+.log-time{color:var(--muted);font-size:.68rem;white-space:nowrap;}.log-txt{flex:1;}
+.log-item.is-alert .log-txt{color:var(--bad);font-weight:700;}
+.log-item.is-good  .log-txt{color:var(--good);font-weight:700;}
+.log-item.is-pomo  .log-txt{color:var(--accent);font-weight:700;}
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden;}
+.confetti-p{position:absolute;border-radius:2px;animation:fall linear forwards;}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+/* ===== SWITCH BANK ===== */
+.bank-section{margin-bottom:20px;}
+.bank-hero{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:28px;padding:20px 18px 16px;box-shadow:0 12px 40px rgba(15,52,96,.45);border:2px solid rgba(255,255,255,.08);position:relative;overflow:hidden;margin-bottom:10px;}
+.bank-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(99,220,255,.15) 0%,transparent 70%);pointer-events:none;}
+.bank-hero::after{content:'🎮';position:absolute;top:14px;right:18px;font-size:2.8rem;opacity:.18;transform:rotate(-10deg);}
+.bank-label{font-size:.65rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:6px;}
+.bank-time-row{display:flex;align-items:flex-end;gap:6px;margin-bottom:4px;}
+.bank-time-num{font-family:'Zen Kaku Gothic New',sans-serif;font-size:4.2rem;font-weight:900;color:#63dcff;line-height:1;text-shadow:0 0 30px rgba(99,220,255,.5);}
+.bank-time-unit{font-size:1rem;font-weight:900;color:rgba(255,255,255,.5);margin-bottom:10px;}
+.bank-sub{font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:14px;}
+.bank-use-btn{width:100%;padding:13px;background:linear-gradient(135deg,#63dcff,#3ba8d4);border:none;border-radius:16px;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.95rem;font-weight:900;color:#0f3460;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(99,220,255,.3);}
+.bank-use-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,220,255,.5);}
+.bank-use-btn:active{transform:translateY(1px);}
+.bank-use-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
+
+.bank-earn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.earn-card{background:white;border-radius:18px;padding:12px 10px 10px;box-shadow:0 4px 16px var(--shadow);border:2px solid var(--border);text-align:center;position:relative;overflow:hidden;transition:border-color .3s,box-shadow .3s;}
+.earn-card.unlocked{border-color:rgba(76,175,130,.5);box-shadow:0 4px 20px rgba(76,175,130,.15);}
+.earn-icon{font-size:1.6rem;margin-bottom:4px;}
+.earn-title{font-size:.72rem;font-weight:900;color:var(--text);margin-bottom:2px;}
+.earn-reward{font-size:1.1rem;font-weight:900;color:var(--accent);margin-bottom:4px;}
+.earn-desc{font-size:.62rem;color:var(--muted);line-height:1.4;}
+.earn-progress{margin-top:6px;background:var(--border);border-radius:10px;height:5px;overflow:hidden;}
+.earn-prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--accent),#5B8DEF);transition:width .6s cubic-bezier(.34,1.56,.64,1);}
+.earn-badge{position:absolute;top:7px;right:7px;background:var(--good);color:white;border-radius:20px;font-size:.55rem;font-weight:900;padding:2px 6px;}
+
+/* スキャンカード */
+.scan-card{background:white;border-radius:24px;padding:18px 16px 16px;box-shadow:0 6px 24px var(--shadow);border:2px solid var(--border);margin-bottom:10px;}
+.scan-title{font-size:.8rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+.scan-subjects{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.subj-btn{padding:8px 4px;border:2px solid var(--border);border-radius:12px;background:white;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.65rem;font-weight:900;cursor:pointer;transition:all .15s;text-align:center;color:var(--text);}
+.subj-btn.active{background:var(--accent);border-color:var(--accent);color:white;transform:scale(1.05);}
+.subj-icon{font-size:1.2rem;display:block;margin-bottom:2px;}
+.scan-cam-area{background:#1a1a2e;border-radius:18px;overflow:hidden;position:relative;aspect-ratio:4/3;margin-bottom:10px;border:2px solid rgba(255,255,255,.08);}
+#scanVideo{width:100%;height:100%;object-fit:cover;display:block;}
+.scan-cam-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:rgba(255,255,255,.3);}
+.scan-cam-ph-icon{font-size:2.5rem;}.scan-cam-ph-text{font-size:.75rem;}
+.scan-guide-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:55%;border:3px dashed rgba(99,220,255,.7);border-radius:12px;pointer-events:none;}
+.scan-guide-text{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:.65rem;color:rgba(255,255,255,.7);font-weight:700;}
+.scan-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.scan-btn{padding:11px;border:none;border-radius:14px;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:all .15s;}
+.scan-btn.primary{background:linear-gradient(135deg,#63dcff,#3ba8d4);color:#0f3460;}
+.scan-btn.secondary{background:var(--border);color:var(--text);}
+.scan-btn:disabled{opacity:.4;cursor:not-allowed;}
+.scan-result-area{background:var(--bg);border-radius:14px;padding:12px;margin-top:10px;display:none;text-align:center;}
+.scan-result-area.show{display:block;}
+.scan-result-score{font-family:'Zen Kaku Gothic New',sans-serif;font-size:3rem;font-weight:900;line-height:1.1;}
+.scan-result-score.great{color:var(--good);}
+.scan-result-score.ok{color:var(--warn);}
+.scan-result-score.bad{color:var(--bad);}
+.scan-result-msg{font-size:.82rem;font-weight:700;margin-top:4px;margin-bottom:8px;}
+.scan-confirm-btn{width:100%;padding:12px;border:none;border-radius:14px;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer;background:var(--good);color:white;box-shadow:0 4px 16px rgba(76,175,130,.35);}
+.scan-confirm-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* 集中15分バッジ */
+.focus15-badge{background:white;border-radius:18px;padding:12px 14px;box-shadow:0 4px 16px var(--shadow);border:2px solid var(--border);display:flex;align-items:center;gap:12px;margin-bottom:10px;transition:border-color .4s;}
+.focus15-badge.active{border-color:rgba(124,92,191,.4);background:rgba(124,92,191,.03);}
+.focus15-badge.earned{border-color:rgba(76,175,130,.5);background:rgba(76,175,130,.04);}
+.f15-icon{font-size:2rem;flex-shrink:0;}
+.f15-info{flex:1;}
+.f15-title{font-size:.85rem;font-weight:900;margin-bottom:2px;}
+.f15-sub{font-size:.7rem;color:var(--muted);}
+.f15-bar-wrap{background:var(--border);border-radius:10px;height:6px;overflow:hidden;margin-top:5px;}
+.f15-bar-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--accent),#5B8DEF);transition:width 1s linear;}
+.f15-reward{font-size:.75rem;font-weight:900;color:var(--accent);white-space:nowrap;}
+
+/* 履歴 */
+.history-card{background:white;border-radius:18px;padding:12px 14px;box-shadow:0 4px 16px var(--shadow);border:2px solid var(--border);margin-bottom:10px;}
+.history-title{font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.hist-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:.78rem;}
+.hist-item:last-child{border:none;}
+.hist-icon{font-size:1rem;flex-shrink:0;}
+.hist-text{flex:1;font-weight:700;}
+.hist-plus{color:var(--good);font-weight:900;font-size:.85rem;}
+.hist-time{font-size:.65rem;color:var(--muted);}
+
+/* 使用モーダル */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal-box{background:white;border-radius:28px;padding:28px 24px;width:min(340px,92vw);text-align:center;transform:scale(.85) translateY(20px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+.modal-overlay.show .modal-box{transform:scale(1) translateY(0);}
+.modal-emoji{font-size:4rem;margin-bottom:10px;}
+.modal-title{font-size:1.3rem;font-weight:900;margin-bottom:8px;}
+.modal-body{font-size:.9rem;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.modal-time-big{font-family:'Zen Kaku Gothic New',sans-serif;font-size:3.5rem;font-weight:900;color:var(--accent);margin:10px 0;}
+.modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.modal-btn{padding:13px;border:none;border-radius:16px;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer;}
+.modal-btn.yes{background:linear-gradient(135deg,var(--accent),#5B8DEF);color:white;box-shadow:0 4px 16px rgba(124,92,191,.35);}
+.modal-btn.no{background:var(--border);color:var(--text);}
+
+/* 花火 */
+.firework-wrap{position:fixed;inset:0;pointer-events:none;z-index:998;overflow:hidden;}
+.fw-particle{position:absolute;border-radius:50%;animation:fw-fly linear forwards;}
+@keyframes fw-fly{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0;}}
+
+/* AIスキャン処理中 */
+.scan-loading{display:none;position:absolute;inset:0;background:rgba(26,26,46,.88);border-radius:16px;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:10;}
+.scan-loading.show{display:flex;}
+.scan-spin{width:36px;height:36px;border:4px solid rgba(255,255,255,.15);border-top-color:#63dcff;border-radius:50%;animation:spin .8s linear infinite;}
+.scan-load-text{color:white;font-size:.78rem;text-align:center;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header"><div class="header-inner"><span class="h-icon">🎮</span><span class="h-title">スイッチ<em>じかん銀行</em></span></div></div>
+
+  <!-- ===== スイッチじかん銀行 ===== -->
+  <div class="bank-section">
+    <!-- 残高ヒーロー -->
+    <div class="bank-hero">
+      <div class="bank-label">🎮 ゲームできる時間</div>
+      <div class="bank-time-row">
+        <div class="bank-time-num" id="bankMin">0</div>
+        <div class="bank-time-unit">分</div>
+      </div>
+      <div class="bank-sub" id="bankSub">がんばって時間をためよう！</div>
+      <button class="bank-use-btn" id="bankUseBtn" disabled>🕹 スイッチをやる（時間を引き出す）</button>
+    </div>
+
+    <!-- ためかた2種 -->
+    <div class="bank-earn-row">
+      <div class="earn-card" id="earnTestCard">
+        <div class="earn-badge" id="earnTestBadge" style="display:none">NEW!</div>
+        <div class="earn-icon">📝</div>
+        <div class="earn-title">復習テスト</div>
+        <div class="earn-reward">80点以上 → +10分</div>
+        <div class="earn-desc">4教科の週テストをスキャンして点数を登録しよう</div>
+        <div class="earn-progress"><div class="earn-prog-fill" id="earnTestProg" style="width:0%"></div></div>
+      </div>
+      <div class="earn-card" id="earnFocusCard">
+        <div class="earn-badge" id="earnFocusBadge" style="display:none">NEW!</div>
+        <div class="earn-icon">🧠</div>
+        <div class="earn-title">集中15分</div>
+        <div class="earn-reward">継続15分 → +5分</div>
+        <div class="earn-desc">カメラで集中を観測して15分続けよう</div>
+        <div class="earn-progress"><div class="earn-prog-fill" id="earnFocusProg" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- 集中15分バッジ（リアルタイム） -->
+    <div class="focus15-badge" id="focus15Badge">
+      <div class="f15-icon">🧠</div>
+      <div class="f15-info">
+        <div class="f15-title">集中タイム</div>
+        <div class="f15-sub" id="f15Sub">カメラをスタートしてね</div>
+        <div class="f15-bar-wrap"><div class="f15-bar-fill" id="f15BarFill" style="width:0%"></div></div>
+      </div>
+      <div class="f15-reward" id="f15Reward">+5分</div>
+    </div>
+
+    <!-- テストスキャンカード -->
+    <div class="scan-card">
+      <div class="scan-title">📷 テストをスキャン</div>
+      <!-- 教科選択 -->
+      <div class="scan-subjects">
+        <button class="subj-btn active" data-subj="国語" onclick="selectSubj(this)"><span class="subj-icon">📖</span>国語</button>
+        <button class="subj-btn" data-subj="算数" onclick="selectSubj(this)"><span class="subj-icon">🔢</span>算数</button>
+        <button class="subj-btn" data-subj="理科" onclick="selectSubj(this)"><span class="subj-icon">🔬</span>理科</button>
+        <button class="subj-btn" data-subj="社会" onclick="selectSubj(this)"><span class="subj-icon">🌏</span>社会</button>
+      </div>
+      <!-- カメラエリア -->
+      <div class="scan-cam-area" id="scanCamArea">
+        <video id="scanVideo" autoplay playsinline muted></video>
+        <div class="scan-cam-placeholder" id="scanCamPlaceholder">
+          <div class="scan-cam-ph-icon">📷</div>
+          <div class="scan-cam-ph-text">ボタンを押してカメラをひらこう</div>
+        </div>
+        <div class="scan-guide-box" id="scanGuideBox" style="display:none"></div>
+        <div class="scan-guide-text" id="scanGuideText" style="display:none">点数が見えるようにかまえてね 📄</div>
+        <div class="scan-loading" id="scanLoading">
+          <div class="scan-spin"></div>
+          <div class="scan-load-text">AIが点数を読み取り中…<br>少し待ってね</div>
+        </div>
+      </div>
+      <!-- ボタン -->
+      <div class="scan-btns">
+        <button class="scan-btn secondary" id="scanOpenBtn" onclick="openScanCamera()">📷 カメラをひらく</button>
+        <button class="scan-btn primary" id="scanShootBtn" onclick="shootScan()" disabled>📸 スキャン！</button>
+      </div>
+      <!-- 結果 -->
+      <div class="scan-result-area" id="scanResultArea">
+        <div class="scan-result-score" id="scanResultScore">--</div>
+        <div class="scan-result-msg" id="scanResultMsg"></div>
+        <button class="scan-confirm-btn" id="scanConfirmBtn" onclick="confirmScore()">✅ この点数で登録する</button>
+      </div>
+    </div>
+
+    <!-- 履歴 -->
+    <div class="history-card">
+      <div class="history-title">📋 きろく</div>
+      <div id="bankHistory"><div style="font-size:.75rem;color:var(--muted);text-align:center;padding:8px 0">まだ記録がないよ</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 以下 既存の集中モニター ===== -->
+  <div class="header" style="margin-top:4px;margin-bottom:12px;"><div class="header-inner"><span class="h-icon">📚</span><span class="h-title">べんきょう<em>モニター</em></span></div></div>
+
+  <div class="calib-card" id="calibCard">
+    <div class="calib-title">🎯 キャリブレーション</div>
+    <div class="calib-status">
+      <div class="calib-icon" id="calibIcon">📐</div>
+      <div><div class="calib-label" id="calibLabel">手元を見ている姿勢を登録しよう</div>
+      <div class="calib-sub" id="calibSub">カメラON後に、テキストを読むように手元を見た状態で登録してね</div></div>
+    </div>
+    <div class="calib-values" id="calibValues" style="display:none">
+      <div class="calib-val-box"><div class="calib-val-name">頭の角度（上下）</div><div class="calib-val-num" id="cv-pitch">--</div></div>
+      <div class="calib-val-box"><div class="calib-val-name">頭の傾き</div><div class="calib-val-num" id="cv-roll">--</div></div>
+      <div class="calib-val-box"><div class="calib-val-name">目の開き</div><div class="calib-val-num" id="cv-ear">--</div></div>
+      <div class="calib-val-box"><div class="calib-val-name">目線（左右）</div><div class="calib-val-num" id="cv-gaze">--</div></div>
+    </div>
+    <button class="calib-btn" id="calibBtn" disabled>カメラをONにしてから登録できます</button>
+  </div>
+
+  <div class="pomo-card">
+    <div class="pomo-header"><span class="pomo-title">⏱ ポモドーロ</span><span class="pomo-mode" id="pomoMode">集中タイム</span></div>
+    <div class="pomo-time" id="pomoTime">25:00</div>
+    <div class="pomo-sub" id="pomoSub">スタートボタンで始めよう</div>
+    <div class="pomo-bar-wrap"><div class="pomo-bar" id="pomoBar" style="width:100%"></div></div>
+    <div class="pomo-controls">
+      <button class="pomo-btn primary" id="pomoStartBtn">▶ スタート</button>
+      <button class="pomo-btn secondary" id="pomoResetBtn">↺ リセット</button>
+    </div>
+    <div class="pomo-cycles"><span class="pomo-dot" id="pd0"></span><span class="pomo-dot" id="pd1"></span><span class="pomo-dot" id="pd2"></span><span class="pomo-dot" id="pd3"></span></div>
+  </div>
+
+  <div class="score-card" id="scoreCard">
+    <div class="score-row">
+      <span class="score-face" id="scoreFace">😴</span>
+      <div><div class="score-label" id="scoreLabel">カメラをスタートしよう！</div><div class="score-sub" id="scoreSub">下のボタンを押してね</div></div>
+    </div>
+    <div class="gauge-wrap"><div class="gauge-fill" id="gaugeFill" style="width:0%;background:var(--muted)"></div></div>
+  </div>
+
+  <div class="camera-card">
+    <video id="videoEl" autoplay playsinline muted></video>
+    <canvas id="overlayCanvas"></canvas>
+    <canvas id="irisCanvas"></canvas>
+    <div class="cam-placeholder" id="camPlaceholder"><div class="cam-ph-icon">📷</div><div class="cam-ph-text">カメラをスタートしてね</div></div>
+    <div class="loading-overlay hidden" id="loadingOverlay">
+      <div class="load-spinner"></div>
+      <div class="load-text" id="loadText">AIモデルを読み込み中…<br>少し待ってね（30秒ほど）</div>
+      <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
+    </div>
+    <div class="countdown-overlay hidden" id="countdownOverlay">
+      <div class="countdown-msg">テキストを読むように<br>手元を見た状態で待ってね 📖</div>
+      <div class="countdown-num" id="countdownNum">3</div>
+    </div>
+    <div class="flash-overlay" id="flashOverlay"></div>
+    <div class="detect-badge"><div class="detect-dot" id="detectDot"></div><div class="detect-text" id="detectText">待機中</div></div>
+  </div>
+
+  <div class="detect-grid">
+    <div class="detect-card" id="dc-face"><div class="dc-icon">👤</div><div class="dc-name">顔の向き</div><div class="dc-val" id="dv-face">--</div><div class="dc-mini-bar"><div class="dc-mini-fill" id="db-face" style="width:0%"></div></div></div>
+    <div class="detect-card" id="dc-gaze"><div class="dc-icon">👁</div><div class="dc-name">目線</div><div class="dc-val" id="dv-gaze">--</div><div class="dc-mini-bar"><div class="dc-mini-fill" id="db-gaze" style="width:0%"></div></div></div>
+    <div class="detect-card" id="dc-eyes"><div class="dc-icon">😶</div><div class="dc-name">目の開き</div><div class="dc-val" id="dv-eyes">--</div><div class="dc-mini-bar"><div class="dc-mini-fill" id="db-eyes" style="width:0%"></div></div></div>
+    <div class="detect-card" id="dc-motion"><div class="dc-icon">✍️</div><div class="dc-name">手元の動き</div><div class="dc-val" id="dv-motion">--</div><div class="dc-mini-bar"><div class="dc-mini-fill" id="db-motion" style="width:0%"></div></div></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-icon">⏱️</div><div class="stat-num" id="statFocus">0:00</div><div class="stat-lbl">集中時間</div></div>
+    <div class="stat-card"><div class="stat-icon">🔔</div><div class="stat-num" id="statAlerts">0</div><div class="stat-lbl">声がけ</div></div>
+    <div class="stat-card"><div class="stat-icon">🍅</div><div class="stat-num" id="statPomos">0</div><div class="stat-lbl">完了セット</div></div>
+  </div>
+
+  <div class="settings-card">
+    <div class="settings-title">⚙ せってい</div>
+    <div class="setting-row"><span class="setting-lbl">🍅 集中タイム（分）</span><input type="range" id="pomoWorkMin" min="5" max="30" value="25" step="5"><span class="setting-val" id="pomoWorkVal">25分</span></div>
+    <div class="setting-row"><span class="setting-lbl">☕ 休憩タイム（分）</span><input type="range" id="pomoBreakMin" min="3" max="15" value="5" step="1"><span class="setting-val" id="pomoBreakVal">5分</span></div>
+    <div class="setting-row"><span class="setting-lbl">🔔 声がけまでの時間</span><input type="range" id="threshSlider" min="5" max="30" value="10" step="1"><span class="setting-val" id="threshVal">10秒</span></div>
+    <div class="setting-row"><span class="setting-lbl">✍️ 手元静止の警告</span><input type="range" id="motionThresh" min="10" max="60" value="30" step="5"><span class="setting-val" id="motionThreshVal">30秒</span></div>
+    <div class="setting-row"><span class="setting-lbl">📱 タブレット注視の警告</span><input type="range" id="tabletThresh" min="1" max="8" value="3" step="1"><span class="setting-val" id="tabletThreshVal">3秒</span></div>
+    <div class="setting-row"><span class="setting-lbl">👀 目線ズレの警告</span><input type="range" id="gazeThresh" min="1" max="8" value="3" step="1"><span class="setting-val" id="gazeThreshVal">3秒</span></div>
+    <div class="setting-row"><span class="setting-lbl">🔊 音量</span><input type="range" id="volSlider" min="0" max="1" value="0.8" step="0.1"><span class="setting-val" id="volVal">80%</span></div>
+  </div>
+
+  <button class="btn-main start" id="mainBtn">📷 カメラをスタート</button>
+
+  <div class="log-card"><div class="log-title">📋 きろく</div><div id="logList"></div></div>
+</div>
+
+<div class="alert-pop" id="alertPop">
+  <div class="alert-pop-emoji" id="apEmoji">😮</div>
+  <div class="alert-pop-title" id="apTitle">集中しよう！</div>
+  <div class="alert-pop-reason" id="apReason"></div>
+  <div class="alert-pop-msg" id="apMsg">もうひとふんばりできるよ！</div>
+</div>
+<div class="confetti-wrap" id="confettiWrap"></div>
+<div class="firework-wrap" id="fireworkWrap"></div>
+
+<!-- 使用確認モーダル -->
+<div class="modal-overlay" id="useModal">
+  <div class="modal-box">
+    <div class="modal-emoji">🕹️</div>
+    <div class="modal-title">スイッチをやる？</div>
+    <div class="modal-body">
+      いまの残り時間：<br>
+      <div class="modal-time-big" id="modalTimeBig">0分</div>
+      使う時間をえらんでね
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;" id="modalTimePicker"></div>
+    <div class="modal-btns">
+      <button class="modal-btn yes" id="modalYesBtn" onclick="confirmUse()">✅ つかう</button>
+      <button class="modal-btn no" onclick="closeModal()">❌ キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- 引き出し完了モーダル -->
+<div class="modal-overlay" id="doneModal">
+  <div class="modal-box">
+    <div class="modal-emoji">🎮</div>
+    <div class="modal-title" id="doneModalTitle">楽しんでね！</div>
+    <div class="modal-body" id="doneModalBody"></div>
+    <button class="modal-btn yes" style="width:100%" onclick="closeDoneModal()">わかった！</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+'use strict';
+// =============================================
+// CALIBRATION
+// =============================================
+const BL = {
+  pitch:null, roll:null, yaw:null, ear:null,
+  gazeX:null, gazeY:null,  // 虹彩の正常位置
+  ready:false
+};
+const TOL = { pitch:0.14, roll:0.10, yaw:0.13 };
+
+// =============================================
+// STATE
+// =============================================
+const S = {
+  running:false, modelsLoaded:false, detectionActive:false,
+  lastFocused:false, unfocusedSec:0, focusedSec:0,
+  focusSec:0, totalSec:0, alertCount:0,
+  alertCooldown:false, motionAlertCooldown:false,
+  cameraCooldown:false, gazeCooldown:false,
+  // 即反応をやめて「連続して検出された回数」でカウント
+  // 800ms×カウント数 = 実際の経過時間
+  tabletSec:0,   // タブレット注視の継続カウント（800ms単位）
+  gazeSec:0,     // 目線ズレの継続カウント
+  tabletThresh:3, // 何秒続いたらブー（デフォルト3秒）
+  gazeThresh:3,
+  mainTimer:null, detectionLoop:null,
+  thresh:10, motionThreshSec:30, volume:0.8,
+  pomoRunning:false, pomoIsBreak:false,
+  pomoWorkSec:25*60, pomoBreakSec:5*60,
+  pomoRemaining:25*60, pomoTotal:25*60,
+  pomoTimer:null, pomoCycles:0,
+  prevFrameData:null, motionStillSec:0, lastMotionScore:50,
+  motionCanvas:null, motionCtx:null,
+  // キャリブレーション用に最新の特徴量を保持
+  lastFeatures:null,
+};
+
+const FOCUS_ALERTS=[
+  {emoji:'😊',title:'集中しよう！',msg:'勉強がんばれ！きみならできる！'},
+  {emoji:'💪',title:'もうひとふんばり！',msg:'あとすこしで終わるよ！'},
+  {emoji:'👀',title:'教材を見てみよう！',msg:'目線を本に戻してね！'},
+  {emoji:'🌟',title:'集中モード、オン！',msg:'深呼吸して集中しよう！'},
+  {emoji:'🚀',title:'ファイト！',msg:'集中パワーを出して！'},
+];
+const MOTION_ALERTS=[
+  {emoji:'✍️',title:'えんぴつ動かそう！',msg:'すこし書いてみてね！'},
+  {emoji:'📝',title:'書いてる？',msg:'手が止まってるみたいだよ！'},
+];
+
+// =============================================
+// DOM refs
+// =============================================
+const videoEl=document.getElementById('videoEl');
+const overlayCanvas=document.getElementById('overlayCanvas');
+const oc=overlayCanvas.getContext('2d');
+const irisCanvas=document.getElementById('irisCanvas');
+const ic=irisCanvas.getContext('2d');
+const camPlaceholder=document.getElementById('camPlaceholder');
+const loadingOverlay=document.getElementById('loadingOverlay');
+const loadText=document.getElementById('loadText');
+const loadBar=document.getElementById('loadBar');
+const scoreCard=document.getElementById('scoreCard');
+const scoreFace=document.getElementById('scoreFace');
+const scoreLabel=document.getElementById('scoreLabel');
+const scoreSub=document.getElementById('scoreSub');
+const gaugeFill=document.getElementById('gaugeFill');
+const detectDot=document.getElementById('detectDot');
+const detectText=document.getElementById('detectText');
+const alertPop=document.getElementById('alertPop');
+const mainBtn=document.getElementById('mainBtn');
+const logList=document.getElementById('logList');
+const calibBtn=document.getElementById('calibBtn');
+const countdownOverlay=document.getElementById('countdownOverlay');
+const countdownNum=document.getElementById('countdownNum');
+const flashOverlay=document.getElementById('flashOverlay');
+
+// Settings
+document.getElementById('threshSlider').addEventListener('input',e=>{S.thresh=+e.target.value;document.getElementById('threshVal').textContent=e.target.value+'秒';});
+document.getElementById('motionThresh').addEventListener('input',e=>{S.motionThreshSec=+e.target.value;document.getElementById('motionThreshVal').textContent=e.target.value+'秒';});
+document.getElementById('tabletThresh').addEventListener('input',e=>{S.tabletThresh=+e.target.value;document.getElementById('tabletThreshVal').textContent=e.target.value+'秒';});
+document.getElementById('gazeThresh').addEventListener('input',e=>{S.gazeThresh=+e.target.value;document.getElementById('gazeThreshVal').textContent=e.target.value+'秒';});
+document.getElementById('volSlider').addEventListener('input',e=>{S.volume=+e.target.value;document.getElementById('volVal').textContent=Math.round(S.volume*100)+'%';});
+document.getElementById('pomoWorkMin').addEventListener('input',e=>{S.pomoWorkSec=+e.target.value*60;document.getElementById('pomoWorkVal').textContent=e.target.value+'分';if(!S.pomoRunning&&!S.pomoIsBreak)resetPomo();});
+document.getElementById('pomoBreakMin').addEventListener('input',e=>{S.pomoBreakSec=+e.target.value*60;document.getElementById('pomoBreakVal').textContent=e.target.value+'分';});
+
+// =============================================
+// POMODORO
+// =============================================
+function resetPomo(){S.pomoRemaining=S.pomoWorkSec;S.pomoTotal=S.pomoWorkSec;S.pomoIsBreak=false;updatePomoUI();}
+function updatePomoUI(){
+  const m=Math.floor(S.pomoRemaining/60),s=S.pomoRemaining%60;
+  document.getElementById('pomoTime').textContent=m+':'+String(s).padStart(2,'0');
+  const pct=S.pomoTotal>0?(S.pomoRemaining/S.pomoTotal)*100:100;
+  document.getElementById('pomoBar').style.width=pct+'%';
+  const ib=S.pomoIsBreak,urg=!ib&&S.pomoRemaining<=60;
+  document.getElementById('pomoTime').className='pomo-time'+(ib?' break':urg?' urgent':'');
+  document.getElementById('pomoMode').textContent=ib?'休憩タイム ☕':'集中タイム 📚';
+  document.getElementById('pomoMode').className='pomo-mode'+(ib?' break':'');
+  document.getElementById('pomoBar').className='pomo-bar'+(ib?' break':'');
+  document.getElementById('pomoSub').textContent=S.pomoRunning?(ib?'ゆっくり休んでね':urg?'あと少し！ファイト！':'がんばって勉強しよう！'):'スタートボタンで始めよう';
+  for(let i=0;i<4;i++)document.getElementById('pd'+i).className='pomo-dot'+(i<S.pomoCycles?' done':'');
+  document.getElementById('statPomos').textContent=S.pomoCycles;
+}
+function tickPomo(){
+  if(!S.pomoRunning)return;
+  S.pomoRemaining--;updatePomoUI();
+  if(S.pomoRemaining<=0){
+    if(!S.pomoIsBreak){
+      S.pomoCycles++;S.pomoIsBreak=true;S.pomoRemaining=S.pomoBreakSec;S.pomoTotal=S.pomoBreakSec;
+      updatePomoUI();showAlert({emoji:'☕',title:'休憩タイム！',msg:'よくがんばった！ゆっくり休んでね。'},'break');
+      addLog('☕ 休憩タイム！',false,false,true);celebrate();
+    }else{
+      S.pomoIsBreak=false;S.pomoRemaining=S.pomoWorkSec;S.pomoTotal=S.pomoWorkSec;
+      updatePomoUI();showAlert({emoji:'📚',title:'さあ、また始めよう！',msg:'次の集中タイムのスタートだよ！'},'break');
+      addLog('📚 集中タイム再開！',false,true);
+    }
+  }
+}
+document.getElementById('pomoStartBtn').addEventListener('click',()=>{
+  if(S.pomoRunning){S.pomoRunning=false;clearInterval(S.pomoTimer);document.getElementById('pomoStartBtn').textContent='▶ スタート';}
+  else{S.pomoRunning=true;S.pomoTimer=setInterval(tickPomo,1000);document.getElementById('pomoStartBtn').textContent='⏸ 一時停止';updatePomoUI();}
+});
+document.getElementById('pomoResetBtn').addEventListener('click',()=>{S.pomoRunning=false;clearInterval(S.pomoTimer);resetPomo();document.getElementById('pomoStartBtn').textContent='▶ スタート';});
+
+// =============================================
+// LOAD MODELS
+// =============================================
+async function loadModels(){
+  loadingOverlay.classList.remove('hidden');
+  loadText.textContent='AIモデルを読み込み中…\n少し待ってね（30秒ほど）';
+  loadBar.style.width='10%';
+  try{
+    const M='https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
+    await faceapi.nets.tinyFaceDetector.loadFromUri(M); loadBar.style.width='45%';
+    await faceapi.nets.faceLandmark68TinyNet.loadFromUri(M); loadBar.style.width='80%';
+    await faceapi.nets.faceExpressionNet.loadFromUri(M); loadBar.style.width='100%';
+    S.modelsLoaded=true;
+    loadingOverlay.classList.add('hidden');
+    calibBtn.disabled=false; calibBtn.className='calib-btn ready';
+    calibBtn.textContent=BL.ready?'✅ 登録済み（もう一度登録し直す）':'🎯 集中姿勢を登録する（3秒）';
+    addLog('✅ AIモデル読み込み完了！',false,true);
+    return true;
+  }catch(e){
+    loadText.textContent='読み込みに失敗しました😢\nリロードしてみてね';
+    addLog('❌ モデル読み込みエラー: '+e.message);
+    return false;
+  }
+}
+
+// =============================================
+// FEATURE EXTRACTION (face-api.js 68点ランドマーク)
+// =============================================
+function extractFeatures(det){
+  const lm=det.landmarks;
+  const lEye=lm.getLeftEye(), rEye=lm.getRightEye();
+  const nose=lm.getNose(), jaw=lm.getJawOutline();
+
+  // Pitch（上下）: 鼻先の顔内位置
+  const faceTop=Math.min(...lEye.map(p=>p.y),...rEye.map(p=>p.y));
+  const faceBottom=jaw[8].y;
+  const faceH=faceBottom-faceTop;
+  const noseTip=nose[3];
+  const pitch=faceH>1?(noseTip.y-faceTop)/faceH:0.55;
+
+  // Roll（傾き）: 両目中心の水平度
+  const lCx=lEye.reduce((s,p)=>s+p.x,0)/lEye.length;
+  const lCy=lEye.reduce((s,p)=>s+p.y,0)/lEye.length;
+  const rCx=rEye.reduce((s,p)=>s+p.x,0)/rEye.length;
+  const rCy=rEye.reduce((s,p)=>s+p.y,0)/rEye.length;
+  const dx=rCx-lCx, dy=rCy-lCy;
+  const roll=Math.abs(dy)/(Math.sqrt(dx*dx+dy*dy)+0.001);
+
+  // Yaw（左右）: 鼻先の顎中心からのズレ
+  const jawMid=(jaw[0].x+jaw[16].x)/2;
+  const jawW=Math.abs(jaw[16].x-jaw[0].x);
+  const yaw=jawW>1?Math.abs(noseTip.x-jawMid)/(jawW/2):0;
+
+  // EAR（目の開き）
+  function ear(pts){
+    const h1=Math.abs(pts[1].y-pts[5].y),h2=Math.abs(pts[2].y-pts[4].y);
+    const w=Math.abs(pts[0].x-pts[3].x);
+    return w>0?(h1+h2)/(2*w):0.3;
+  }
+  const earVal=(ear(lEye)+ear(rEye))/2;
+
+  // 虹彩の位置：目の白目領域をピクセル解析して黒目中心を推定
+  const gazePos=estimateGaze(lEye, rEye);
+
+  return {pitch,roll,yaw,earVal,gazeX:gazePos.x,gazeY:gazePos.y};
+}
+
+// =============================================
+// 虹彩推定（ピクセル輝度解析）
+// 目の白目領域の中で最も暗い領域 = 黒目の中心
+// =============================================
+function estimateGaze(lEye, rEye){
+  if(!videoEl.videoWidth) return {x:0.5,y:0.5};
+
+  function eyeCenter(eye){
+    // 目の境界ボックス
+    const xs=eye.map(p=>p.x), ys=eye.map(p=>p.y);
+    const x0=Math.min(...xs), x1=Math.max(...xs);
+    const y0=Math.min(...ys), y1=Math.max(...ys);
+    const w=x1-x0, h=y1-y0;
+    if(w<4||h<2) return 0.5;
+
+    // irisCanvasにその目の部分を切り出す
+    const sw=Math.round(w), sh=Math.round(h*1.2);
+    irisCanvas.width=sw; irisCanvas.height=sh;
+    ic.drawImage(videoEl,
+      videoEl.videoWidth - x1, y0,  // ミラー補正
+      w, sh,
+      0,0,sw,sh
+    );
+
+    // グレースケール輝度マップを作り、最暗点を探す
+    const data=ic.getImageData(0,0,sw,sh).data;
+    let minBrightness=255, darkX=sw/2;
+    // 水平方向の平均輝度を列ごとに計算
+    for(let cx=0;cx<sw;cx++){
+      let colBrightness=0;
+      for(let cy=0;cy<sh;cy++){
+        const idx=(cy*sw+cx)*4;
+        colBrightness+=(data[idx]*0.299+data[idx+1]*0.587+data[idx+2]*0.114);
+      }
+      colBrightness/=sh;
+      if(colBrightness<minBrightness){minBrightness=colBrightness;darkX=cx;}
+    }
+    // 0〜1に正規化（0=左端,1=右端）
+    return darkX/sw;
+  }
+
+  const lGaze=eyeCenter(lEye);
+  const rGaze=eyeCenter(rEye);
+  return {x:(lGaze+rGaze)/2, y:0.5};
+}
+
+// =============================================
+// ANALYSIS
+// =============================================
+function analyze(det){
+  const f=extractFeatures(det);
+  S.lastFeatures=f;
+  let faceScore=100, gazeScore=100, eyeScore=100;
+  const reasons=[];
+  let lookingAtTablet=false, gazeOff=false;
+
+  // ---- 頭の向き ----
+  if(BL.ready){
+    const pd=f.pitch-BL.pitch; // 正=より下向き、負=より上向き（タブレット方向）
+    const rd=Math.abs(f.roll-BL.roll);
+    const yd=Math.abs(f.yaw-BL.yaw);
+    // 少しでも顔が上がる = タブレットを見ている
+    if(pd < -(TOL.pitch*0.3)){
+      lookingAtTablet=true; faceScore-=70; reasons.push('タブレットを見てるよ！📱');
+    }
+    if(pd > TOL.pitch*2.0){ faceScore-=45; reasons.push('うつぶせだよ 😴'); }
+    if(rd > TOL.roll){ faceScore-=50; reasons.push('頭が傾いてるよ 😪'); }
+    if(yd > TOL.yaw){ faceScore-=55; reasons.push('横を向いてるよ 👉'); }
+  }else{
+    if(f.pitch<0.60){ lookingAtTablet=f.pitch<0.52; faceScore-=65; reasons.push(lookingAtTablet?'タブレットを見てるよ！📱':'顔が上がってるよ 👆'); }
+    if(f.pitch>0.88){ faceScore-=45; reasons.push('うつぶせだよ 😴'); }
+    if(f.roll>0.20){ faceScore-=50; reasons.push('頭が傾いてるよ 😪'); }
+    if(f.yaw>0.25){ faceScore-=55; reasons.push('横を向いてるよ 👉'); }
+  }
+  faceScore=Math.max(0,faceScore);
+
+  // ---- 虹彩（目線）----
+  // キャリブレーション済み: 登録時の目線位置からのズレ
+  if(BL.ready && BL.gazeX!==null){
+    const gd=Math.abs(f.gazeX - BL.gazeX);
+    if(gd > 0.18 && !lookingAtTablet){
+      gazeOff=true; gazeScore-=65; reasons.push('目線が横にズレてるよ 👀');
+    }else if(gd > 0.10 && !lookingAtTablet){
+      gazeScore-=30; // 少しズレ
+    }
+  }else{
+    // 未キャリブ: 目線が端に寄りすぎたら警告
+    if(f.gazeX<0.22||f.gazeX>0.78){ gazeOff=true; gazeScore-=60; reasons.push('目線が横に向いてるよ 👀'); }
+  }
+  gazeScore=Math.max(0,gazeScore);
+
+  // ---- 目の開き ----
+  const earBase=BL.ready&&BL.ear?BL.ear:0.27;
+  const earRatio=f.earVal/earBase;
+  const sleepy=(det.expressions?.sleepy||0)>0.28;
+  if(earRatio<0.55){ eyeScore=5; reasons.push('目が閉じてるよ 😴'); }
+  else if(earRatio<0.72||sleepy){ eyeScore=38; reasons.push('眠そうだよ 🥱'); }
+  eyeScore=Math.max(0,eyeScore);
+
+  return {faceScore,gazeScore,eyeScore,reasons,feat:f,lookingAtTablet,gazeOff};
+}
+
+// =============================================
+// DRAW OVERLAY
+// =============================================
+function drawOverlay(det, result){
+  overlayCanvas.width=videoEl.videoWidth||overlayCanvas.clientWidth;
+  overlayCanvas.height=videoEl.videoHeight||overlayCanvas.clientHeight;
+  oc.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
+  const W=overlayCanvas.width, H=overlayCanvas.height;
+  const lm=det.landmarks;
+
+  const faceOk=result.faceScore>=60, gazeOk=result.gazeScore>=60;
+  const eyeCol=(!faceOk||!gazeOk)?'rgba(232,93,93,.7)':'rgba(76,175,130,.7)';
+
+  // 目の輪郭
+  [lm.getLeftEye(),lm.getRightEye()].forEach(eye=>{
+    oc.beginPath(); eye.forEach((p,i)=>i===0?oc.moveTo(p.x,p.y):oc.lineTo(p.x,p.y));
+    oc.closePath(); oc.strokeStyle=eyeCol; oc.lineWidth=2; oc.stroke();
+  });
+
+  // 鼻先
+  const tip=lm.getNose()[3];
+  oc.beginPath(); oc.arc(tip.x,tip.y,4,0,Math.PI*2);
+  oc.fillStyle=faceOk?'rgba(76,175,130,.7)':'rgba(232,93,93,.7)'; oc.fill();
+
+  // 虹彩推定位置の可視化
+  if(result.feat){
+    const lEye=lm.getLeftEye(), rEye=lm.getRightEye();
+    [lEye,rEye].forEach(eye=>{
+      const xs=eye.map(p=>p.x), ys=eye.map(p=>p.y);
+      const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+      const cx=x0+(x1-x0)*result.feat.gazeX;
+      const cy=(y0+y1)/2;
+      oc.beginPath(); oc.arc(cx,cy,5,0,Math.PI*2);
+      oc.fillStyle=gazeOk?'rgba(76,175,130,.9)':'rgba(248,113,113,.9)'; oc.fill();
+    });
+  }
+}
+
+// =============================================
+// CALIBRATION
+// =============================================
+calibBtn.addEventListener('click',startCalibration);
+
+function startCalibration(){
+  if(!S.running||!S.modelsLoaded)return;
+  calibBtn.className='calib-btn counting'; calibBtn.textContent='姿勢をキープしてね…';
+  countdownOverlay.classList.remove('hidden');
+  let count=3; countdownNum.textContent=count;
+  const iv=setInterval(()=>{
+    count--;
+    if(count>0){ countdownNum.textContent=count; }
+    else{
+      clearInterval(iv);
+      flashOverlay.classList.add('flash');
+      setTimeout(()=>flashOverlay.classList.remove('flash'),300);
+      countdownOverlay.classList.add('hidden');
+      doCalibration();
+    }
+  },1000);
+}
+
+async function doCalibration(){
+  const samples=[];
+  for(let i=0;i<6;i++){
+    try{
+      const dets=await faceapi
+        .detectAllFaces(videoEl,new faceapi.TinyFaceDetectorOptions({inputSize:224,scoreThreshold:0.4}))
+        .withFaceLandmarks(true).withFaceExpressions();
+      if(dets&&dets.length>0) samples.push(extractFeatures(dets[0]));
+    }catch(e){}
+    await new Promise(r=>setTimeout(r,200));
+  }
+  if(samples.length<2){
+    calibBtn.className='calib-btn ready'; calibBtn.textContent='顔が見えませんでした。もう一度試してね';
+    addLog('⚠️ キャリブレーション失敗'); return;
+  }
+  BL.pitch =samples.reduce((s,x)=>s+x.pitch, 0)/samples.length;
+  BL.roll  =samples.reduce((s,x)=>s+x.roll,  0)/samples.length;
+  BL.yaw   =samples.reduce((s,x)=>s+x.yaw,   0)/samples.length;
+  BL.ear   =samples.reduce((s,x)=>s+x.earVal,0)/samples.length;
+  BL.gazeX =samples.reduce((s,x)=>s+x.gazeX, 0)/samples.length;
+  BL.gazeY =samples.reduce((s,x)=>s+x.gazeY, 0)/samples.length;
+  BL.ready=true;
+
+  document.getElementById('calibCard').classList.add('done');
+  document.getElementById('calibIcon').textContent='✅';
+  document.getElementById('calibLabel').textContent='キャリブレーション完了！';
+  document.getElementById('calibSub').textContent='この子の手元を見る姿勢と目線を登録しました';
+  document.getElementById('calibValues').style.display='grid';
+  document.getElementById('cv-pitch').textContent=BL.pitch.toFixed(3);
+  document.getElementById('cv-roll').textContent=BL.roll.toFixed(3);
+  document.getElementById('cv-ear').textContent=BL.ear.toFixed(3);
+  document.getElementById('cv-gaze').textContent='X:'+BL.gazeX.toFixed(2);
+  calibBtn.className='calib-btn done-btn'; calibBtn.textContent='✅ 登録済み（もう一度登録し直す）';
+  addLog('✅ キャリブレーション完了！目線位置も登録',false,true);
+  speak('登録できたよ！これがベースラインです。');
+}
+
+// =============================================
+// MOTION DETECTION
+// =============================================
+function initMotionCanvas(){
+  S.motionCanvas=document.createElement('canvas');
+  S.motionCanvas.width=80; S.motionCanvas.height=60;
+  S.motionCtx=S.motionCanvas.getContext('2d');
+}
+function calcMotionScore(){
+  if(!S.motionCanvas||!videoEl.videoWidth)return 50;
+  const mc=S.motionCanvas,mctx=S.motionCtx;
+  mctx.drawImage(videoEl,0,videoEl.videoHeight*.5,videoEl.videoWidth,videoEl.videoHeight*.5,0,0,mc.width,mc.height);
+  const curr=mctx.getImageData(0,0,mc.width,mc.height).data;
+  if(!S.prevFrameData){S.prevFrameData=curr.slice();return 50;}
+  let diff=0;
+  for(let i=0;i<curr.length;i+=4)diff+=Math.abs(curr[i]-S.prevFrameData[i])+Math.abs(curr[i+1]-S.prevFrameData[i+1])+Math.abs(curr[i+2]-S.prevFrameData[i+2]);
+  S.prevFrameData=curr.slice();
+  return Math.min(100,Math.round(diff/(mc.width*mc.height*3)*6));
+}
+
+// =============================================
+// UI
+// =============================================
+function setCard(id,score,label){
+  const col=score>=70?'var(--good)':score>=40?'var(--warn)':'var(--bad)';
+  const cls=score>=70?'ok':score>=40?'warn':'bad';
+  document.getElementById('dc-'+id).className='detect-card '+cls;
+  const v=document.getElementById('dv-'+id); v.textContent=label; v.style.color=col;
+  const b=document.getElementById('db-'+id); b.style.width=score+'%'; b.style.background=col;
+}
+function updateMainUI(score,focused,reasons){
+  scoreCard.className='score-card '+(focused?'ok':score>=40?'warn':'bad');
+  scoreFace.textContent=focused?'😊':score>=40?'😕':'😵';
+  scoreLabel.textContent=focused?'集中してるね！すごい！':(reasons[0]||'集中が切れてるかも？');
+  scoreSub.textContent=focused?'✨ このちょうしでがんばれ！':reasons.slice(1).join(' ')||'';
+  gaugeFill.style.width=score+'%';
+  gaugeFill.style.background=score>=70?'var(--good)':score>=40?'var(--warn)':'var(--bad)';
+  detectDot.className='detect-dot '+(focused?'live':'bad');
+  detectText.textContent=focused?'集中しているよ！':(reasons[0]||'集中が切れてるかも');
+}
+function updateNoFace(){
+  scoreCard.className='score-card warn'; scoreFace.textContent='🔍';
+  scoreLabel.textContent='顔が見えないよ…'; scoreSub.textContent='カメラの前に座ってね';
+  gaugeFill.style.width='0%'; gaugeFill.style.background='var(--muted)';
+  detectDot.className='detect-dot warn'; detectText.textContent='顔を探してるよ…';
+  setCard('face',0,'未検出'); setCard('gaze',0,'--'); setCard('eyes',0,'--');
+}
+
+// =============================================
+// DETECTION LOOP (800ms interval)
+// =============================================
+async function runDetection(){
+  if(!S.running||!S.modelsLoaded)return;
+  try{
+    const dets=await faceapi
+      .detectAllFaces(videoEl,new faceapi.TinyFaceDetectorOptions({inputSize:224,scoreThreshold:0.4}))
+      .withFaceLandmarks(true).withFaceExpressions();
+
+    if(!S.running)return;
+    const ms=calcMotionScore(); S.lastMotionScore=ms;
+    setCard('motion',Math.min(100,ms*3),ms>=15?'◎ 動いてる':ms>=5?'△ 少し':'× 止まり');
+
+    if(dets&&dets.length>0){
+      const det=dets[0];
+      const r=analyze(det);
+      drawOverlay(det,r);
+
+      const overall=Math.round(r.faceScore*.40+r.gazeScore*.35+r.eyeScore*.25);
+      const focused=overall>=55;
+      S.lastFocused=focused;
+
+      updateMainUI(overall,focused,r.reasons);
+      setCard('face',r.faceScore,r.faceScore>=70?'◎ 手元向き':r.faceScore>=40?'△ 注意':'× NG');
+      setCard('gaze',r.gazeScore,r.gazeScore>=70?'◎ 手元向き':r.gazeScore>=40?'△ ズレあり':'× 外れ');
+      setCard('eyes',r.eyeScore,r.eyeScore>=70?'◎ 開いてる':r.eyeScore>=40?'△ 眠い':'× 閉じ');
+
+      // タブレット注視カウンター（続いた時間で判定）
+      if(r.lookingAtTablet){
+        S.tabletSec++;
+        if(S.tabletSec>=S.tabletThresh&&!S.cameraCooldown){
+          S.cameraCooldown=true; S.tabletSec=0;
+          buzz(120,0.4,'sawtooth');
+          addLog('📱 タブレットを'+S.tabletThresh+'秒以上見てた！',true);
+          setTimeout(()=>{S.cameraCooldown=false;},3000);
+        }
+      }else{
+        S.tabletSec=0; // 視線が戻ったらリセット
+      }
+
+      // 目線ズレカウンター（続いた時間で判定）
+      if(r.gazeOff){
+        S.gazeSec++;
+        if(S.gazeSec>=S.gazeThresh&&!S.gazeCooldown){
+          S.gazeCooldown=true; S.gazeSec=0;
+          buzz(880,0.25,'square');
+          addLog('👀 目線が'+S.gazeThresh+'秒以上外れてた！',true);
+          setTimeout(()=>{S.gazeCooldown=false;},3000);
+        }
+      }else{
+        S.gazeSec=0; // 目線が戻ったらリセット
+      }
+    }else{
+      oc.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
+      updateNoFace(); S.lastFocused=false;
+      S.tabletSec=0; S.gazeSec=0;
+    }
+  }catch(e){}
+
+  if(S.running) S.detectionLoop=setTimeout(runDetection,800);
+}
+
+// =============================================
+// MAIN TIMER (カメラが動いている時だけカウント)
+// =============================================
+function startMainTimer(){
+  if(S.mainTimer)clearInterval(S.mainTimer);
+  S.mainTimer=setInterval(()=>{
+    // ★ カメラが動いていて、モデルが読み込まれていないとカウントしない
+    if(!S.running||!S.modelsLoaded||!S.detectionActive)return;
+    S.totalSec++;
+    if(S.lastFocused){
+      S.focusSec++; S.focusedSec++; S.unfocusedSec=0;
+      if(S.focusedSec===300)celebrate();
+    }else{
+      S.unfocusedSec++; S.focusedSec=0;
+      if(S.unfocusedSec>=S.thresh&&!S.alertCooldown)triggerAlert('focus');
+    }
+    tickFocus15();
+    if(!S.pomoIsBreak){
+      if(S.lastMotionScore<4){
+        S.motionStillSec++;
+        if(S.motionStillSec>=S.motionThreshSec&&!S.motionAlertCooldown)triggerAlert('motion');
+      }else S.motionStillSec=0;
+    }
+    const m=Math.floor(S.focusSec/60),sec=S.focusSec%60;
+    document.getElementById('statFocus').textContent=m+':'+String(sec).padStart(2,'0');
+  },1000);
+}
+
+// =============================================
+// ALERTS
+// =============================================
+function triggerAlert(type){
+  if(type==='focus'){
+    S.alertCooldown=true; S.alertCount++;
+    document.getElementById('statAlerts').textContent=S.alertCount;
+    const a=FOCUS_ALERTS[S.alertCount%FOCUS_ALERTS.length];
+    showAlert(a,'bad'); addLog(a.emoji+' '+a.title,true);
+    setTimeout(()=>{S.unfocusedSec=0;setTimeout(()=>{S.alertCooldown=false;},S.thresh*1200);},4000);
+  }else{
+    S.motionAlertCooldown=true;
+    const a=MOTION_ALERTS[Math.floor(Math.random()*MOTION_ALERTS.length)];
+    showAlert(a,'bad'); addLog(a.emoji+' '+a.title,true);
+    setTimeout(()=>{S.motionStillSec=0;setTimeout(()=>{S.motionAlertCooldown=false;},S.motionThreshSec*1000);},4000);
+  }
+}
+function showAlert(a,type){
+  document.getElementById('apEmoji').textContent=a.emoji;
+  document.getElementById('apTitle').textContent=a.title;
+  document.getElementById('apTitle').className='alert-pop-title '+(type==='break'?'good-col':'bad-col');
+  document.getElementById('apReason').textContent=a.reason||'';
+  document.getElementById('apMsg').textContent=a.msg;
+  alertPop.className='alert-pop show'+(type==='break'?' break-alert':'');
+  speak(a.title+'。'+a.msg);
+  setTimeout(()=>{alertPop.className='alert-pop';},4000);
+}
+
+// =============================================
+// SOUND
+// =============================================
+function speak(text){
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ja-JP'; u.rate=0.92; u.pitch=1.1; u.volume=S.volume;
+  const v=speechSynthesis.getVoices().find(v=>v.lang.startsWith('ja'));
+  if(v)u.voice=v; speechSynthesis.speak(u);
+}
+let audioCtx=null;
+function buzz(freq,dur,type){
+  try{
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type=type||'sawtooth';
+    osc.frequency.setValueAtTime(freq,audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq*0.5,audioCtx.currentTime+dur);
+    gain.gain.setValueAtTime(S.volume*.6,audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+    osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime+dur);
+  }catch(e){}
+}
+
+// =============================================
+// SWITCH TIME BANK
+// =============================================
+const BANK_KEY = 'switchTimeBank_v1';
+const HIST_KEY = 'switchTimeBank_hist_v1';
+const FOCUS15_SEC = 15 * 60; // 15分 = 900秒
+
+let bankMinutes = 0;
+let bankHistory = [];
+let scanStream = null;
+let scanCanvas = document.createElement('canvas');
+let scanCtx = scanCanvas.getContext('2d');
+let currentSubj = '国語';
+let pendingScore = null;
+let selectedUseMin = 0;
+// 集中15分カウンター（既存のfocusedSecとは別に管理）
+let focus15Sec = 0;
+let focus15Earned = false; // 今セッションで今の15分サイクル分を取得済みか
+
+function loadBank(){
+  try{
+    const d = localStorage.getItem(BANK_KEY);
+    bankMinutes = d ? parseInt(d) : 0;
+    const h = localStorage.getItem(HIST_KEY);
+    bankHistory = h ? JSON.parse(h) : [];
+  }catch(e){ bankMinutes=0; bankHistory=[]; }
+  renderBank();
+}
+function saveBank(){
+  localStorage.setItem(BANK_KEY, String(bankMinutes));
+  localStorage.setItem(HIST_KEY, JSON.stringify(bankHistory.slice(0,30)));
+}
+function addBankMinutes(min, label, icon){
+  bankMinutes += min;
+  const now = new Date();
+  const t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  bankHistory.unshift({ icon, label, plus: min, time: t });
+  saveBank();
+  renderBank();
+  launchFireworks();
+  speak(label+'！スイッチの時間が'+min+'分ふえたよ！いまは'+bankMinutes+'分！');
+}
+function renderBank(){
+  document.getElementById('bankMin').textContent = bankMinutes;
+  const sub = bankMinutes === 0 ? 'がんばって時間をためよう！'
+    : bankMinutes < 15 ? 'もうすこしで遊べるよ！'
+    : bankMinutes < 60 ? bankMinutes+'分ためた！よくがんばった！'
+    : 'すごい！'+bankMinutes+'分もためてる！';
+  document.getElementById('bankSub').textContent = sub;
+  document.getElementById('bankUseBtn').disabled = (bankMinutes <= 0);
+  // 履歴
+  const histEl = document.getElementById('bankHistory');
+  if(bankHistory.length === 0){
+    histEl.innerHTML = '<div style="font-size:.75rem;color:var(--muted);text-align:center;padding:8px 0">まだ記録がないよ</div>';
+  } else {
+    histEl.innerHTML = bankHistory.slice(0,8).map(h =>
+      `<div class="hist-item">
+        <span class="hist-icon">${h.icon}</span>
+        <span class="hist-text">${h.label}</span>
+        <span class="hist-plus" style="color:${h.plus>0?'var(--good)':h.plus<0?'var(--bad)':'var(--muted)'}">${h.plus>0?'+'+h.plus+'分':h.plus<0?h.plus+'分':'±0'}</span>
+        <span class="hist-time">${h.time}</span>
+      </div>`
+    ).join('');
+  }
+}
+
+// ---- 教科選択 ----
+function selectSubj(btn){
+  document.querySelectorAll('.subj-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentSubj = btn.dataset.subj;
+}
+
+// ---- スキャンカメラ ----
+async function openScanCamera(){
+  const btn = document.getElementById('scanOpenBtn');
+  if(scanStream){
+    closeScanCamera(); return;
+  }
+  btn.disabled = true;
+  try{
+    scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:640,height:480}});
+    const sv = document.getElementById('scanVideo');
+    sv.srcObject = scanStream; await sv.play();
+    document.getElementById('scanCamPlaceholder').style.display = 'none';
+    document.getElementById('scanGuideBox').style.display = 'block';
+    document.getElementById('scanGuideText').style.display = 'block';
+    document.getElementById('scanShootBtn').disabled = false;
+    btn.textContent = '🚫 カメラを閉じる';
+    btn.disabled = false;
+  }catch(e){
+    btn.textContent = '📷 カメラをひらく'; btn.disabled = false;
+    alert('カメラを起動できませんでした: '+e.message);
+  }
+}
+function closeScanCamera(){
+  if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; }
+  const sv = document.getElementById('scanVideo');
+  sv.srcObject = null;
+  document.getElementById('scanCamPlaceholder').style.display = 'flex';
+  document.getElementById('scanGuideBox').style.display = 'none';
+  document.getElementById('scanGuideText').style.display = 'none';
+  document.getElementById('scanShootBtn').disabled = true;
+  document.getElementById('scanOpenBtn').textContent = '📷 カメラをひらく';
+  document.getElementById('scanResultArea').classList.remove('show');
+  pendingScore = null;
+}
+
+// ---- AIスキャン ----
+async function shootScan(){
+  const sv = document.getElementById('scanVideo');
+  if(!sv.videoWidth) return;
+  // キャプチャ
+  scanCanvas.width = sv.videoWidth; scanCanvas.height = sv.videoHeight;
+  scanCtx.drawImage(sv, 0, 0);
+  const dataUrl = scanCanvas.toDataURL('image/jpeg', 0.85);
+  const base64 = dataUrl.split(',')[1];
+
+  // ローディング表示
+  document.getElementById('scanLoading').classList.add('show');
+  document.getElementById('scanShootBtn').disabled = true;
+  document.getElementById('scanResultArea').classList.remove('show');
+
+  try{
+    const prompt = `この画像は小学5年生の塾の${currentSubj}の復習テストです。
+答案用紙に書かれた点数（合計点・得点・総合点など）を読み取ってください。
+以下のJSONのみ返してください（前後に説明は不要）：
+{"score": 数字または null, "reason": "読み取れた理由または読み取れなかった理由を20文字以内で"}
+点数が読み取れない場合はscoreをnullにしてください。`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:200,
+        messages:[{
+          role:'user',
+          content:[
+            {type:'image', source:{type:'base64', media_type:'image/jpeg', data:base64}},
+            {type:'text', text:prompt}
+          ]
+        }]
+      })
+    });
+    const data = await res.json();
+    const raw = (data.content||[]).map(c=>c.text||'').join('');
+    let parsed;
+    try{ parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch(e){ parsed = {score:null, reason:'読み取り失敗'}; }
+
+    showScanResult(parsed.score, parsed.reason);
+  }catch(e){
+    showScanResult(null, 'エラーが発生しました');
+  }finally{
+    document.getElementById('scanLoading').classList.remove('show');
+    document.getElementById('scanShootBtn').disabled = false;
+  }
+}
+
+function showScanResult(score, reason){
+  const area = document.getElementById('scanResultArea');
+  const scoreEl = document.getElementById('scanResultScore');
+  const msgEl = document.getElementById('scanResultMsg');
+  const confirmBtn = document.getElementById('scanConfirmBtn');
+  area.classList.add('show');
+
+  if(score === null){
+    scoreEl.textContent = '？';
+    scoreEl.className = 'scan-result-score bad';
+    msgEl.textContent = reason || '点数が読み取れませんでした。もう一度試してね';
+    confirmBtn.disabled = true;
+    pendingScore = null;
+  } else {
+    scoreEl.textContent = score + '点';
+    pendingScore = score;
+    const great = score >= 80;
+    scoreEl.className = 'scan-result-score ' + (score >= 80 ? 'great' : score >= 60 ? 'ok' : 'bad');
+    if(great){
+      msgEl.textContent = '🎉 ' + score + '点！すごい！+10分ゲット！';
+      confirmBtn.disabled = false;
+    } else {
+      msgEl.textContent = score + '点だね。80点以上でスイッチ時間がもらえるよ！';
+      confirmBtn.disabled = false; // 登録はできるが加算なし
+    }
+  }
+}
+
+function confirmScore(){
+  if(pendingScore === null) return;
+  const score = pendingScore;
+  const subj = currentSubj;
+  if(score >= 80){
+    addBankMinutes(10, subj+'テスト '+score+'点', '📝');
+    document.getElementById('earnTestBadge').style.display = 'block';
+    setTimeout(()=>{ document.getElementById('earnTestBadge').style.display='none'; }, 5000);
+  } else {
+    // 点数を記録だけする（加算なし）
+    const now = new Date();
+    const t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+    bankHistory.unshift({ icon:'📝', label:subj+'テスト '+score+'点（80点未満）', plus:0, time:t });
+    saveBank(); renderBank();
+    speak(score+'点だったね。次はもっとがんばろう！');
+  }
+  closeScanCamera();
+  document.getElementById('scanResultArea').classList.remove('show');
+  pendingScore = null;
+}
+
+// ---- 集中15分ボーナス ----
+function tickFocus15(){
+  if(!S.running || !S.modelsLoaded) return;
+  if(S.lastFocused){
+    focus15Sec++;
+    const pct = Math.min(100, focus15Sec / FOCUS15_SEC * 100);
+    document.getElementById('f15BarFill').style.width = pct + '%';
+    const rem = FOCUS15_SEC - focus15Sec;
+    const m = Math.floor(rem/60), s = rem % 60;
+    document.getElementById('f15Sub').textContent = rem > 0
+      ? 'あと ' + m + '分' + String(s).padStart(2,'0') + '秒で+5分！'
+      : '達成済み！';
+    document.getElementById('focus15Badge').className = 'focus15-badge active';
+    if(focus15Sec >= FOCUS15_SEC && !focus15Earned){
+      focus15Earned = true;
+      addBankMinutes(5, '集中15分達成', '🧠');
+      document.getElementById('focus15Badge').className = 'focus15-badge earned';
+      document.getElementById('earnFocusBadge').style.display = 'block';
+      setTimeout(()=>{ document.getElementById('earnFocusBadge').style.display='none'; }, 5000);
+      // 次の15分サイクルへ
+      focus15Sec = 0; focus15Earned = false;
+    }
+  } else {
+    // 集中が切れたら少し戻す（ペナルティ小）
+    focus15Sec = Math.max(0, focus15Sec - 2);
+    const pct = Math.min(100, focus15Sec / FOCUS15_SEC * 100);
+    document.getElementById('f15BarFill').style.width = pct + '%';
+    const rem = FOCUS15_SEC - focus15Sec;
+    const m = Math.floor(rem/60);
+    document.getElementById('f15Sub').textContent = 'もどして！あと'+m+'分でボーナス！';
+  }
+  // プログレスカードも更新
+  const pct2 = Math.min(100, focus15Sec / FOCUS15_SEC * 100);
+  document.getElementById('earnFocusProg').style.width = pct2 + '%';
+}
+
+// ---- 使用モーダル ----
+document.getElementById('bankUseBtn').addEventListener('click', openUseModal);
+function openUseModal(){
+  if(bankMinutes <= 0) return;
+  document.getElementById('modalTimeBig').textContent = bankMinutes + '分';
+  // 時間ボタン生成
+  const picker = document.getElementById('modalTimePicker');
+  const options = [10, 20, 30, 60].filter(m => m <= bankMinutes);
+  if(options.length === 0) options.push(bankMinutes);
+  picker.innerHTML = options.map(m =>
+    `<button onclick="selectUseMin(${m},this)" style="padding:10px 6px;border:2px solid var(--border);border-radius:14px;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer;background:white;transition:all .15s;">${m}分</button>`
+  ).join('');
+  selectedUseMin = options[0];
+  picker.querySelector('button').style.cssText += ';background:var(--accent);color:white;border-color:var(--accent);';
+  document.getElementById('useModal').classList.add('show');
+}
+function selectUseMin(m, btn){
+  selectedUseMin = m;
+  document.querySelectorAll('#modalTimePicker button').forEach(b => {
+    b.style.background='white'; b.style.color=''; b.style.borderColor='var(--border)';
+  });
+  btn.style.background='var(--accent)'; btn.style.color='white'; btn.style.borderColor='var(--accent)';
+}
+function closeModal(){ document.getElementById('useModal').classList.remove('show'); }
+function confirmUse(){
+  const used = Math.min(selectedUseMin, bankMinutes);
+  bankMinutes -= used;
+  const now = new Date();
+  const t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  bankHistory.unshift({ icon:'🕹️', label:'スイッチ '+used+'分 使用', plus:-used, time:t });
+  saveBank(); renderBank();
+  closeModal();
+  document.getElementById('doneModalTitle').textContent = '楽しんでね！🎮';
+  document.getElementById('doneModalBody').textContent =
+    used+'分 スイッチを楽しんでね！\n残り時間：'+bankMinutes+'分\n\n終わったら勉強に戻ってね 📚';
+  document.getElementById('doneModal').classList.add('show');
+  speak(used+'分 スイッチを楽しんでね！');
+  launchFireworks();
+}
+function closeDoneModal(){ document.getElementById('doneModal').classList.remove('show'); }
+
+// ---- 花火 ----
+function launchFireworks(){
+  const wrap = document.getElementById('fireworkWrap');
+  const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9a3c'];
+  for(let b=0; b<4; b++){
+    setTimeout(()=>{
+      const cx = 20 + Math.random()*60, cy = 20 + Math.random()*50;
+      for(let i=0; i<24; i++){
+        const el = document.createElement('div');
+        el.className = 'fw-particle';
+        const ang = (i/24)*Math.PI*2;
+        const dist = 60+Math.random()*80;
+        const tx = Math.cos(ang)*dist, ty = Math.sin(ang)*dist - Math.random()*40;
+        el.style.cssText = `left:${cx}%;top:${cy}%;width:${4+Math.random()*6}px;height:${4+Math.random()*6}px;background:${colors[~~(Math.random()*colors.length)]};--tx:${tx}px;--ty:${ty}px;animation-duration:${0.8+Math.random()*0.7}s;animation-delay:${Math.random()*0.2}s;`;
+        wrap.appendChild(el);
+        setTimeout(()=>el.remove(), 2000);
+      }
+    }, b*200);
+  }
+}
+
+loadBank();
+
+
+function celebrate(){
+  const wrap=document.getElementById('confettiWrap');
+  const cols=['#f87171','#fbbf24','#4ade80','#60a5fa','#a78bfa','#fb923c'];
+  for(let i=0;i<80;i++){
+    const el=document.createElement('div'); el.className='confetti-p';
+    const sz=6+Math.random()*10;
+    el.style.cssText=`left:${Math.random()*100}%;top:-15px;background:${cols[~~(Math.random()*cols.length)]};width:${sz}px;height:${sz}px;animation-duration:${1.5+Math.random()*2.5}s;animation-delay:${Math.random()*0.5}s;`;
+    wrap.appendChild(el); setTimeout(()=>el.remove(),5000);
+  }
+  speak('すごい！5分間よく集中できたね！さいこう！');
+  addLog('🎉 5分間集中達成！',false,true);
+}
+function addLog(text,isAlert=false,isGood=false,isPomo=false){
+  const n=new Date();
+  const t=n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  const d=document.createElement('div');
+  d.className='log-item'+(isAlert?' is-alert':isGood?' is-good':isPomo?' is-pomo':'');
+  d.innerHTML=`<span class="log-time">${t}</span><span class="log-txt">${text}</span>`;
+  logList.prepend(d); if(logList.children.length>50)logList.removeChild(logList.lastChild);
+}
+
+// =============================================
+// START / STOP
+// =============================================
+async function startMonitor(){
+  mainBtn.disabled=true; mainBtn.textContent='起動中…';
+
+  // カメラ起動
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:320,height:240}});
+    videoEl.srcObject=stream; await videoEl.play();
+    camPlaceholder.style.display='none';
+  }catch(e){
+    addLog('❌ カメラエラー: '+e.message);
+    mainBtn.disabled=false; mainBtn.textContent='📷 カメラをスタート'; mainBtn.className='btn-main start'; return;
+  }
+
+  // モデル読み込み
+  if(!S.modelsLoaded){
+    const ok=await loadModels();
+    if(!ok){ mainBtn.disabled=false; mainBtn.textContent='📷 カメラをスタート'; mainBtn.className='btn-main start'; return; }
+  }
+
+  initMotionCanvas();
+  S.running=true; S.detectionActive=true;
+  S.focusSec=0; S.totalSec=0; S.alertCount=0;
+  S.unfocusedSec=0; S.focusedSec=0; S.motionStillSec=0;
+  S.alertCooldown=false; S.motionAlertCooldown=false;
+  S.cameraCooldown=false; S.gazeCooldown=false;
+  S.lastFocused=false; S.prevFrameData=null;
+  logList.innerHTML=''; document.getElementById('statAlerts').textContent='0';
+  document.getElementById('statFocus').textContent='0:00';
+
+  mainBtn.disabled=false; mainBtn.className='btn-main stop'; mainBtn.textContent='⏹ ストップ';
+  detectDot.className='detect-dot live'; detectText.textContent='検出中…';
+  addLog('📷 モニタリング開始',false,true);
+  startMainTimer();
+  runDetection();
+}
+
+function stopMonitor(){
+  S.running=false; S.detectionActive=false;
+  if(S.mainTimer)clearInterval(S.mainTimer);
+  if(S.detectionLoop){clearTimeout(S.detectionLoop); S.detectionLoop=null;}
+  S.cameraCooldown=false; S.gazeCooldown=false;
+  S.tabletSec=0; S.gazeSec=0;
+  // 集中15分カウンターをリセット（セッション終了）
+  focus15Sec=0; focus15Earned=false;
+  document.getElementById('f15BarFill').style.width='0%';
+  document.getElementById('f15Sub').textContent='カメラをスタートしてね';
+  document.getElementById('focus15Badge').className='focus15-badge';
+  document.getElementById('earnFocusProg').style.width='0%';
+  if(videoEl.srcObject){videoEl.srcObject.getTracks().forEach(t=>t.stop());videoEl.srcObject=null;}
+  oc.clearRect(0,0,overlayCanvas.width,overlayCanvas.height);
+  camPlaceholder.style.display='flex';
+  alertPop.className='alert-pop';
+  scoreCard.className='score-card'; scoreFace.textContent='😴';
+  scoreLabel.textContent='おつかれさま！';
+  scoreSub.textContent='集中時間: '+document.getElementById('statFocus').textContent;
+  gaugeFill.style.width='0%'; gaugeFill.style.background='var(--muted)';
+  detectDot.className='detect-dot'; detectText.textContent='待機中';
+  mainBtn.className='btn-main start'; mainBtn.textContent='📷 カメラをスタート';
+  calibBtn.disabled=true;
+  if(!BL.ready){calibBtn.className='calib-btn';calibBtn.textContent='カメラをONにしてから登録できます';}
+  addLog('⏹ 終了（集中時間: '+document.getElementById('statFocus').textContent+'）');
+  speechSynthesis&&speechSynthesis.cancel();
+}
+
+mainBtn.addEventListener('click',()=>{if(S.running)stopMonitor();else startMonitor();});
+resetPomo();
+window.addEventListener('load',()=>{
+  if(window.speechSynthesis){speechSynthesis.getVoices();speechSynthesis.addEventListener('voiceschanged',()=>speechSynthesis.getVoices());}
+});
+</script>
+</body>
+</html>
