@@ -1516,15 +1516,20 @@ function dateStr(off){var d=new Date();d.setDate(d.getDate()+off);return d.getFu
 
 // ===== MONSTER STATE =====
 function getMonsterData() {
-  return getData('monsters', {
+  var md = getData('monsters', {
     active: 0,
     owned: [0],
     levels: {0:1},
     exps: {0:0},
     totalCorrect: 0,
     streak: 0,
-    modeCounts: {kanji:0, proverb:0, mixed:0, science:0, social:0, review:0}
+    modeCounts: {kanji:0, proverb:0, science:0, social:0},
+    solvedKeys: {}
   });
+  // 古いデータにmodeCounts/solvedKeysがない場合に補完
+  if(!md.modeCounts) md.modeCounts={kanji:0,proverb:0,science:0,social:0};
+  if(!md.solvedKeys) md.solvedKeys={};
+  return md;
 }
 function saveMonsterData(md) { setData('monsters', md); }
 
@@ -1557,29 +1562,27 @@ function addExp(amount) {
   }
   md.levels[id] = lv;
   md.exps[id] = exp;
-  // 重複なしカウント（復習も含める、同じ問題は1回だけ）
+  // 重複なしカウント（同じ問題は1回だけ）
   if(amount > 0) {
     if(!md.modeCounts) md.modeCounts={kanji:0,proverb:0,mixed:0,science:0,social:0};
     if(!md.solvedKeys) md.solvedKeys={};
-    var mk = (typeof currentMode !== 'undefined' ? currentMode : null) || 'mixed';
-    // idxはグローバル変数と名前が被るので別名で参照
+    var mk2 = (typeof currentMode !== 'undefined' ? currentMode : null) || 'mixed';
     var _qi = (typeof idx !== 'undefined') ? idx : 0;
-    var _qs = (typeof questions !== 'undefined') ? questions : [];
-    var curQ = _qs[_qi] || null;
-    var qkey = curQ ? (curQ.q + '|' + curQ.a) : null;
+    var _qs = (typeof questions !== 'undefined') ? questions : (typeof drawQuestions !== 'undefined' ? drawQuestions : []);
+    // 手書きモードの場合はdrawIdxを使う
+    if(mk2 === 'kanji' && typeof drawIdx !== 'undefined') _qi = drawIdx;
+    var curQ2 = _qs[_qi] || null;
+    var qkey = curQ2 ? (curQ2.q + '|' + curQ2.a) : null;
     if(qkey && !md.solvedKeys[qkey]) {
       md.solvedKeys[qkey] = 1;
-      var countKey = mk;
-      // 復習モードは元の問題タイプで分類
-      if(mk === 'review' && curQ && curQ.type) {
-        countKey = curQ.type;
-      }
-      // kanji_read/proverb_meaning はそれぞれ kanji/proverb にまとめる
-      if(countKey === 'kanji_read') countKey = 'kanji';
-      if(countKey === 'proverb_meaning') countKey = 'proverb';
-      if(countKey && countKey !== 'review' && md.modeCounts.hasOwnProperty(countKey)) {
-        md.modeCounts[countKey] = (md.modeCounts[countKey]||0) + 1;
-      }
+      var countKey = mk2;
+      if(mk2 === 'review' && curQ2 && curQ2.type) countKey = curQ2.type;
+      if(countKey === 'kanji_read' || countKey === 'kanji') countKey = 'kanji';
+      if(countKey === 'proverb_meaning' || countKey === 'proverb' || countKey === 'mixed') countKey = 'proverb';
+      if(countKey === 'science') md.modeCounts.science = (md.modeCounts.science||0) + 1;
+      else if(countKey === 'social') md.modeCounts.social = (md.modeCounts.social||0) + 1;
+      else if(countKey === 'kanji') md.modeCounts.kanji = (md.modeCounts.kanji||0) + 1;
+      else if(countKey === 'proverb') md.modeCounts.proverb = (md.modeCounts.proverb||0) + 1;
     }
     md.totalCorrect = (md.totalCorrect || 0) + 1;
   }
@@ -1748,7 +1751,7 @@ function initHome(){
   var mc=md2.modeCounts||{};
   var setS=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v||0;};
   var kanjiCount = mc.kanji||0;
-  var provCount  = (mc.proverb||0)+(mc.mixed||0);
+  var provCount  = mc.proverb||0;
   var sciCount   = mc.science||0;
   var socCount   = mc.social||0;
   var totalCount = kanjiCount + provCount + sciCount + socCount;
