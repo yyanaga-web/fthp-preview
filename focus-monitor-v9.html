@@ -777,48 +777,69 @@ function analyze(det){
   const reasons=[];
   let lookingAtTablet=false, gazeOff=false;
 
-  // ---- 頭の向き ----
+  // ---- 頭の向き（大幅緩和）----
+  // yaw: 完全に横を向いたときだけ反応（閾値を2倍以上に）
+  // pitch: タブレット注視の判定だけ残す（うつむき・上向きはほぼ無視）
   if(BL.ready){
-    const pd=f.pitch-BL.pitch; // 正=より下向き、負=より上向き（タブレット方向）
-    const rd=Math.abs(f.roll-BL.roll);
-    const yd=Math.abs(f.yaw-BL.yaw);
-    // 少しでも顔が上がる = タブレットを見ている
-    if(pd < -(TOL.pitch*0.3)){
-      lookingAtTablet=true; faceScore-=70; reasons.push('タブレットを見てるよ！📱');
+    const pd=f.pitch - BL.pitch;
+    const yd=Math.abs(f.yaw - BL.yaw);
+    // タブレット注視：明確に顔が上がったとき（閾値を2倍に緩和）
+    if(pd < -(TOL.pitch * 0.7)){
+      lookingAtTablet=true; faceScore-=50; reasons.push('タブレットを見てるかも 📱');
     }
-    if(pd > TOL.pitch*2.0){ faceScore-=45; reasons.push('うつぶせだよ 😴'); }
-    if(rd > TOL.roll){ faceScore-=50; reasons.push('頭が傾いてるよ 😪'); }
-    if(yd > TOL.yaw){ faceScore-=55; reasons.push('横を向いてるよ 👉'); }
+    // 横向き：かなり大きく向いたときだけ（TOL.yawの2.5倍）
+    if(yd > TOL.yaw * 2.5){ faceScore-=40; reasons.push('横を向いてるよ 👉'); }
+    // うつぶせ・傾きは警告なし（集中してても下を向くことはある）
   }else{
-    if(f.pitch<0.60){ lookingAtTablet=f.pitch<0.52; faceScore-=65; reasons.push(lookingAtTablet?'タブレットを見てるよ！📱':'顔が上がってるよ 👆'); }
-    if(f.pitch>0.88){ faceScore-=45; reasons.push('うつぶせだよ 😴'); }
-    if(f.roll>0.20){ faceScore-=50; reasons.push('頭が傾いてるよ 😪'); }
-    if(f.yaw>0.25){ faceScore-=55; reasons.push('横を向いてるよ 👉'); }
+    // キャリブなし: よほど大きく向いたときだけ
+    if(f.pitch < 0.48){ lookingAtTablet=true; faceScore-=50; reasons.push('タブレットを見てるかも 📱'); }
+    if(f.yaw > 0.40){ faceScore-=40; reasons.push('横を向いてるよ 👉'); }
+    // pitch/rollの細かい判定は削除（誤検知の原因）
   }
   faceScore=Math.max(0,faceScore);
 
   // ---- 虹彩（目線）----
-  // キャリブレーション済み: 登録時の目線位置からのズレ
+  // 精度が低いため影響を最小化。「完全に横を向いた」ときだけスコアを少し下げる程度に
   if(BL.ready && BL.gazeX!==null){
     const gd=Math.abs(f.gazeX - BL.gazeX);
-    if(gd > 0.18 && !lookingAtTablet){
-      gazeOff=true; gazeScore-=65; reasons.push('目線が横にズレてるよ 👀');
-    }else if(gd > 0.10 && !lookingAtTablet){
-      gazeScore-=30; // 少しズレ
+    if(gd > 0.30 && !lookingAtTablet){
+      // かなり大きくズレたときだけ（旧0.18→0.30に緩和）
+      gazeOff=true; gazeScore-=40; reasons.push('目線がかなりズレてるよ 👀');
     }
+    // 少しのズレは無視（旧0.10→削除）
   }else{
-    // 未キャリブ: 目線が端に寄りすぎたら警告
-    if(f.gazeX<0.22||f.gazeX>0.78){ gazeOff=true; gazeScore-=60; reasons.push('目線が横に向いてるよ 👀'); }
+    // キャリブなし: 目線判定は完全にオフ（誤爆が多いため）
+    gazeScore=100;
   }
   gazeScore=Math.max(0,gazeScore);
 
-  // ---- 目の開き ----
-  const earBase=BL.ready&&BL.ear?BL.ear:0.27;
-  const earRatio=f.earVal/earBase;
-  const sleepy=(det.expressions?.sleepy||0)>0.28;
-  if(earRatio<0.55){ eyeScore=5; reasons.push('目が閉じてるよ 😴'); }
-  else if(earRatio<0.72||sleepy){ eyeScore=38; reasons.push('眠そうだよ 🥱'); }
-  eyeScore=Math.max(0,eyeScore);
+  // ---- 目の開き（俯き補正あり）----
+  // 問題：俯いてテキストを見ると目がカメラから細く見え EAR が下がり誤検知する
+  // 対策：キャリブ済みなら pitch のズレ分だけ EAR の期待値を補正する
+  const earBase = BL.ready && BL.ear ? BL.ear : 0.27;
+
+  let adjustedEarBase = earBase;
+  if(BL.ready){
+    // 俯くと EAR は下がる傾向。pitch が大きいほど（下向きほど）期待EARを補正
+    // 実験的係数：pitchが0.1増えるごとにEAR期待値を約5%下げる
+    const pitchDiff = f.pitch - BL.pitch;
+    adjustedEarBase = earBase * (1 - pitchDiff * 0.5);
+    adjustedEarBase = Math.max(0.12, Math.min(0.45, adjustedEarBase));
+  }
+
+  const earRatio = f.earVal / adjustedEarBase;
+  const sleepy = (det.expressions?.sleepy||0) > 0.55; // かなり眠そうな時だけ
+
+  // キャリブなし時は目の開き判定をほぼ無効化（俯き角度が不明なため誤爆する）
+  if(!BL.ready){
+    // 完全に目を閉じた場合（EAR絶対値が極端に低い）だけ反応
+    if(f.earVal < 0.12){ eyeScore = 5; reasons.push('目が閉じてるよ 😴'); }
+    // それ以外は判定しない
+  } else {
+    if(earRatio < 0.42){ eyeScore = 5; reasons.push('目が閉じてるよ 😴'); }
+    else if(earRatio < 0.60 && sleepy){ eyeScore = 45; reasons.push('眠そうだよ 🥱'); }
+  }
+  eyeScore = Math.max(0, eyeScore);
 
   return {faceScore,gazeScore,eyeScore,reasons,feat:f,lookingAtTablet,gazeOff};
 }
@@ -988,13 +1009,16 @@ async function runDetection(){
       const r=analyze(det);
       drawOverlay(det,r);
 
-      const overall=Math.round(r.faceScore*.40+r.gazeScore*.35+r.eyeScore*.25);
-      const focused=overall>=55;
+      // スコア計算：顔の向き60%・目の開き20%・目線10%・手ボーナス10%
+      // 目の開きは俯き時に誤検知しやすいため重みを下げた
+      const motionBonus = ms >= 8 ? 15 : ms >= 4 ? 8 : 0;
+      const overall = Math.min(100, Math.round(r.faceScore * 0.60 + r.gazeScore * 0.10 + r.eyeScore * 0.20) + motionBonus);
+      const focused = overall >= 50;
       S.lastFocused=focused;
 
       updateMainUI(overall,focused,r.reasons);
-      setCard('face',r.faceScore,r.faceScore>=70?'◎ 手元向き':r.faceScore>=40?'△ 注意':'× NG');
-      setCard('gaze',r.gazeScore,r.gazeScore>=70?'◎ 手元向き':r.gazeScore>=40?'△ ズレあり':'× 外れ');
+      setCard('face',r.faceScore,r.faceScore>=70?'◎ 前向き':r.faceScore>=40?'△ 注意':'× NG');
+      setCard('gaze',r.gazeScore,r.gazeScore>=70?'◎ OK':r.gazeScore>=40?'△ ズレ':'× 大ズレ');
       setCard('eyes',r.eyeScore,r.eyeScore>=70?'◎ 開いてる':r.eyeScore>=40?'△ 眠い':'× 閉じ');
 
       // タブレット注視カウンター（続いた時間で判定）
