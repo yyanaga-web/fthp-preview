@@ -1506,7 +1506,10 @@ function renderSprite(artKey, container, size) {
 
 // ===== STORAGE =====
 var _mem = {};
-function loadData(){try{var d=localStorage.getItem('yuuta_q2');return d?JSON.parse(d):(_mem._d||{});}catch(e){return _mem._d||{};}}
+function loadData(){
+  if(_mem._d) return _mem._d;
+  try{var d=localStorage.getItem('yuuta_q2');_mem._d=d?JSON.parse(d):{};return _mem._d;}catch(e){_mem._d={};return _mem._d;}
+}
 function saveData(d){_mem._d=d;try{localStorage.setItem('yuuta_q2',JSON.stringify(d));}catch(e){}}
 function getData(k,def){var d=loadData();return d[k]!==undefined?d[k]:def;}
 function setData(k,v){var d=loadData();d[k]=v;saveData(d);}
@@ -1589,8 +1592,8 @@ function addExp(amount, questionObj, isStreak) {
   var tc = md.totalCorrect;
   var unlockAt = [50,100,150,250,350,500,650,750,999];
   var newMon = null;
-  for(var i=0;i<unlockAt.length;i++) {
-    if(tc === unlockAt[i]) {
+  for(var i=unlockAt.length-1;i>=0;i--) {
+    if(tc >= unlockAt[i]) {
       var candidate = i+1;
       if(candidate < MONSTERS.length && md.owned.indexOf(candidate)===-1) {
         md.owned.push(candidate);
@@ -1598,7 +1601,6 @@ function addExp(amount, questionObj, isStreak) {
         md.exps[candidate] = 0;
         saveMonsterData(md);
         newMon = MONSTERS[candidate];
-        break;
       }
     }
   }
@@ -1752,11 +1754,13 @@ function initHome(){
   var sciCount   = mc.science||0;
   var socCount   = mc.social||0;
   var totalCount = kanjiCount + provCount + sciCount + socCount;
+  // totalCorrectが大きい場合はそちらを表示（古いデータとの互換性）
+  var displayTotal = Math.max(totalCount, md2.totalCorrect||0);
   setS('stat-kanji',   kanjiCount);
   setS('stat-proverb', provCount);
   setS('stat-science', sciCount);
   setS('stat-social',  socCount);
-  setS('stat-total',   totalCount);
+  setS('stat-total',   displayTotal);
   // Lock mode buttons if review exists
   var locked = rev.length > 0;
   var modeBtns = document.querySelectorAll('.mode-btn');
