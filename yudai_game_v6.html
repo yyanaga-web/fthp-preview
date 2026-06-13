@@ -1516,24 +1516,6 @@ function setData(k,v){var d=loadData();d[k]=v;saveData(d);}
 
 function todayStr(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
 function dateStr(off){var d=new Date();d.setDate(d.getDate()+off);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-
-// ===== MONSTER STATE =====
-function getMonsterData() {
-  var md = getData('monsters', {
-    active: 0,
-    owned: [0],
-    levels: {0:1},
-    exps: {0:0},
-    totalCorrect: 0,
-    streak: 0,
-    modeCounts: {kanji:0, proverb:0, science:0, social:0},
-    solvedKeys: {}
-  });
-  // 古いデータにmodeCounts/solvedKeysがない場合に補完
-  if(!md.modeCounts) md.modeCounts={kanji:0,proverb:0,science:0,social:0};
-  if(!md.solvedKeys) md.solvedKeys={};
-  return md;
-}
 function saveMonsterData(md) { setData('monsters', md); }
 
 function getMonsterEvo(mon, lv) {
@@ -1575,7 +1557,7 @@ function addExp(amount, questionObj, isStreak) {
       md.solvedKeys[qkey] = 1;
       var mk2 = (typeof currentMode !== 'undefined' ? currentMode : null) || 'mixed';
       var countKey = mk2;
-      if(mk2 === 'review' && questionObj.type) countKey = questionObj.type;
+      if((mk2 === 'review' || mk2 === 'mixed') && questionObj.type) countKey = questionObj.type;
       if(countKey === 'kanji_read') countKey = 'kanji';
       if(countKey === 'proverb_meaning') countKey = 'proverb';
       if(countKey === 'mixed') countKey = 'proverb';
@@ -1706,6 +1688,17 @@ function getTodayReview(){
 function clearTodayReview(){var rq=getReviewQueue();delete rq[todayStr()];saveReviewQueue(rq);}
 
 // ===== STREAK =====
+// ===== MONSTER STATE =====
+function getMonsterData() {
+  var md = getData('monsters', {
+    active: 0, owned: [0], levels: {0:1}, exps: {0:0},
+    totalCorrect: 0, streak: 0,
+    modeCounts: {kanji:0, proverb:0, science:0, social:0}, solvedKeys: {}
+  });
+  if(!md.modeCounts) md.modeCounts={kanji:0,proverb:0,science:0,social:0};
+  if(!md.solvedKeys) md.solvedKeys={};
+  return md;
+}
 function getStreak(){return getData('streak',0);}
 function getLastDate(){return getData('lastDate','');}
 function getDoneDates(){return getData('doneDates',[]);}
@@ -1754,13 +1747,11 @@ function initHome(){
   var sciCount   = mc.science||0;
   var socCount   = mc.social||0;
   var totalCount = kanjiCount + provCount + sciCount + socCount;
-  // totalCorrectが大きい場合はそちらを表示（古いデータとの互換性）
-  var displayTotal = Math.max(totalCount, md2.totalCorrect||0);
   setS('stat-kanji',   kanjiCount);
   setS('stat-proverb', provCount);
   setS('stat-science', sciCount);
   setS('stat-social',  socCount);
-  setS('stat-total',   displayTotal);
+  setS('stat-total',   totalCount);
   // Lock mode buttons if review exists
   var locked = rev.length > 0;
   var modeBtns = document.querySelectorAll('.mode-btn');
@@ -1926,13 +1917,13 @@ function renderChoices(choices,answer){
     var btn=document.createElement('button');
     btn.className='choice-btn';
     btn.textContent=choices[i];
-    var q2=questions[idx];
-    btn.onclick=(function(c){return function(){onChoice(c,q2);};})(choices[i]);
+    btn.setAttribute('data-val',choices[i]);
+    btn.onclick=(function(val){return function(){onChoice(val);};})(choices[i]);
     cc.appendChild(btn);
   }
   // loading非表示・choices表示・ボタン表示
   document.getElementById('loading-msg').style.display='none';
-  cc.style.display='grid';
+  cc.style.display='flex';
   document.getElementById('dunno-btn').style.display='block';
 }
 
