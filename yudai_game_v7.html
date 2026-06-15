@@ -1507,7 +1507,7 @@ function renderSprite(artKey, container, size) {
 // ===== STORAGE =====
 var _mem = {};
 function loadData(){
-  if(_mem._d) return _mem._d;
+  // キャッシュを使わず常にlocalStorageから読む（表示ズレ防止）
   try{var d=localStorage.getItem('yuuta_q2');_mem._d=d?JSON.parse(d):{};return _mem._d;}catch(e){_mem._d={};return _mem._d;}
 }
 function saveData(d){_mem._d=d;try{localStorage.setItem('yuuta_q2',JSON.stringify(d));}catch(e){}}
