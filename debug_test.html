@@ -175,9 +175,23 @@ function addLog(cls, msg){
   el.scrollTop = el.scrollHeight;
 }
 
+// localStorageの全キーを表示
+function showAllKeys(){
+  var allKeys = [];
+  for(var i=0;i<localStorage.length;i++){
+    var k = localStorage.key(i);
+    var v = localStorage.getItem(k);
+    allKeys.push(k + ' = ' + v.substring(0,80)+'...');
+  }
+  if(allKeys.length===0) addLog('err','localStorageが空です！');
+  else allKeys.forEach(function(s){ addLog('warn',s); });
+}
+
 // 初期表示
 refreshDisplay();
-addLog('info','起動完了。「正解1問をシミュレート」ボタンを押してください。');
+addLog('info','起動完了。');
+addLog('info','--- localStorage 全キー ---');
+showAllKeys();
 </script>
 </body>
 </html>
