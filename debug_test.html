@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EXPデバッグテスト</title>
+<style>
+body{background:#0a0a1a;color:#fff;font-family:sans-serif;padding:16px;max-width:480px;margin:0 auto;}
+h2{color:#f1c40f;margin-bottom:12px;}
+.card{background:#111;border:1px solid #333;border-radius:12px;padding:14px;margin-bottom:14px;}
+.label{color:#aaa;font-size:0.8rem;margin-bottom:4px;}
+.val{font-size:1.4rem;font-weight:900;color:#f1c40f;}
+button{background:#27ae60;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:1rem;width:100%;margin-bottom:8px;cursor:pointer;}
+button.red{background:#e74c3c;}
+button.blue{background:#2980b9;}
+.log{background:#000;border:1px solid #333;border-radius:8px;padding:10px;font-size:0.75rem;line-height:1.8;max-height:300px;overflow-y:auto;}
+.ok{color:#2ecc71;} .err{color:#e74c3c;} .info{color:#3498db;} .warn{color:#f1c40f;}
+</style>
+</head>
+<body>
+<h2>🔍 EXPデバッグテスト</h2>
+<p style="color:#aaa;font-size:0.8rem;margin-bottom:12px">本番と同じlocalStorage(yuuta_q2)を使います</p>
+
+<div class="card">
+  <div class="label">① localStorage の生データ</div>
+  <div id="ls-raw" style="font-size:0.7rem;color:#aaa;word-break:break-all;">読み込み中...</div>
+</div>
+
+<div class="card">
+  <div class="label">② getMonsterData() の結果</div>
+  <div class="label">active:</div><div class="val" id="d-active">-</div>
+  <div class="label">levels[0]:</div><div class="val" id="d-lv">-</div>
+  <div class="label">exps[0]:</div><div class="val" id="d-exp">-</div>
+  <div class="label">totalCorrect:</div><div class="val" id="d-total">-</div>
+</div>
+
+<button onclick="testOneCorrect()">✅ 正解1問をシミュレート（+10EXP）</button>
+<button onclick="testTenCorrect()">✅✅ 正解10問をシミュレート（+100EXP）</button>
+<button class="blue" onclick="refreshDisplay()">🔄 表示を更新</button>
+<button class="red" onclick="clearLS()">⚠️ データをリセット</button>
+
+<div class="log" id="log"></div>
+
+<script>
+// ===== 本番と同じストレージ層（v7修正後） =====
+function loadData(){
+  try{
+    var raw=localStorage.getItem('yuuta_q2');
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function saveData(d){
+  try{localStorage.setItem('yuuta_q2',JSON.stringify(d));}catch(e){
+    addLog('err','❌ saveData失敗: '+e.message);
+  }
+}
+function getData(k,def){
+  var d=loadData();
+  return d[k]!==undefined ? d[k] : def;
+}
+function setData(k,v){
+  var d=loadData();
+  d[k]=v;
+  saveData(d);
+}
+function saveMonsterData(md){
+  var d=loadData();
+  d['monsters']=md;
+  saveData(d);
+}
+function getMonsterData(){
+  var md=getData('monsters',{
+    active:0,owned:[0],levels:{0:1},exps:{0:0},
+    totalCorrect:0,modeCounts:{kanji:0,proverb:0,science:0,social:0},solvedKeys:{}
+  });
+  if(!md.modeCounts)md.modeCounts={kanji:0,proverb:0,science:0,social:0};
+  if(!md.solvedKeys)md.solvedKeys={};
+  return md;
+}
+function expForLevel(lv){ return lv*100; } // 本番に合わせて100
+
+function addExp(amount, questionObj, isStreak){
+  addLog('info','--- addExp('+amount+', isStreak='+isStreak+') 開始 ---');
+
+  // ① getMonsterData
+  var md = getMonsterData();
+  addLog('info','① getMonsterData: lv='+md.levels[0]+' exp='+md.exps[0]);
+
+  var id = md.active;
+  var lv = md.levels[id] || 1;
+  var exp = md.exps[id] || 0;
+
+  exp += amount;
+  addLog('info','② exp加算後: exp='+exp);
+
+  // レベルアップ
+  while(true){
+    var need = expForLevel(lv);
+    if(exp >= need && lv < 100){ exp -= need; lv++; addLog('warn','★ レベルアップ! lv='+lv); }
+    else break;
+  }
+
+  md.levels[id] = lv;
+  md.exps[id] = exp;
+  addLog('info','③ md更新: lv='+md.levels[id]+' exp='+md.exps[id]);
+
+  // 問題数カウント
+  if(!isStreak && questionObj){
+    var qkey = questionObj.q+'|'+questionObj.a;
+    if(!md.solvedKeys[qkey]){
+      md.solvedKeys[qkey]=1;
+      md.modeCounts.kanji = (md.modeCounts.kanji||0)+1;
+      md.totalCorrect = (md.totalCorrect||0)+1;
+      addLog('info','④ totalCorrect='+md.totalCorrect);
+    }
+  }
+
+  // 保存
+  saveMonsterData(md);
+  addLog('info','⑤ saveMonsterData完了');
+
+  // ★ 保存直後にlocalStorageから再読みして確認
+  var verify = loadData();
+  var vMon = verify.monsters || {};
+  addLog(
+    (vMon.exps && vMon.exps[0]===exp) ? 'ok' : 'err',
+    '⑥ 保存確認: LS-exp='+(vMon.exps?vMon.exps[0]:'なし')+' 期待値='+exp+' → '+((vMon.exps && vMon.exps[0]===exp)?'✅ 一致':'❌ 不一致！')
+  );
+  addLog(
+    (vMon.levels && vMon.levels[0]===lv) ? 'ok' : 'err',
+    '   保存確認: LS-lv='+(vMon.levels?vMon.levels[0]:'なし')+' 期待値='+lv+' → '+((vMon.levels && vMon.levels[0]===lv)?'✅ 一致':'❌ 不一致！')
+  );
+
+  refreshDisplay();
+}
+
+var qCount = 0;
+function testOneCorrect(){
+  qCount++;
+  addExp(10, {type:'kanji', q:'問題'+qCount, a:'答え'+qCount}, false);
+}
+function testTenCorrect(){
+  for(var i=0;i<10;i++){
+    qCount++;
+    addExp(10, {type:'kanji', q:'問題'+qCount, a:'答え'+qCount}, false);
+  }
+}
+
+function refreshDisplay(){
+  // localStorage生データ
+  var raw = localStorage.getItem('yuuta_q2');
+  document.getElementById('ls-raw').textContent = raw ? raw.substring(0,200)+'...' : '（空）';
+
+  // getMonsterData経由
+  var md = getMonsterData();
+  document.getElementById('d-active').textContent = md.active;
+  document.getElementById('d-lv').textContent = md.levels[0] || 1;
+  document.getElementById('d-exp').textContent = md.exps[0] || 0;
+  document.getElementById('d-total').textContent = md.totalCorrect || 0;
+}
+
+function clearLS(){
+  if(!confirm('リセットしますか？')) return;
+  localStorage.removeItem('yuuta_q2');
+  addLog('err','リセット完了');
+  refreshDisplay();
+}
+
+function addLog(cls, msg){
+  var el = document.getElementById('log');
+  var d = document.createElement('div');
+  d.className = cls;
+  d.textContent = msg;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+// 初期表示
+refreshDisplay();
+addLog('info','起動完了。「正解1問をシミュレート」ボタンを押してください。');
+</script>
+</body>
+</html>
