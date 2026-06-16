@@ -1505,6 +1505,7 @@ function renderSprite(artKey, container, size) {
 }
 
 // ===== STORAGE =====
+console.log("yudai_game_v7: loadData cache-free version loaded ✅");
 var _mem = {};
 function loadData(){
   try{
@@ -1542,7 +1543,17 @@ function getMonsterEvo(mon, lv) {
 }
 
 function addExp(amount, questionObj, isStreak) {
-  var md = getMonsterData();
+  // localStorageから1回だけ読む
+  var store = loadData();
+  var md = store['monsters'];
+  // monstersキーがなければ初期化
+  if(!md) {
+    md = {active:0, owned:[0], levels:{0:1}, exps:{0:0},
+          totalCorrect:0, modeCounts:{kanji:0,proverb:0,science:0,social:0}, solvedKeys:{}};
+  }
+  if(!md.modeCounts) md.modeCounts={kanji:0,proverb:0,science:0,social:0};
+  if(!md.solvedKeys) md.solvedKeys={};
+
   var id = md.active;
   var lv = md.levels[id] || 1;
   var exp = md.exps[id] || 0;
@@ -1565,8 +1576,6 @@ function addExp(amount, questionObj, isStreak) {
 
   // 問題数カウント（streakボーナスはカウントしない）
   if(!isStreak && questionObj) {
-    if(!md.modeCounts) md.modeCounts={kanji:0,proverb:0,science:0,social:0};
-    if(!md.solvedKeys) md.solvedKeys={};
     var qkey = questionObj.q + '|' + questionObj.a;
     if(!md.solvedKeys[qkey]) {
       md.solvedKeys[qkey] = 1;
@@ -1583,9 +1592,8 @@ function addExp(amount, questionObj, isStreak) {
       md.totalCorrect = (md.totalCorrect || 0) + 1;
     }
   }
-  saveMonsterData(md);
 
-  // Maybe unlock new monster (every 50 correct answers)
+  // モンスターアンロックチェック
   var tc = md.totalCorrect;
   var unlockAt = [50,100,150,250,350,500,650,750,999];
   var newMon = null;
@@ -1596,11 +1604,15 @@ function addExp(amount, questionObj, isStreak) {
         md.owned.push(candidate);
         md.levels[candidate] = 1;
         md.exps[candidate] = 0;
-        saveMonsterData(md);
         newMon = MONSTERS[candidate];
       }
     }
   }
+
+  // localStorageに1回だけ書く
+  store['monsters'] = md;
+  saveData(store);
+
   return { evoedName: evoedName, newMon: newMon };
 }
 
