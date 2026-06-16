@@ -1507,16 +1507,31 @@ function renderSprite(artKey, container, size) {
 // ===== STORAGE =====
 var _mem = {};
 function loadData(){
-  // キャッシュを使わず常にlocalStorageから読む（表示ズレ防止）
-  try{var d=localStorage.getItem('yuuta_q2');_mem._d=d?JSON.parse(d):{};return _mem._d;}catch(e){_mem._d={};return _mem._d;}
+  try{
+    var raw=localStorage.getItem('yuuta_q2');
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
 }
-function saveData(d){_mem._d=d;try{localStorage.setItem('yuuta_q2',JSON.stringify(d));}catch(e){}}
-function getData(k,def){var d=loadData();return d[k]!==undefined?d[k]:def;}
-function setData(k,v){var d=loadData();d[k]=v;saveData(d);}
+function saveData(d){
+  try{localStorage.setItem('yuuta_q2',JSON.stringify(d));}catch(e){}
+}
+function getData(k,def){
+  var d=loadData();
+  return d[k]!==undefined ? d[k] : def;
+}
+function setData(k,v){
+  var d=loadData();
+  d[k]=v;
+  saveData(d);
+}
 
 function todayStr(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
 function dateStr(off){var d=new Date();d.setDate(d.getDate()+off);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function saveMonsterData(md) { setData('monsters', md); }
+function saveMonsterData(md) {
+  var d=loadData();
+  d['monsters']=md;
+  saveData(d);
+}
 
 function getMonsterEvo(mon, lv) {
   var evo = mon.evos[0];
@@ -2101,11 +2116,15 @@ function showComplete(){
   document.getElementById('comp-emoji').textContent=emoji;
   document.getElementById('comp-score').textContent=scoreOK+'/'+total;
   var _dbgRaw=localStorage.getItem('yuuta_q2');
-  var _dbgM=(_dbgRaw?JSON.parse(_dbgRaw):{}).monsters||{};
+  var _dbgAll=_dbgRaw?JSON.parse(_dbgRaw):{};
+  var _dbgM=_dbgAll.monsters||{};
+  var _dbgKeys=Object.keys(_dbgAll);
   document.getElementById('comp-sub').textContent='正解率 '+rate+'% ／ +'+sessionExpGained+' EXP獲得！'
-    +' [正解'+scoreOK+'問 / 保存EXP:'+(_dbgM.exps&&_dbgM.exps[0]!==undefined?_dbgM.exps[0]:'?')
-    +' / Lv:'+(_dbgM.levels&&_dbgM.levels[0]?_dbgM.levels[0]:'?')
-    +' / 累計:'+(_dbgM.totalCorrect||0)+']';
+    +' [正解'+scoreOK+'問'
+    +' / LS-EXP:'+(_dbgM.exps&&_dbgM.exps[0]!==undefined?_dbgM.exps[0]:'未保存')
+    +' / LS-Lv:'+(_dbgM.levels&&_dbgM.levels[0]?_dbgM.levels[0]:'未保存')
+    +' / LS-累計:'+(_dbgM.totalCorrect!==undefined?_dbgM.totalCorrect:'未保存')
+    +' / LSキー数:'+_dbgKeys.length+']';
   document.getElementById('comp-ok').textContent=scoreOK;
   document.getElementById('comp-ng').textContent=scoreNG;
   document.getElementById('comp-tot').textContent=total;
