@@ -1546,6 +1546,8 @@ function addExp(amount, questionObj, isStreak) {
   // localStorageから1回だけ読む
   var store = loadData();
   var md = store['monsters'];
+  // デバッグ：addExp呼び出し時の状態を記録
+  window._lastAddExpDebug = 'store.monsters='+(md?'あり':'なし【初期化される！】')+' active='+(md?md.active:'N/A')+' amount='+amount;
   // monstersキーがなければ初期化
   if(!md) {
     md = {active:0, owned:[0], levels:{0:1}, exps:{0:0},
@@ -2131,12 +2133,14 @@ function showComplete(){
   var _dbgAll=_dbgRaw?JSON.parse(_dbgRaw):{};
   var _dbgM=_dbgAll.monsters||{};
   var _dbgKeys=Object.keys(_dbgAll);
+  var _act = _dbgM.active;
   document.getElementById('comp-sub').textContent='正解率 '+rate+'% ／ +'+sessionExpGained+' EXP獲得！'
     +' [正解'+scoreOK+'問'
-    +' / LS-EXP:'+(_dbgM.exps&&_dbgM.exps[0]!==undefined?_dbgM.exps[0]:'未保存')
-    +' / LS-Lv:'+(_dbgM.levels&&_dbgM.levels[0]?_dbgM.levels[0]:'未保存')
+    +' / active:'+_act
+    +' / LS-EXP:'+(_dbgM.exps&&_dbgM.exps[_act]!==undefined?_dbgM.exps[_act]:'未保存')
+    +' / LS-Lv:'+(_dbgM.levels&&_dbgM.levels[_act]?_dbgM.levels[_act]:'未保存')
     +' / LS-累計:'+(_dbgM.totalCorrect!==undefined?_dbgM.totalCorrect:'未保存')
-    +' / LSキー数:'+_dbgKeys.length+']';
+    +' / addExp:'+( window._lastAddExpDebug||'?')+']';
   document.getElementById('comp-ok').textContent=scoreOK;
   document.getElementById('comp-ng').textContent=scoreNG;
   document.getElementById('comp-tot').textContent=total;
