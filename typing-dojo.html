@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>タイピング道場</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12141c;
+    --bg-panel:#1b1f2a;
+    --bg-panel-2:#22273380;
+    --paper:#f3ead8;
+    --paper-line:#d9cba8;
+    --ink:#2a2118;
+    --gold:#c9a227;
+    --gold-bright:#e6c247;
+    --vermillion:#d0432b;
+    --vermillion-dark:#9a2e1c;
+    --jade:#4f8f6d;
+    --text:#eae5d8;
+    --text-dim:#a9a394;
+    --border:#33394a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 20% -10%, #262c3d 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 10%, #241f1a 0%, transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{font-family:'Shippori Mincho', serif;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  #app{max-width:720px;margin:0 auto;padding:20px 16px 64px;}
+
+  /* ---------- header ---------- */
+  .dojo-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;margin-bottom:22px;
+    background:linear-gradient(180deg, #1e2330, #171a24);
+    border:1px solid var(--border);border-radius:14px;
+    position:relative;overflow:hidden;
+  }
+  .dojo-header::before{
+    content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(135deg, rgba(201,162,39,0.045) 0 2px, transparent 2px 14px);
+    pointer-events:none;
+  }
+  .dojo-title{display:flex;align-items:center;gap:12px;}
+  .dojo-title h1{font-size:1.5rem;margin:0;letter-spacing:.08em;font-weight:800;color:var(--gold-bright);}
+  .dojo-title .sub{font-size:.68rem;color:var(--text-dim);letter-spacing:.2em;margin-top:2px;}
+  .belt-badge{
+    display:flex;align-items:center;gap:8px;
+    background:var(--bg-panel-2);border:1px solid var(--border);
+    padding:7px 12px;border-radius:999px;font-size:.8rem;
+  }
+  .belt-swatch{width:22px;height:10px;border-radius:3px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.3);}
+
+  /* ---------- panel ---------- */
+  .panel{
+    background:var(--bg-panel);border:1px solid var(--border);
+    border-radius:16px;padding:22px;margin-bottom:18px;
+  }
+  .panel h2{
+    font-family:'Shippori Mincho',serif;font-size:1.15rem;margin:0 0 14px;
+    color:var(--gold-bright);display:flex;align-items:center;gap:8px;
+  }
+  .btn{
+    font-family:'Zen Kaku Gothic New',sans-serif;font-weight:700;
+    border:none;border-radius:10px;padding:14px 22px;font-size:1rem;
+    cursor:pointer;transition:transform .12s ease, filter .12s ease;
+    letter-spacing:.03em;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-main{
+    background:linear-gradient(180deg, var(--vermillion), var(--vermillion-dark));
+    color:#fff8ee;box-shadow:0 3px 0 #6e1f12, 0 8px 20px -6px rgba(208,67,43,.5);
+  }
+  .btn-main:hover{filter:brightness(1.08);}
+  .btn-ghost{
+    background:transparent;border:1px solid var(--border);color:var(--text);
+  }
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-bright);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;filter:none;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+  /* ---------- stamp calendar (signature element) ---------- */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .cal-head .ym{font-family:'Shippori Mincho',serif;font-size:1rem;color:var(--text);}
+  .cal-nav{display:flex;gap:6px;}
+  .cal-nav button{background:none;border:1px solid var(--border);color:var(--text-dim);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:.9rem;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .cal-dow{font-size:.68rem;color:var(--text-dim);text-align:center;padding-bottom:2px;}
+  .cal-cell{
+    aspect-ratio:1/1;border-radius:10px;position:relative;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.78rem;color:var(--text-dim);
+    background:#181c26;border:1px solid #262c3a;
+    cursor:default;
+  }
+  .cal-cell.empty{background:transparent;border:none;}
+  .cal-cell.today{border-color:var(--gold);color:var(--gold-bright);}
+  .cal-cell.stamped{cursor:pointer;background:#241a16;border-color:var(--vermillion-dark);}
+  .cal-cell.stamped:hover{filter:brightness(1.15);}
+  .hanko{
+    position:absolute;inset:3px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--vermillion);border:2px solid var(--vermillion);
+    font-family:'Shippori Mincho',serif;font-weight:800;font-size:.62rem;
+    transform:rotate(-8deg);
+    box-shadow:0 0 0 1px rgba(208,67,43,.25) inset;
+    background:rgba(208,67,43,.08);
+  }
+  .cal-cell .daynum{position:absolute;top:3px;left:6px;font-size:.6rem;color:var(--text-dim);z-index:1;}
+  .cal-cell.stamped .daynum{color:#e0a08f;}
+
+  /* ---------- warmup screen ---------- */
+  .progress-track{height:8px;background:#0e1017;border-radius:99px;overflow:hidden;margin-bottom:18px;border:1px solid var(--border);}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-bright));transition:width .25s ease;}
+  .sentence-box{
+    background:var(--paper);color:var(--ink);border-radius:12px;padding:22px 20px;
+    font-family:'JetBrains Mono',monospace;font-size:1.25rem;line-height:1.8;
+    letter-spacing:.02em;margin-bottom:14px;
+    box-shadow:0 10px 24px -12px rgba(0,0,0,.5);
+    position:relative;
+  }
+  .sentence-box::after{
+    content:"";position:absolute;left:16px;right:16px;bottom:12px;height:1px;background:var(--paper-line);
+  }
+  .ch{position:relative;}
+  .ch.correct{color:var(--jade);}
+  .ch.wrong{color:var(--vermillion);background:rgba(208,67,43,.15);border-radius:2px;}
+  .ch.pending{color:#b8a97e;}
+  .ch.cursor{border-bottom:2px solid var(--vermillion-dark);}
+  .type-input{
+    width:100%;padding:14px 16px;font-size:1.1rem;border-radius:10px;
+    border:1px solid var(--border);background:#0e1017;color:var(--text);
+    font-family:'JetBrains Mono',monospace;outline:none;
+  }
+  .type-input:focus{border-color:var(--gold);}
+  .stat-row{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .stat-chip{
+    background:var(--bg-panel-2);border:1px solid var(--border);border-radius:10px;
+    padding:8px 14px;font-size:.82rem;color:var(--text-dim);
+  }
+  .stat-chip b{color:var(--gold-bright);font-family:'JetBrains Mono',monospace;font-size:.95rem;}
+
+  /* ---------- diary screen ---------- */
+  .timer-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .timer-display{
+    font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;
+    color:var(--gold-bright);
+  }
+  .timer-display.low{color:var(--vermillion);}
+  .diary-paper{
+    background:var(--paper);border-radius:12px;padding:4px;
+    box-shadow:0 10px 24px -12px rgba(0,0,0,.5);
+  }
+  textarea#diaryText{
+    width:100%;min-height:260px;resize:vertical;border:none;background:transparent;
+    color:var(--ink);font-size:1.08rem;line-height:2.1;padding:18px 18px 8px;
+    font-family:'Zen Kaku Gothic New',sans-serif;outline:none;
+    background-image:repeating-linear-gradient(to bottom, transparent 0, transparent 2.05em, var(--paper-line) 2.1em);
+  }
+  .diary-meta{display:flex;justify-content:space-between;padding:8px 16px 4px;font-size:.75rem;color:#8a7a5e;}
+
+  /* ---------- result screen ---------- */
+  .score-hero{
+    display:flex;align-items:center;gap:18px;padding:8px 4px 20px;
+  }
+  .score-ring{
+    width:92px;height:92px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:conic-gradient(var(--gold-bright) calc(var(--pct)*1%), #262c3a 0);
+    position:relative;
+  }
+  .score-ring::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--bg-panel);}
+  .score-ring span{position:relative;font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--gold-bright);}
+  .score-words h3{margin:0 0 4px;font-family:'Shippori Mincho',serif;font-size:1.1rem;color:var(--text);}
+  .score-words p{margin:0;color:var(--text-dim);font-size:.85rem;}
+  .metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+  .metric{background:var(--bg-panel-2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;}
+  .metric .val{font-family:'JetBrains Mono',monospace;font-size:1.35rem;color:var(--gold-bright);font-weight:700;}
+  .metric .lbl{font-size:.68rem;color:var(--text-dim);margin-top:3px;}
+  .sensei-box{
+    background:#1a1512;border:1px solid #3a2c1c;border-left:4px solid var(--vermillion);
+    border-radius:10px;padding:16px 18px;margin-bottom:16px;
+  }
+  .sensei-box .who{font-size:.72rem;color:var(--gold-bright);letter-spacing:.1em;margin-bottom:6px;}
+  .sensei-box p{margin:0;line-height:1.75;font-size:.95rem;}
+  .stamp-award{
+    display:flex;align-items:center;gap:12px;justify-content:center;
+    padding:14px;margin-bottom:16px;background:rgba(208,67,43,.08);
+    border:1px dashed var(--vermillion-dark);border-radius:12px;
+  }
+
+  /* ---------- history modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(8,9,13,.72);backdrop-filter:blur(2px);
+    display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .modal-box{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;
+    max-width:520px;width:100%;max-height:80vh;overflow-y:auto;padding:22px;
+  }
+  .modal-close{float:right;background:none;border:none;color:var(--text-dim);font-size:1.3rem;cursor:pointer;}
+  .modal-diary-text{
+    background:var(--paper);color:var(--ink);border-radius:10px;padding:16px;
+    font-size:.95rem;line-height:1.9;white-space:pre-wrap;margin:12px 0;
+  }
+
+  .empty-note{color:var(--text-dim);font-size:.85rem;text-align:center;padding:18px 0;}
+  .loading-dots::after{content:'…';animation:dots 1.2s steps(4,end) infinite;}
+  @keyframes dots{0%,20%{content:''}40%{content:'.'}60%{content:'..'}80%,100%{content:'...'}}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ 例文プール（男の子向け・くだらない系） ============ */
+  const SENTENCES = [
+    "かいじゅうがビルをふんづけてゲームセンターにいった。",
+    "うちゅうじんはたこやきをたべたことがない。",
+    "ぼくのペンギンはロボットにへんしんできる。",
+    "きょうりゅうがコンビニでアイスをかいしめた。",
+    "にんじゃはくしゃみをがまんするしゅぎょうをした。",
+    "サメがじてんしゃにのってがっこうにきた。",
+    "おならをしたロボットがばくはつしそうになった。",
+    "ゆうれいがカラオケでえんかをうたっていた。",
+    "ドラゴンがれいぞうこのプリンをたべてしまった。",
+    "せかいでいちばんつよいカブトムシをさがしている。",
+    "うんこじゃないよ、これはチョコレートだよ。",
+    "ライオンがそうじきをこわがってにげまわった。",
+    "ロケットにのったカエルがつきでサッカーをした。",
+    "せんせいがとつぜんにんじゃにへんしんした。",
+    "みずぶくれのモンスターがおふろでおよいでいる。",
+    "オバケがトイレのドアをノックしてきた。",
+    "たまごやきをめぐってきょうりゅうとけんかになった。",
+    "ロボットがランドセルをせおって学校にちこくした。",
+    "でんしゃにのったゴリラがしんぶんをよんでいた。",
+    "ぼくのすきなおかしはうちゅうじんにぬすまれた。",
+    "かいじゅうがくしゃみでビルをたおしてしまった。",
+    "サッカーボールがきゅうにしゃべりだしてびっくりした。",
+    "パンダがコンビニのレジでバイトをしている。",
+    "にんじゃがラーメンをたべながらしゅりけんをなげた。",
+    "つきにすむウサギがもちつきたいかいをひらいた。",
+    "でんきウナギがゲームきをじゅうでんしてくれた。",
+    "せかいのはてまでうんてんするタクシーうんてんしゅがいる。",
+    "カブトガニがゆうえんちでかんらんしゃにのった。",
+    "ふゆのゆきだるまがなつやすみをほしがっている。",
+    "とりのすにスマホがまぎれこんでいた。",
+    "かいぞくせんがラーメンやのちゅうしゃじょうにとまった。",
+    "ロボットせんせいがしゅくだいをわすれてしまった。",
+    "きょだいなアリがおにぎりをまるごとはこんでいった。",
+    "たこがはちまきをまいてうんどうかいにさんかした。",
+    "つちのなかからきょうりゅうのたまごがでてきた。",
+    "ねこがマラソンたいかいでゆうしょうしてしまった。",
+    "でんしゃのなかでかいじゅうがねぼうしてしまった。",
+    "うみのそこにひみつのゲームセンターがあるらしい。",
+    "ロボットがだっしゅつゲームをかいはつしている。",
+    "モグラがちかにひみつのきちをつくっていた。"
+  ];
+  const WARMUP_COUNT = 5;
+
+  /* ============ 帯（ベルト）ランク ============ */
+  const BELTS = [
+    {min:0,  name:"10級", color:"#f4f0e6", label:"白帯"},
+    {min:3,  name:"8級",  color:"#f4f0e6", label:"白帯"},
+    {min:6,  name:"6級",  color:"#e0c96a", label:"黄帯"},
+    {min:10, name:"4級",  color:"#e8973a", label:"オレンジ帯"},
+    {min:15, name:"3級",  color:"#4f8f6d", label:"緑帯"},
+    {min:21, name:"2級",  color:"#3b6fc4", label:"青帯"},
+    {min:28, name:"1級",  color:"#5a3d99", label:"紫帯"},
+    {min:36, name:"初段",  color:"#2a2118", label:"黒帯"}
+  ];
+  function beltFor(count){
+    let b = BELTS[0];
+    for(const belt of BELTS){ if(count >= belt.min) b = belt; }
+    return b;
+  }
+
+  /* ============ state ============ */
+  const S = {
+    screen: 'home',
+    calMonth: new Date().getMonth(),
+    calYear: new Date().getFullYear(),
+    entryDates: [],       // list of "YYYY-MM-DD" with saved diary
+    entryCount: 0,
+    localCache: {},       // in-session fallback cache, keyed by date, used if persistent storage is unavailable
+    storageOk: true,
+    warmup: { idx:0, sentences:[], typed:"", startTime:0, results:[] },
+    diary: { seconds: 300, remaining: 300, timerId:null, running:false, backspaces:0, keypresses:0, text:"", finished:false },
+    result: null,
+    modalDate: null,
+  };
+
+  function todayStr(d){
+    d = d || new Date();
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+
+  /* ============ storage helpers ============ */
+  // Persistent storage (window.storage) can throw on a brand-new artifact before
+  // anything has ever been saved (e.g. list() on an empty namespace). That is an
+  // expected, recoverable condition -- not a real failure -- so we don't log it
+  // at all, and we always keep an in-memory fallback (S.localCache) so the app
+  // stays fully usable for the current session even if persistence itself is
+  // unavailable in this environment.
+  async function loadEntryList(){
+    try{
+      const res = await window.storage.list('diary:', false);
+      const keys = (res && Array.isArray(res.keys)) ? res.keys : [];
+      const fromStorage = keys.map(k => k.replace('diary:',''));
+      const fromCache = Object.keys(S.localCache);
+      S.entryDates = Array.from(new Set([...fromStorage, ...fromCache])).sort();
+      S.entryCount = S.entryDates.length;
+    }catch(e){
+      S.storageOk = false;
+      S.entryDates = Object.keys(S.localCache).sort();
+      S.entryCount = S.entryDates.length;
+    }
+  }
+  async function saveEntry(dateStr, data){
+    S.localCache[dateStr] = data; // always keep a working copy for this session
+    try{
+      const r = await window.storage.set('diary:'+dateStr, JSON.stringify(data), false);
+      return !!r;
+    }catch(e){
+      return false;
+    }
+  }
+  async function getEntry(dateStr){
+    try{
+      const r = await window.storage.get('diary:'+dateStr, false);
+      if(r) return JSON.parse(r.value);
+    }catch(e){ /* fall through to cache */ }
+    return S.localCache[dateStr] || null;
+  }
+
+  /* ============ Claude API content evaluation ============ */
+  async function evaluateDiary(text){
+    const prompt = `あなたは小学生に日記の書き方をやさしく教える、にんじゃ道場の「文章さばき師範」です。
+以下は小学校高学年の男の子が制限時間内に書いた日記です。厳しすぎず、でも本気で読んで、良いところ・具体的な改善点をひとつずつ伝えてください。
+
+【日記本文】
+${text}
+
+【出力形式】
+以下のJSONのみを出力してください。前後に説明や\`\`\`は付けないでください。
+{"score": 1から10の整数, "praise": "具体的に褒める一言（30-50文字程度、日記の内容に触れる）", "tip": "次に書くときのアドバイスひとつ（30-50文字程度）", "comment": "師範からの一言まとめ（40-70文字程度、にんじゃ道場らしい語り口で）"}`;
+    try{
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1000,
+          messages: [{role:"user", content: prompt}]
+        })
+      });
+      const data = await response.json();
+      const raw = (data.content||[]).map(b=>b.text||"").join("");
+      const clean = raw.replace(/```json|```/g,"").trim();
+      const parsed = JSON.parse(clean);
+      return {
+        score: Math.max(1, Math.min(10, parseInt(parsed.score) || 6)),
+        praise: parsed.praise || "がんばって書いたことがよく伝わってきたぞ。",
+        tip: parsed.tip || "つぎは、その時どう思ったかも書いてみよう。",
+        comment: parsed.comment || "今日もよく筆を動かした。修行の成果が出ておる。"
+      };
+    }catch(e){
+      // Network/API issue reaching the evaluation service -- fall back to a
+      // simple encouraging message rather than surfacing a console error.
+      return {
+        score: 6,
+        praise: "今日も最後まで書ききったのはえらい！",
+        tip: "できごとだけでなく、気持ちも一言添えてみよう。",
+        comment: "師範は今しばらく瞑想中じゃ…また明日、じっくり読ませてもらおう。",
+        aiFailed: true
+      };
+    }
+  }
+
+  /* ============ render root ============ */
+  function render(){
+    const app = document.getElementById('app');
+    app.innerHTML = header() + body() + (S.modalDate ? modal() : '');
+    attachHandlers();
+  }
+
+  function header(){
+    const belt = beltFor(S.entryCount);
+    return `
+    <div class="dojo-header">
+      <div class="dojo-title">
+        <span style="font-size:1.7rem;">⛩️</span>
+        <div>
+          <h1>タイピング道場</h1>
+          <div class="sub">TYPING DOJO</div>
+        </div>
+      </div>
+      <div class="belt-badge">
+        <span class="belt-swatch" style="background:${belt.color};"></span>
+        <span>${belt.name}・${belt.label}</span>
+      </div>
+    </div>`;
+  }
+
+  function body(){
+    if(S.screen === 'home') return homeScreen();
+    if(S.screen === 'warmup') return warmupScreen();
+    if(S.screen === 'diary') return diaryScreen();
+    if(S.screen === 'result') return resultScreen();
+    return '';
+  }
+
+  /* ---------- HOME ---------- */
+  function homeScreen(){
+    const doneToday = S.entryDates.includes(todayStr());
+    return `
+    <div class="panel">
+      <h2>🥋 今日の修行</h2>
+      <p style="color:var(--text-dim);margin:0 0 16px;font-size:.9rem;line-height:1.7;">
+        まず${WARMUP_COUNT}本のくだらない例文でタイピングの手ならし。<br>
+        そのあと、制限時間で今日の日記を書いて師範に判定してもらおう。
+      </p>
+      <div class="btn-row">
+        <button class="btn btn-main" id="startBtn">${doneToday ? '今日の修行をやり直す' : '修行をはじめる'}</button>
+      </div>
+      ${doneToday ? `<p style="color:var(--jade);font-size:.8rem;margin:10px 0 0;">✅ 今日はもう道場印を受け取っているぞ</p>` : ''}
+    </div>
+    <div class="panel">
+      <h2>📅 道場印カレンダー</h2>
+      ${calendarHTML()}
+    </div>`;
+  }
+
+  function calendarHTML(){
+    const y = S.calYear, m = S.calMonth;
+    const first = new Date(y, m, 1);
+    const startDow = first.getDay();
+    const daysInMonth = new Date(y, m+1, 0).getDate();
+    const dowLabels = ['日','月','火','水','木','金','土'];
+    let cells = '';
+    for(let i=0;i<startDow;i++) cells += `<div class="cal-cell empty"></div>`;
+    for(let d=1; d<=daysInMonth; d++){
+      const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isToday = ds === todayStr();
+      const stamped = S.entryDates.includes(ds);
+      cells += `<div class="cal-cell ${stamped?'stamped':''} ${isToday?'today':''}" data-date="${stamped?ds:''}">
+        <span class="daynum">${d}</span>
+        ${stamped ? `<span class="hanko">修</span>` : ''}
+      </div>`;
+    }
+    return `
+      <div class="cal-head">
+        <div class="ym">${y}年 ${m+1}月</div>
+        <div class="cal-nav">
+          <button id="calPrev">‹</button>
+          <button id="calNext">›</button>
+        </div>
+      </div>
+      <div class="cal-grid">
+        ${dowLabels.map(l=>`<div class="cal-dow">${l}</div>`).join('')}
+        ${cells}
+      </div>
+      ${S.entryDates.length===0 ? `<div class="empty-note">まだ道場印はない。今日の修行から始めよう。</div>` : ''}
+    `;
+  }
+
+  /* ---------- WARMUP ---------- */
+  function warmupScreen(){
+    const w = S.warmup;
+    return `
+    <div class="panel">
+      <h2>⌨️ 手ならしの巻 (<span id="warmupCounter">${w.idx+1}/${WARMUP_COUNT}</span>)</h2>
+      <div class="progress-track"><div class="progress-fill" style="width:${Math.round((w.idx/WARMUP_COUNT)*100)}%;"></div></div>
+      <div class="sentence-box">${warmupSentenceHtml()}</div>
+      <input type="text" class="type-input" id="warmupInput" placeholder="ここに入力…" autocomplete="off" autocapitalize="off" spellcheck="false" value="${escapeAttr(w.typed)}">
+      <div class="stat-row">
+        <div class="stat-chip">クリア <b id="warmupClearCount">${w.results.length}</b> 本</div>
+      </div>
+    </div>`;
+  }
+  function warmupSentenceHtml(){
+    const w = S.warmup;
+    const target = w.sentences[w.idx] || '';
+    const typed = w.typed;
+    let chars = '';
+    for(let i=0;i<target.length;i++){
+      let cls = 'pending';
+      if(i < typed.length) cls = (typed[i] === target[i]) ? 'correct' : 'wrong';
+      if(i === typed.length) cls += ' cursor';
+      chars += `<span class="ch ${cls}">${escapeHtml(target[i])}</span>`;
+    }
+    return chars;
+  }
+  // Updates only the sentence display / progress / counters without touching the
+  // <input> element itself. A full render() on every keystroke would recreate the
+  // input node and break Japanese IME composition (romaji->kana conversion) and
+  // steal focus/cursor position on mobile. This keeps the same input node alive
+  // for the whole sentence.
+  function updateWarmupUI(){
+    const w = S.warmup;
+    const box = document.querySelector('.sentence-box');
+    if(box) box.innerHTML = warmupSentenceHtml();
+    const fill = document.querySelector('.progress-fill');
+    if(fill) fill.style.width = Math.round((w.idx/WARMUP_COUNT)*100) + '%';
+    const counter = document.getElementById('warmupCounter');
+    if(counter) counter.textContent = `${w.idx+1}/${WARMUP_COUNT}`;
+    const clearCount = document.getElementById('warmupClearCount');
+    if(clearCount) clearCount.textContent = w.results.length;
+  }
+
+  /* ---------- DIARY ---------- */
+  function diaryScreen(){
+    const d = S.diary;
+    const mm = String(Math.floor(d.remaining/60)).padStart(2,'0');
+    const ss = String(d.remaining%60).padStart(2,'0');
+    const low = d.remaining <= 30;
+    const chars = d.text.length;
+    if(!d.running && !d.started){
+      return `
+      <div class="panel">
+        <h2>📖 日記の陣</h2>
+        <p style="color:var(--text-dim);font-size:.9rem;line-height:1.7;margin:0 0 16px;">
+          今日あったこと・思ったことを、制限時間いっぱい書いてみよう。書き終わったら「提出する」を押すか、時間切れを待とう。
+        </p>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:.82rem;color:var(--text-dim);display:block;margin-bottom:8px;">時間をえらぶ</label>
+          <div class="btn-row">
+            <button class="btn ${d.seconds===180?'btn-main':'btn-ghost'}" data-sec="180">3分</button>
+            <button class="btn ${d.seconds===300?'btn-main':'btn-ghost'}" data-sec="300">5分</button>
+            <button class="btn ${d.seconds===600?'btn-main':'btn-ghost'}" data-sec="600">10分</button>
+          </div>
+        </div>
+        <button class="btn btn-main" id="diaryStartBtn">よし、書きはじめる</button>
+      </div>`;
+    }
+    return `
+    <div class="panel">
+      <h2>📖 日記の陣</h2>
+      <div class="timer-wrap">
+        <div class="timer-display ${low?'low':''}">${mm}:${ss}</div>
+        <button class="btn btn-main" id="submitDiaryBtn">提出する</button>
+      </div>
+      <div class="diary-paper">
+        <textarea id="diaryText" placeholder="今日はどんな一日だった？">${escapeHtml(d.text)}</textarea>
+        <div class="diary-meta"><span>${chars} 文字</span><span>師範がのちほど読みます</span></div>
+      </div>
+    </div>`;
+  }
+
+  /* ---------- RESULT ---------- */
+  function resultScreen(){
+    const r = S.result;
+    if(!r) return `<div class="panel"><p class="empty-note">判定中<span class="loading-dots"></span></p></div>`;
+    if(r.loading){
+      return `<div class="panel"><h2>🧘 師範が読んでいます</h2><p class="empty-note">しばらく待つのじゃ<span class="loading-dots"></span></p></div>`;
+    }
+    const pct = r.score * 10;
+    return `
+    <div class="panel">
+      <h2>🏅 本日の判定</h2>
+      <div class="score-hero">
+        <div class="score-ring" style="--pct:${pct};"><span>${r.score}</span></div>
+        <div class="score-words">
+          <h3>${scoreTitle(r.score)}</h3>
+          <p>${r.volumeTier}</p>
+        </div>
+      </div>
+      <div class="metric-grid">
+        <div class="metric"><div class="val">${r.charCount}</div><div class="lbl">文字数</div></div>
+        <div class="metric"><div class="val">${r.typoEstimate}</div><div class="lbl">推定ミスタイプ</div></div>
+        <div class="metric"><div class="val">${r.warmupAccuracy}%</div><div class="lbl">手ならし正確率</div></div>
+      </div>
+      <div class="sensei-box">
+        <div class="who">📜 師範のひとこと ${r.aiFailed?'(通信できず・簡易判定)':''}</div>
+        <p><b>良かった点：</b>${escapeHtml(r.praise)}</p>
+        <p style="margin-top:8px;"><b>次への一言：</b>${escapeHtml(r.tip)}</p>
+        <p style="margin-top:8px;">${escapeHtml(r.comment)}</p>
+      </div>
+      ${r.newStamp ? `<div class="stamp-award"><span class="hanko" style="position:static;transform:rotate(-8deg);">修</span><span>道場印をゲット！</span></div>` : ''}
+      <div class="btn-row">
+        <button class="btn btn-main" id="backHomeBtn">道場にもどる</button>
+      </div>
+    </div>`;
+  }
+  function scoreTitle(score){
+    if(score>=9) return "免許皆伝級！";
+    if(score>=7) return "見事な筆さばき";
+    if(score>=5) return "しっかり修行できた";
+    return "まだ修行の途中";
+  }
+
+  /* ---------- MODAL (history detail) ---------- */
+  function modal(){
+    return `
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-box">
+        <button class="modal-close" id="modalClose">×</button>
+        <h2 class="display" style="color:var(--gold-bright);margin:0 0 4px;">${S.modalDate} の日記</h2>
+        <div id="modalBody"><p class="empty-note">よみこみ中<span class="loading-dots"></span></p></div>
+      </div>
+    </div>`;
+  }
+  async function openModal(dateStr){
+    S.modalDate = dateStr;
+    render();
+    const entry = await getEntry(dateStr);
+    const body = document.getElementById('modalBody');
+    if(!body) return;
+    if(!entry){ body.innerHTML = `<p class="empty-note">データが見つからなかった。</p>`; return; }
+    body.innerHTML = `
+      <div class="metric-grid">
+        <div class="metric"><div class="val">${entry.charCount}</div><div class="lbl">文字数</div></div>
+        <div class="metric"><div class="val">${entry.typoEstimate}</div><div class="lbl">推定ミス</div></div>
+        <div class="metric"><div class="val">${entry.score}</div><div class="lbl">判定点</div></div>
+      </div>
+      <div class="modal-diary-text">${escapeHtml(entry.text)}</div>
+      <div class="sensei-box">
+        <div class="who">📜 師範のひとこと</div>
+        <p><b>良かった点：</b>${escapeHtml(entry.praise || '')}</p>
+        <p style="margin-top:8px;"><b>次への一言：</b>${escapeHtml(entry.tip || '')}</p>
+        <p style="margin-top:8px;">${escapeHtml(entry.comment || '')}</p>
+      </div>
+    `;
+  }
+
+  /* ============ handlers ============ */
+  function attachHandlers(){
+    const startBtn = document.getElementById('startBtn');
+    if(startBtn) startBtn.onclick = beginWarmup;
+
+    const calPrev = document.getElementById('calPrev');
+    const calNext = document.getElementById('calNext');
+    if(calPrev) calPrev.onclick = () => { shiftMonth(-1); };
+    if(calNext) calNext.onclick = () => { shiftMonth(1); };
+
+    document.querySelectorAll('.cal-cell.stamped').forEach(cell=>{
+      cell.onclick = () => openModal(cell.getAttribute('data-date'));
+    });
+
+    const warmupInput = document.getElementById('warmupInput');
+    if(warmupInput){
+      warmupInput.focus();
+      warmupInput.oninput = onWarmupInput;
+    }
+
+    document.querySelectorAll('[data-sec]').forEach(btn=>{
+      btn.onclick = () => { S.diary.seconds = parseInt(btn.getAttribute('data-sec')); S.diary.remaining = S.diary.seconds; render(); };
+    });
+    const diaryStartBtn = document.getElementById('diaryStartBtn');
+    if(diaryStartBtn) diaryStartBtn.onclick = startDiaryTimer;
+
+    const diaryTextEl = document.getElementById('diaryText');
+    if(diaryTextEl){
+      diaryTextEl.focus();
+      diaryTextEl.addEventListener('keydown', onDiaryKeydown);
+      diaryTextEl.addEventListener('input', onDiaryInput);
+      const len = diaryTextEl.value.length;
+      diaryTextEl.setSelectionRange(len, len);
+    }
+    const submitDiaryBtn = document.getElementById('submitDiaryBtn');
+    if(submitDiaryBtn) submitDiaryBtn.onclick = () => finishDiary(false);
+
+    const backHomeBtn = document.getElementById('backHomeBtn');
+    if(backHomeBtn) backHomeBtn.onclick = async () => { S.screen='home'; await loadEntryList(); render(); };
+
+    const modalClose = document.getElementById('modalClose');
+    const modalOverlay = document.getElementById('modalOverlay');
+    if(modalClose) modalClose.onclick = closeModal;
+    if(modalOverlay) modalOverlay.onclick = (e)=>{ if(e.target===modalOverlay) closeModal(); };
+  }
+  function closeModal(){ S.modalDate = null; render(); }
+  function shiftMonth(delta){
+    S.calMonth += delta;
+    if(S.calMonth < 0){ S.calMonth = 11; S.calYear--; }
+    if(S.calMonth > 11){ S.calMonth = 0; S.calYear++; }
+    render();
+  }
+
+  /* ---------- warmup logic ---------- */
+  function beginWarmup(){
+    const pool = [...SENTENCES].sort(()=>Math.random()-0.5).slice(0, WARMUP_COUNT);
+    S.warmup = { idx:0, sentences: pool, typed:"", startTime: Date.now(), results: [] };
+    S.screen = 'warmup';
+    render();
+  }
+  function onWarmupInput(e){
+    // Skip while an IME composition is in progress (romaji->kana conversion);
+    // only evaluate once the browser has committed the actual characters.
+    if(e.isComposing) return;
+    const w = S.warmup;
+    w.typed = e.target.value;
+    const target = w.sentences[w.idx];
+    if(w.typed.length >= target.length){
+      let correct = 0;
+      for(let i=0;i<target.length;i++) if(w.typed[i] === target[i]) correct++;
+      const elapsed = Math.max(0.5, (Date.now() - w.startTime) / 1000);
+      w.results.push({ accuracy: correct/target.length, elapsed, len: target.length });
+      w.idx++; w.typed=""; w.startTime = Date.now();
+      if(w.idx >= WARMUP_COUNT){
+        S.screen = 'diary';
+        S.diary = { seconds: S.diary.seconds||300, remaining: S.diary.seconds||300, timerId:null, running:false, backspaces:0, keypresses:0, text:"", started:false, finished:false };
+        render();
+        return;
+      }
+      e.target.value = ""; // clear without recreating the input node
+      updateWarmupUI();
+      return;
+    }
+    updateWarmupUI();
+  }
+
+  /* ---------- diary logic ---------- */
+  function startDiaryTimer(){
+    S.diary.started = true;
+    S.diary.running = true;
+    render();
+    S.diary.timerId = setInterval(()=>{
+      S.diary.remaining--;
+      if(S.diary.remaining <= 0){
+        clearInterval(S.diary.timerId);
+        finishDiary(true);
+        return;
+      }
+      const timerEl = document.querySelector('.timer-display');
+      if(timerEl){
+        const mm = String(Math.floor(S.diary.remaining/60)).padStart(2,'0');
+        const ss = String(S.diary.remaining%60).padStart(2,'0');
+        timerEl.textContent = `${mm}:${ss}`;
+        timerEl.classList.toggle('low', S.diary.remaining<=30);
+      }
+    }, 1000);
+  }
+  function onDiaryKeydown(e){
+    if(e.key === 'Backspace' || e.key === 'Delete') S.diary.backspaces++;
+    else if(e.key.length === 1) S.diary.keypresses++;
+  }
+  function onDiaryInput(e){
+    S.diary.text = e.target.value;
+    const meta = document.querySelector('.diary-meta span');
+    if(meta) meta.textContent = `${S.diary.text.length} 文字`;
+  }
+  async function finishDiary(timeUp){
+    if(S.diary.finished) return; // guard against the submit button and the timer both firing
+    S.diary.finished = true;
+    if(S.diary.timerId) clearInterval(S.diary.timerId);
+    S.diary.running = false;
+    S.screen = 'result';
+    S.result = { loading: true };
+    render();
+
+    const text = S.diary.text.trim();
+    const charCount = text.length;
+    const typoEstimate = S.diary.backspaces;
+    const w = S.warmup.results;
+    const warmupAccuracy = w.length ? Math.round((w.reduce((a,r)=>a+r.accuracy,0)/w.length)*100) : 0;
+
+    let volumeTier;
+    if(charCount === 0) volumeTier = "今日はまだ何も書けていない…また挑戦しよう";
+    else if(charCount < 40) volumeTier = "もう少し書けそうだ、次はもっと粘ってみよう";
+    else if(charCount < 100) volumeTier = "しっかり書けました";
+    else volumeTier = "たっぷり書けた、大健闘！";
+
+    let aiResult;
+    if(charCount < 5){
+      aiResult = { score: 1, praise: "まずは一文字でも書き始めたことがスタートじゃ。", tip: "次はできごとをひとつ、思い出して書いてみよう。", comment: "道場の朝は短い一歩から始まる。焦らずいこう。" };
+    } else {
+      aiResult = await evaluateDiary(text);
+    }
+
+    const alreadyStamped = S.entryDates.includes(todayStr());
+
+    const entryData = {
+      text, charCount, typoEstimate, warmupAccuracy,
+      score: aiResult.score, praise: aiResult.praise, tip: aiResult.tip, comment: aiResult.comment,
+      savedAt: new Date().toISOString()
+    };
+    await saveEntry(todayStr(), entryData);
+    await loadEntryList();
+
+    S.result = {
+      charCount, typoEstimate, warmupAccuracy, volumeTier,
+      score: aiResult.score, praise: aiResult.praise, tip: aiResult.tip, comment: aiResult.comment,
+      aiFailed: !!aiResult.aiFailed,
+      newStamp: !alreadyStamped
+    };
+    render();
+  }
+
+  /* ---------- utils ---------- */
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeAttr(s){ return escapeHtml(s); }
+
+  /* ============ init ============ */
+  (async function init(){
+    await loadEntryList();
+    render();
+  })();
+})();
+</script>
+</body>
+</html>
