@@ -716,6 +716,12 @@ ${text}
   function onWarmupInput(e){
     S.warmup.typed = e.target.value;
     updateWarmupUI();
+    // While the IME is still composing (e.g. typing the hiragana reading before
+    // it converts to kanji), the in-progress text is often LONGER than the
+    // final kanji-counted target sentence. Checking length here would trigger
+    // "done" before the word is actually converted, so we wait for the segment
+    // to be committed (isComposing false, or the compositionend event below).
+    if(e.isComposing) return;
     checkWarmupCompletion(e.target);
   }
   // Some mobile IMEs (e.g. Japanese romaji input) keep text in an uncommitted
