@@ -229,48 +229,48 @@
 (function(){
   "use strict";
 
-  /* ============ 例文プール（男の子向け・くだらない系） ============ */
+  /* ============ 例文プール（男の子向け・くだらない系・漢字変換あり） ============ */
   const SENTENCES = [
-    "かいじゅうがビルをふんづけてゲームセンターにいった。",
-    "うちゅうじんはたこやきをたべたことがない。",
-    "ぼくのペンギンはロボットにへんしんできる。",
-    "きょうりゅうがコンビニでアイスをかいしめた。",
-    "にんじゃはくしゃみをがまんするしゅぎょうをした。",
-    "サメがじてんしゃにのってがっこうにきた。",
-    "おならをしたロボットがばくはつしそうになった。",
-    "ゆうれいがカラオケでえんかをうたっていた。",
-    "ドラゴンがれいぞうこのプリンをたべてしまった。",
-    "せかいでいちばんつよいカブトムシをさがしている。",
-    "うんこじゃないよ、これはチョコレートだよ。",
-    "ライオンがそうじきをこわがってにげまわった。",
-    "ロケットにのったカエルがつきでサッカーをした。",
-    "せんせいがとつぜんにんじゃにへんしんした。",
-    "みずぶくれのモンスターがおふろでおよいでいる。",
-    "オバケがトイレのドアをノックしてきた。",
-    "たまごやきをめぐってきょうりゅうとけんかになった。",
-    "ロボットがランドセルをせおって学校にちこくした。",
-    "でんしゃにのったゴリラがしんぶんをよんでいた。",
-    "ぼくのすきなおかしはうちゅうじんにぬすまれた。",
-    "かいじゅうがくしゃみでビルをたおしてしまった。",
-    "サッカーボールがきゅうにしゃべりだしてびっくりした。",
-    "パンダがコンビニのレジでバイトをしている。",
-    "にんじゃがラーメンをたべながらしゅりけんをなげた。",
-    "つきにすむウサギがもちつきたいかいをひらいた。",
-    "でんきウナギがゲームきをじゅうでんしてくれた。",
-    "せかいのはてまでうんてんするタクシーうんてんしゅがいる。",
-    "カブトガニがゆうえんちでかんらんしゃにのった。",
-    "ふゆのゆきだるまがなつやすみをほしがっている。",
-    "とりのすにスマホがまぎれこんでいた。",
-    "かいぞくせんがラーメンやのちゅうしゃじょうにとまった。",
-    "ロボットせんせいがしゅくだいをわすれてしまった。",
-    "きょだいなアリがおにぎりをまるごとはこんでいった。",
-    "たこがはちまきをまいてうんどうかいにさんかした。",
-    "つちのなかからきょうりゅうのたまごがでてきた。",
-    "ねこがマラソンたいかいでゆうしょうしてしまった。",
-    "でんしゃのなかでかいじゅうがねぼうしてしまった。",
-    "うみのそこにひみつのゲームセンターがあるらしい。",
-    "ロボットがだっしゅつゲームをかいはつしている。",
-    "モグラがちかにひみつのきちをつくっていた。"
+    "教室でだれかがこっそりおならをして、みんな気づかないふりをした。",
+    "給食のカレーのにおいで、怪獣が学校の前に集まってきた。",
+    "先生の大きなくしゃみで、黒板の字が全部消えてしまった。",
+    "ロボットのおなら検知センサーが、なぜか一日中鳴りっぱなしだった。",
+    "体育のとき、ズボンがずり落ちて、みんなに大笑いされた。",
+    "恐竜が盛大なげっぷをしたら、教室の窓ガラスがビリビリ震えた。",
+    "忍者が修行中にお腹を鳴らしてしまい、敵に居場所がばれた。",
+    "ロケットの発射のけむりが、なぜか変な形の雲になった。",
+    "校長先生が朝礼で「実はにおいに弱い」と告白してしまった。",
+    "宇宙人が給食の味を気に入りすぎて、地球に住みつくと言い出した。",
+    "カブトムシが先生の話が長すぎて、教室でぐっすり寝てしまった。",
+    "サメが自転車に乗って、こっそり保健室に通っているらしい。",
+    "冷蔵庫の奥から出てきたプリンに、名前を呼ばれた気がした。",
+    "ライオンが掃除機の音をこわがって、教室中を逃げまわった。",
+    "友達のおならが強烈すぎて、ハエまで気絶したという噂が広まった。",
+    "ゆうれいがトイレの前でずっと順番を待っているという噂がある。",
+    "机の中から一週間前の給食のパンが発見されて大騒ぎになった。",
+    "先生がとつぜん忍者に変装して、宿題の答え合わせをはじめた。",
+    "パンダがコンビニのレジでアルバイトをしているのを見た気がする。",
+    "サッカーボールが急にしゃべりだして、みんな腰をぬかした。",
+    "うさぎ小屋のうさぎが、体育館でこっそりダンスの練習をしていた。",
+    "電気ウナギが友達のゲーム機を勝手に充電してくれていた。",
+    "海賊船がラーメン屋の駐車場に、堂々と停まっていた。",
+    "巨大なアリが、給食のおにぎりを丸ごと巣に持ち帰ってしまった。",
+    "たこが鉢巻きを巻いて、運動会の玉入れに全力参加していた。",
+    "土の中から出てきた卵から、恐竜ではなく目覚まし時計が出てきた。",
+    "猫がマラソン大会にまぎれこんで、まさかの優勝をしてしまった。",
+    "電車の中で怪獣が居眠りして、乗り過ごしてしまったらしい。",
+    "海の底に、秘密のゲームセンターがあるという噂を耳にした。",
+    "ロボットが宿題を手伝いすぎて、逆にぜんぶ間違えていた。",
+    "モグラが地下に、こっそり秘密基地を作っているのを見つけた。",
+    "げっぷの音がくしゃみとまちがえられて、先生に心配された。",
+    "臭い靴下を隠していたら、犬に一瞬でかぎ当てられてしまった。",
+    "鼻をほじっているところを先生に見られて、教室中が大笑いした。",
+    "給食のあとの歯みがきで、ゾンビみたいな顔になった友達がいた。",
+    "図書室の本を読みすぎたロボットが、急に詩人になってしまった。",
+    "テストの答案用紙に、まちがえてらくがきの怪獣を描いてしまった。",
+    "雨の日、傘から変な生き物が飛び出してきた気がした。",
+    "友達のくしゃみが強すぎて、机の上のプリントが宙を舞った。",
+    "夜中にトイレに起きたら、廊下でロボット掃除機と目が合った。"
   ];
   const WARMUP_COUNT = 5;
 
@@ -490,6 +490,10 @@ ${text}
       <div class="progress-track"><div class="progress-fill" style="width:${Math.round((w.idx/WARMUP_COUNT)*100)}%;"></div></div>
       <div class="sentence-box">${warmupSentenceHtml()}</div>
       <input type="text" class="type-input" id="warmupInput" placeholder="ここに入力…" autocomplete="off" autocapitalize="off" spellcheck="false" value="${escapeAttr(w.typed)}">
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn btn-ghost" id="warmupNextBtn">つぎの例文へ ▶</button>
+      </div>
+      <p style="color:var(--text-dim);font-size:.72rem;margin:8px 0 0;">文字を打ち終わると自動で次に進みます。進まないときは「つぎの例文へ」を押してください。</p>
       <div class="stat-row">
         <div class="stat-chip">クリア <b id="warmupClearCount">${w.results.length}</b> 本</div>
       </div>
@@ -657,7 +661,16 @@ ${text}
     const warmupInput = document.getElementById('warmupInput');
     if(warmupInput){
       warmupInput.focus();
-      warmupInput.oninput = onWarmupInput;
+      warmupInput.addEventListener('input', onWarmupInput);
+      warmupInput.addEventListener('compositionend', onWarmupCompositionEnd);
+    }
+    const warmupNextBtn = document.getElementById('warmupNextBtn');
+    if(warmupNextBtn){
+      warmupNextBtn.onclick = () => {
+        const input = document.getElementById('warmupInput');
+        if(input) S.warmup.typed = input.value;
+        checkWarmupCompletion(input, true);
+      };
     }
 
     document.querySelectorAll('[data-sec]').forEach(btn=>{
@@ -701,17 +714,28 @@ ${text}
     render();
   }
   function onWarmupInput(e){
-    // Skip while an IME composition is in progress (romaji->kana conversion);
-    // only evaluate once the browser has committed the actual characters.
-    if(e.isComposing) return;
+    S.warmup.typed = e.target.value;
+    updateWarmupUI();
+    checkWarmupCompletion(e.target);
+  }
+  // Some mobile IMEs (e.g. Japanese romaji input) keep text in an uncommitted
+  // "composing" state for a while and don't always fire a normal 'input' event
+  // right when the segment is finalized. Re-checking on compositionend ensures
+  // typing still advances to the next sentence on phones, not just desktop.
+  function onWarmupCompositionEnd(e){
+    S.warmup.typed = e.target.value;
+    updateWarmupUI();
+    checkWarmupCompletion(e.target);
+  }
+  function checkWarmupCompletion(inputEl, force){
     const w = S.warmup;
-    w.typed = e.target.value;
     const target = w.sentences[w.idx];
-    if(w.typed.length >= target.length){
+    if(force || w.typed.length >= target.length){
       let correct = 0;
-      for(let i=0;i<target.length;i++) if(w.typed[i] === target[i]) correct++;
+      const compareLen = Math.min(w.typed.length, target.length);
+      for(let i=0;i<compareLen;i++) if(w.typed[i] === target[i]) correct++;
       const elapsed = Math.max(0.5, (Date.now() - w.startTime) / 1000);
-      w.results.push({ accuracy: correct/target.length, elapsed, len: target.length });
+      w.results.push({ accuracy: target.length ? correct/target.length : 0, elapsed, len: target.length });
       w.idx++; w.typed=""; w.startTime = Date.now();
       if(w.idx >= WARMUP_COUNT){
         S.screen = 'diary';
@@ -719,11 +743,9 @@ ${text}
         render();
         return;
       }
-      e.target.value = ""; // clear without recreating the input node
+      if(inputEl) inputEl.value = ""; // clear without recreating the input node
       updateWarmupUI();
-      return;
     }
-    updateWarmupUI();
   }
 
   /* ---------- diary logic ---------- */
