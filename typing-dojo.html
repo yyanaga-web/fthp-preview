@@ -152,6 +152,48 @@
   }
   .stat-chip b{color:var(--gold-bright);font-family:'JetBrains Mono',monospace;font-size:.95rem;}
 
+  /* ---------- pace walker race ---------- */
+  .pace-track{
+    position:relative;height:38px;margin:2px 0 14px;
+    background:linear-gradient(180deg, #241c14, #1a140e);
+    border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;
+  }
+  .pace-track::before{
+    content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(90deg, rgba(217,203,168,.12) 0 2px, transparent 2px 22px);
+  }
+  .pace-goal{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:1.15rem;z-index:1;}
+  .pace-walker{
+    position:absolute;left:2%;top:50%;transform:translateY(-50%);
+    font-size:1.4rem;transition:left linear;z-index:2;
+  }
+  .pace-walker.done{filter:grayscale(1) brightness(.7);}
+  .pace-label{font-size:.68rem;color:var(--text-dim);margin:-6px 0 10px;text-align:right;}
+
+  /* ---------- dramatic error shake ---------- */
+  @keyframes shakeError{
+    10%,90%{transform:translateX(-3px);}
+    20%,80%{transform:translateX(5px);}
+    30%,50%,70%{transform:translateX(-9px);}
+    40%,60%{transform:translateX(9px);}
+  }
+  .sentence-box.shake-error{animation:shakeError .45s;border:2px solid var(--vermillion);box-shadow:0 0 0 4px rgba(208,67,43,.18), 0 10px 24px -12px rgba(0,0,0,.5);}
+
+  .big-banner{
+    position:fixed;left:50%;top:36%;transform:translate(-50%,-50%) scale(.75);
+    background:linear-gradient(180deg,#241a16,#171009);
+    border:3px solid var(--vermillion);color:#fff3e6;
+    padding:20px 30px;border-radius:16px;
+    font-family:'Shippori Mincho',serif;font-size:1.55rem;font-weight:800;
+    text-align:center;z-index:80;opacity:0;pointer-events:none;
+    box-shadow:0 20px 50px -10px rgba(0,0,0,.65);
+    transition:opacity .15s ease, transform .15s ease;
+    max-width:80vw;
+  }
+  .big-banner.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  .big-banner .sub{display:block;font-family:'Zen Kaku Gothic New',sans-serif;font-size:.82rem;font-weight:500;margin-top:6px;color:#e0a08f;}
+  .big-banner.ok{border-color:var(--jade);}
+
   /* ---------- diary screen ---------- */
   .timer-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
   .timer-display{
@@ -224,6 +266,7 @@
 </head>
 <body>
 <div id="app"></div>
+<div class="big-banner" id="bigBanner"></div>
 
 <script>
 (function(){
@@ -274,6 +317,10 @@
   ];
   const WARMUP_COUNT = 5;
 
+  /* ============ タイピングの目標ペース ============ */
+  const PACE_CPS = { slow: 1.0, normal: 1.6, fast: 2.3 }; // characters per second
+  const PACE_LABELS = { slow: "おそい", normal: "ふつう", fast: "はやい" };
+
   /* ============ 帯（ベルト）ランク ============ */
   const BELTS = [
     {min:0,  name:"10級", color:"#f4f0e6", label:"白帯"},
@@ -300,7 +347,8 @@
     entryCount: 0,
     localCache: {},       // in-session fallback cache, keyed by date, used if persistent storage is unavailable
     storageOk: true,
-    warmup: { idx:0, sentences:[], typed:"", startTime:0, results:[] },
+    pace: 'normal',
+    warmup: { idx:0, sentences:[], typed:"", startTime:0, results:[], paceTimerId:null, paceSeconds:0 },
     diary: { seconds: 300, remaining: 300, timerId:null, running:false, backspaces:0, keypresses:0, text:"", finished:false },
     result: null,
     modalDate: null,
@@ -348,6 +396,15 @@
       if(r) return JSON.parse(r.value);
     }catch(e){ /* fall through to cache */ }
     return S.localCache[dateStr] || null;
+  }
+  async function loadSettings(){
+    try{
+      const r = await window.storage.get('settings:pace', false);
+      if(r && r.value && PACE_CPS[JSON.parse(r.value)]) S.pace = JSON.parse(r.value);
+    }catch(e){ /* keep default pace for this session */ }
+  }
+  async function savePace(){
+    try{ await window.storage.set('settings:pace', JSON.stringify(S.pace), false); }catch(e){ /* session-only is fine */ }
   }
 
   /* ============ Claude API content evaluation ============ */
@@ -434,13 +491,22 @@ ${text}
     <div class="panel">
       <h2>🥋 今日の修行</h2>
       <p style="color:var(--text-dim);margin:0 0 16px;font-size:.9rem;line-height:1.7;">
-        まず${WARMUP_COUNT}本のくだらない例文でタイピングの手ならし。<br>
+        まず${WARMUP_COUNT}本のくだらない例文でタイピングの手ならし。にんじゃが目標ペースで歩くから、追いつかれる前に打ちきろう。<br>
         そのあと、制限時間で今日の日記を書いて師範に判定してもらおう。
       </p>
       <div class="btn-row">
         <button class="btn btn-main" id="startBtn">${doneToday ? '今日の修行をやり直す' : '修行をはじめる'}</button>
       </div>
       ${doneToday ? `<p style="color:var(--jade);font-size:.8rem;margin:10px 0 0;">✅ 今日はもう道場印を受け取っているぞ</p>` : ''}
+    </div>
+    <div class="panel">
+      <h2>🥷 にんじゃの歩くペース</h2>
+      <p style="color:var(--text-dim);margin:0 0 12px;font-size:.85rem;">手ならし中、にんじゃがこのペースで文の最後まで歩く。追いつかれたらその例文は失敗になるよ。</p>
+      <div class="btn-row">
+        <button class="btn ${S.pace==='slow'?'btn-main':'btn-ghost'}" data-pace="slow">おそい</button>
+        <button class="btn ${S.pace==='normal'?'btn-main':'btn-ghost'}" data-pace="normal">ふつう</button>
+        <button class="btn ${S.pace==='fast'?'btn-main':'btn-ghost'}" data-pace="fast">はやい</button>
+      </div>
     </div>
     <div class="panel">
       <h2>📅 道場印カレンダー</h2>
@@ -488,12 +554,14 @@ ${text}
     <div class="panel">
       <h2>⌨️ 手ならしの巻 (<span id="warmupCounter">${w.idx+1}/${WARMUP_COUNT}</span>)</h2>
       <div class="progress-track"><div class="progress-fill" style="width:${Math.round((w.idx/WARMUP_COUNT)*100)}%;"></div></div>
-      <div class="sentence-box">${warmupSentenceHtml()}</div>
+      <div class="sentence-box" id="sentenceBox">${warmupSentenceHtml()}</div>
+      <div class="pace-track"><span class="pace-walker" id="paceWalker">🥷</span><span class="pace-goal">🚩</span></div>
+      <div class="pace-label">目標ペース：${PACE_LABELS[S.pace]}</div>
       <input type="text" class="type-input" id="warmupInput" placeholder="ここに入力…" autocomplete="off" autocapitalize="off" spellcheck="false" value="${escapeAttr(w.typed)}">
       <div class="btn-row" style="margin-top:12px;">
-        <button class="btn btn-ghost" id="warmupNextBtn">つぎの例文へ ▶</button>
+        <button class="btn btn-ghost" id="warmupNextBtn">この例文をスキップする ▶</button>
       </div>
-      <p style="color:var(--text-dim);font-size:.72rem;margin:8px 0 0;">文字を打ち終わると自動で次に進みます。進まないときは「つぎの例文へ」を押してください。</p>
+      <p style="color:var(--text-dim);font-size:.72rem;margin:8px 0 0;">1文字でも間違えていると次には進めません。なおしてから最後まで打ちきろう。にんじゃに追いつかれると失敗になるよ。</p>
       <div class="stat-row">
         <div class="stat-chip">クリア <b id="warmupClearCount">${w.results.length}</b> 本</div>
       </div>
@@ -512,14 +580,9 @@ ${text}
     }
     return chars;
   }
-  // Updates only the sentence display / progress / counters without touching the
-  // <input> element itself. A full render() on every keystroke would recreate the
-  // input node and break Japanese IME composition (romaji->kana conversion) and
-  // steal focus/cursor position on mobile. This keeps the same input node alive
-  // for the whole sentence.
   function updateWarmupUI(){
     const w = S.warmup;
-    const box = document.querySelector('.sentence-box');
+    const box = document.getElementById('sentenceBox');
     if(box) box.innerHTML = warmupSentenceHtml();
     const fill = document.querySelector('.progress-fill');
     if(fill) fill.style.width = Math.round((w.idx/WARMUP_COUNT)*100) + '%';
@@ -527,6 +590,77 @@ ${text}
     if(counter) counter.textContent = `${w.idx+1}/${WARMUP_COUNT}`;
     const clearCount = document.getElementById('warmupClearCount');
     if(clearCount) clearCount.textContent = w.results.length;
+  }
+
+  function showBanner(mainText, subText, ms, ok){
+    const el = document.getElementById('bigBanner');
+    if(!el) return;
+    el.innerHTML = `${escapeHtml(mainText)}${subText ? `<span class="sub">${escapeHtml(subText)}</span>` : ''}`;
+    el.classList.toggle('ok', !!ok);
+    el.classList.remove('show');
+    void el.offsetWidth; // restart animation if triggered again quickly
+    el.classList.add('show');
+    if(el._hideTimer) clearTimeout(el._hideTimer);
+    el._hideTimer = setTimeout(()=>{ el.classList.remove('show'); }, ms || 1100);
+  }
+
+  // Animates the pacer character walking across the track over `seconds`, and
+  // arms a timeout that fires if the sentence still isn't an exact match by
+  // then (a miss for that sentence).
+  function startPacer(){
+    const w = S.warmup;
+    const target = w.sentences[w.idx];
+    const cps = PACE_CPS[S.pace] || PACE_CPS.normal;
+    const seconds = Math.max(3, (target ? target.length : 0) / cps);
+    w.paceSeconds = seconds;
+    if(w.paceTimerId) clearTimeout(w.paceTimerId);
+    w.paceTimerId = setTimeout(onPaceTimeout, seconds * 1000);
+    const walker = document.getElementById('paceWalker');
+    if(walker){
+      walker.classList.remove('done');
+      walker.style.transition = 'none';
+      walker.style.left = '2%';
+      void walker.offsetWidth; // force reflow so the next transition actually animates
+      walker.style.transition = `left ${seconds}s linear`;
+      requestAnimationFrame(()=>{ walker.style.left = '94%'; });
+    }
+  }
+  function stopPacer(){
+    const w = S.warmup;
+    if(w.paceTimerId){ clearTimeout(w.paceTimerId); w.paceTimerId = null; }
+  }
+  function onPaceTimeout(){
+    const w = S.warmup;
+    const target = w.sentences[w.idx];
+    if(!target) return;
+    const inputEl = document.getElementById('warmupInput');
+    const typedNow = inputEl ? inputEl.value : w.typed;
+    let correct = 0;
+    const compareLen = Math.min(typedNow.length, target.length);
+    for(let i=0;i<compareLen;i++) if(typedNow[i] === target[i]) correct++;
+    w.results.push({ accuracy: target.length ? correct/target.length : 0, elapsed: w.paceSeconds, len: target.length, failed:true });
+    const walker = document.getElementById('paceWalker');
+    if(walker) walker.classList.add('done');
+    showBanner('⏰ タイムオーバー！', 'にんじゃに追いつかれた…', 1300);
+    advanceWarmupSentence();
+  }
+  // Moves on to the next sentence (or to the diary screen once all are done),
+  // resetting the input and (re)starting the pacer for the new sentence.
+  function advanceWarmupSentence(){
+    const w = S.warmup;
+    stopPacer();
+    w.idx++; w.typed = ""; w.startTime = Date.now();
+    const inputEl = document.getElementById('warmupInput');
+    if(inputEl) inputEl.value = "";
+    if(w.idx >= WARMUP_COUNT){
+      S.screen = 'diary';
+      S.diary = { seconds: S.diary.seconds||300, remaining: S.diary.seconds||300, timerId:null, running:false, backspaces:0, keypresses:0, text:"", started:false, finished:false };
+      render();
+      return;
+    }
+    updateWarmupUI();
+    startPacer();
+    if(inputEl) inputEl.focus();
   }
 
   /* ---------- DIARY ---------- */
@@ -649,6 +783,10 @@ ${text}
     const startBtn = document.getElementById('startBtn');
     if(startBtn) startBtn.onclick = beginWarmup;
 
+    document.querySelectorAll('[data-pace]').forEach(btn=>{
+      btn.onclick = () => { S.pace = btn.getAttribute('data-pace'); savePace(); render(); };
+    });
+
     const calPrev = document.getElementById('calPrev');
     const calNext = document.getElementById('calNext');
     if(calPrev) calPrev.onclick = () => { shiftMonth(-1); };
@@ -709,9 +847,10 @@ ${text}
   /* ---------- warmup logic ---------- */
   function beginWarmup(){
     const pool = [...SENTENCES].sort(()=>Math.random()-0.5).slice(0, WARMUP_COUNT);
-    S.warmup = { idx:0, sentences: pool, typed:"", startTime: Date.now(), results: [] };
+    S.warmup = { idx:0, sentences: pool, typed:"", startTime: Date.now(), results: [], paceTimerId:null, paceSeconds:0 };
     S.screen = 'warmup';
     render();
+    startPacer();
   }
   function onWarmupInput(e){
     S.warmup.typed = e.target.value;
@@ -733,24 +872,36 @@ ${text}
     updateWarmupUI();
     checkWarmupCompletion(e.target);
   }
+  // A sentence only counts as cleared on an EXACT match with the target text.
+  // If the typed length reaches the target but contains a mistake, we show a
+  // big dramatic error and keep the player on the same sentence until it's
+  // fixed. The only ways off a sentence are: (1) an exact match, (2) the pace
+  // timer running out (onPaceTimeout, a miss), or (3) the manual skip button
+  // (force=true).
   function checkWarmupCompletion(inputEl, force){
     const w = S.warmup;
     const target = w.sentences[w.idx];
-    if(force || w.typed.length >= target.length){
+    if(!target) return;
+    if(force){
       let correct = 0;
       const compareLen = Math.min(w.typed.length, target.length);
       for(let i=0;i<compareLen;i++) if(w.typed[i] === target[i]) correct++;
       const elapsed = Math.max(0.5, (Date.now() - w.startTime) / 1000);
-      w.results.push({ accuracy: target.length ? correct/target.length : 0, elapsed, len: target.length });
-      w.idx++; w.typed=""; w.startTime = Date.now();
-      if(w.idx >= WARMUP_COUNT){
-        S.screen = 'diary';
-        S.diary = { seconds: S.diary.seconds||300, remaining: S.diary.seconds||300, timerId:null, running:false, backspaces:0, keypresses:0, text:"", started:false, finished:false };
-        render();
-        return;
-      }
-      if(inputEl) inputEl.value = ""; // clear without recreating the input node
-      updateWarmupUI();
+      w.results.push({ accuracy: target.length ? correct/target.length : 0, elapsed, len: target.length, skipped:true });
+      advanceWarmupSentence();
+      return;
+    }
+    if(w.typed.length < target.length) return; // still typing, nothing to judge yet
+    const exact = w.typed.length === target.length && w.typed === target;
+    if(exact){
+      const elapsed = Math.max(0.5, (Date.now() - w.startTime) / 1000);
+      w.results.push({ accuracy: 1, elapsed, len: target.length });
+      showBanner('⭕ せいかい！', null, 550, true);
+      advanceWarmupSentence();
+    } else {
+      const box = document.getElementById('sentenceBox');
+      if(box){ box.classList.remove('shake-error'); void box.offsetWidth; box.classList.add('shake-error'); }
+      showBanner('❌ ちがう！', 'なおしてもう一度', 900);
     }
   }
 
@@ -839,6 +990,7 @@ ${text}
 
   /* ============ init ============ */
   (async function init(){
+    await loadSettings();
     await loadEntryList();
     render();
   })();
