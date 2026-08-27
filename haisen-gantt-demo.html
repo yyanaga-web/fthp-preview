@@ -19,52 +19,36 @@
     --text-faint:#516080;
     --accent-red:#EF5757;
     --accent-white:#F4F7FC;
+    --accent-teal:#5EE6D0;
     --font-sans: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", Roboto, sans-serif;
     --font-mono: "SFMono-Regular", "SF Mono", Consolas, "Menlo", monospace;
   }
-  @media (prefers-reduced-motion: reduce){
-    *{ animation: none !important; transition: none !important; }
-  }
+  @media (prefers-reduced-motion: reduce){ *{ animation: none !important; transition: none !important; } }
   *{ box-sizing:border-box; }
   html,body{ height:100%; }
-  body{
-    margin:0; background:var(--bg-app); color:var(--text);
-    font-family:var(--font-sans); overflow:hidden;
-  }
+  body{ margin:0; background:var(--bg-app); color:var(--text); font-family:var(--font-sans); overflow:hidden; }
   #app{ display:flex; flex-direction:column; height:100vh; }
 
   /* ---------- Header ---------- */
   header{
     flex:0 0 auto; background:linear-gradient(180deg,#0F1A2C 0%, #0B1220 100%);
-    border-bottom:1px solid var(--line-med);
-    padding:14px 20px 12px;
-    animation: fadeDown .5s ease both;
+    border-bottom:1px solid var(--line-med); padding:12px 20px 10px; animation: fadeDown .5s ease both;
+    position:relative; z-index:200;
   }
   @keyframes fadeDown{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
-  .titleRow{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
-  .eyebrow{
-    font-family:var(--font-mono); font-size:10.5px; letter-spacing:.18em;
-    color:#5EE6D0; font-weight:700;
-  }
-  h1{ font-size:18px; margin:2px 0 0; font-weight:800; letter-spacing:.01em; }
-  .subline{ font-size:12px; color:var(--text-muted); margin-top:4px; max-width:900px; line-height:1.6; }
-  .toolbar{
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-    margin-top:12px;
-  }
-  .grp{ display:flex; align-items:center; gap:4px; background:var(--bg-panel);
-    border:1px solid var(--line-soft); border-radius:8px; padding:3px; }
-  button.tbtn{
-    background:transparent; border:none; color:var(--text); cursor:pointer;
-    font-size:12px; padding:6px 10px; border-radius:6px; font-family:var(--font-sans);
-    display:flex; align-items:center; gap:6px; white-space:nowrap;
-  }
+  .eyebrow{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.18em; color:var(--accent-teal); font-weight:700; }
+  h1{ font-size:17px; margin:2px 0 0; font-weight:800; letter-spacing:.01em; }
+  .subline{ font-size:11.5px; color:var(--text-muted); margin-top:4px; max-width:960px; line-height:1.55; }
+  .toolbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  .grp{ display:flex; align-items:center; gap:4px; background:var(--bg-panel); border:1px solid var(--line-soft); border-radius:8px; padding:3px; position:relative; }
+  button.tbtn{ background:transparent; border:none; color:var(--text); cursor:pointer; font-size:12px; padding:6px 10px;
+    border-radius:6px; font-family:var(--font-sans); display:flex; align-items:center; gap:6px; white-space:nowrap; }
   button.tbtn:hover{ background:#1B2A44; }
   button.tbtn:active{ background:#233657; }
-  button.tbtn:focus-visible, select:focus-visible, .lockTag:focus-visible{
-    outline:2px solid #5EE6D0; outline-offset:1px;
+  button.tbtn:focus-visible, select:focus-visible, .lockTag:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--accent-teal); outline-offset:1px;
   }
-  .zoomLabel{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); min-width:34px; text-align:center; }
+  .zoomLabel{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); min-width:42px; text-align:center; }
   .legend{ display:flex; align-items:center; gap:14px; margin-left:auto; flex-wrap:wrap; }
   .legItem{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-muted); }
   .swatch{ width:22px; height:11px; border-radius:2px; flex:0 0 auto; }
@@ -74,73 +58,73 @@
   .tag-fixed-demo{ background:var(--accent-white); color:#0B1220; }
   .tag-tent-demo{ border:1px dashed var(--text-faint); color:var(--text-muted); }
 
+  /* ---------- Region filter popover ---------- */
+  .filterPopover{
+    position:absolute; top:calc(100% + 6px); left:0; width:260px; background:var(--bg-panel);
+    border:1px solid var(--line-med); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.5);
+    padding:10px; display:none; z-index:300;
+  }
+  .filterPopover.open{ display:block; }
+  .filterHead{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .filterHead span{ font-size:11.5px; color:var(--text-muted); }
+  .filterActions{ display:flex; gap:6px; }
+  .filterActions button{ font-size:10.5px; background:#182746; border:1px solid var(--line-med); color:var(--text);
+    border-radius:5px; padding:3px 7px; cursor:pointer; }
+  .filterActions button:hover{ background:#213155; }
+  .regionRow{ display:flex; align-items:center; gap:8px; padding:5px 4px; border-radius:6px; cursor:pointer; }
+  .regionRow:hover{ background:#182746; }
+  .regionRow input{ accent-color:var(--accent-teal); }
+  .regionDot{ width:10px; height:10px; border-radius:3px; flex:0 0 auto; }
+  .regionRow .rname{ font-size:12.5px; flex:1; }
+  .regionRow .rcount{ font-size:10.5px; color:var(--text-faint); font-family:var(--font-mono); }
+
   /* ---------- Gantt area ---------- */
   #ganttOuter{ flex:1 1 auto; min-height:0; position:relative; display:flex; }
   #ganttScroll{ flex:1; overflow:auto; position:relative; }
   #canvas{ display:flex; flex-direction:column; position:relative; }
 
   .headerRow{ display:flex; position:sticky; top:0; z-index:40; }
-  .corner{
-    position:sticky; left:0; z-index:41; flex:0 0 auto;
-    background:var(--bg-app); border-right:1px solid var(--line-strong);
-    border-bottom:1px solid var(--line-strong);
-    display:flex; align-items:flex-end; justify-content:center;
-    font-family:var(--font-mono); font-size:9.5px; color:var(--text-faint); padding-bottom:6px;
-  }
-  #ruler{
-    position:relative; flex:0 0 auto; background:var(--bg-app);
-    border-bottom:1px solid var(--line-strong);
-  }
+  .corner{ position:sticky; left:0; z-index:41; flex:0 0 auto; background:var(--bg-app);
+    border-right:1px solid var(--line-strong); border-bottom:1px solid var(--line-strong);
+    display:flex; align-items:flex-end; justify-content:center; font-family:var(--font-mono);
+    font-size:9.5px; color:var(--text-faint); padding-bottom:6px; text-align:center; }
+  #ruler{ position:relative; flex:0 0 auto; background:var(--bg-app); border-bottom:1px solid var(--line-strong); }
   .tick{ position:absolute; top:0; bottom:0; border-left:1px solid var(--line-soft); }
   .tick.med{ border-left-color:var(--line-med); }
-  .tick.strong{ border-left-color:var(--line-strong); border-left-width:1px; }
-  .tickLabel{
-    position:absolute; top:4px; font-family:var(--font-mono); font-size:10px;
-    color:var(--text-faint); white-space:nowrap; transform:translateX(2px);
-  }
-  .dayLabel{
-    position:absolute; top:20px; font-family:var(--font-mono); font-size:12px; font-weight:700;
-    color:var(--text); white-space:nowrap; transform:translateX(4px);
-  }
+  .tick.strong{ border-left-color:var(--line-strong); }
+  .tickLabel{ position:absolute; top:4px; font-family:var(--font-mono); font-size:10px; color:var(--text-faint);
+    white-space:nowrap; transform:translateX(2px); }
+  .dayLabel{ position:absolute; top:20px; font-family:var(--font-mono); font-size:12px; font-weight:700;
+    color:var(--text); white-space:nowrap; transform:translateX(4px); }
 
   .bodyRow{ display:flex; position:relative; }
-  #labelsCol{
-    position:sticky; left:0; z-index:20; flex:0 0 auto; display:flex; flex-direction:column;
-    border-right:1px solid var(--line-strong);
-  }
-  .portLabel{
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    border-bottom:1px solid var(--line-strong); position:relative;
-  }
-  .portLabel .letter{
-    font-family:var(--font-mono); font-size:20px; font-weight:800; color:var(--text);
-    width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center;
-    background:#1A2740; border:1px solid var(--line-med);
-  }
-  .portLabel .cap{ font-size:9.5px; color:var(--text-faint); margin-top:6px; letter-spacing:.08em; }
+  #labelsCol{ position:sticky; left:0; z-index:20; flex:0 0 auto; display:flex; flex-direction:column;
+    border-right:1px solid var(--line-strong); }
+  .portLabel{ display:flex; align-items:center; border-bottom:1px solid var(--line-strong); position:relative;
+    padding-left:10px; }
+  .portLabel .stripe{ position:absolute; left:0; top:0; bottom:0; width:4px; }
+  .portLabel .plabel{ font-family:var(--font-mono); font-size:12.5px; font-weight:700; color:var(--text); }
+  .regionDivider{ display:flex; align-items:center; gap:6px; padding-left:10px; font-size:10.5px; font-weight:700;
+    color:var(--text-muted); background:#0A1120; border-bottom:1px solid var(--line-strong);
+    border-top:1px solid var(--line-strong); letter-spacing:.04em; }
+  .regionDivider .rd-dot{ width:8px; height:8px; border-radius:2px; }
+  .regionDividerContent{ background:#0A1120; border-bottom:1px solid var(--line-strong); border-top:1px solid var(--line-strong); }
 
   #contentCol{ position:relative; flex:0 0 auto; }
   .gridline{ position:absolute; top:0; width:1px; background:var(--line-soft); }
   .gridline.med{ background:var(--line-med); }
-  .gridline.strong{ background:var(--line-strong); width:1px; }
+  .gridline.strong{ background:var(--line-strong); }
   .rowBg{ position:absolute; left:0; right:0; border-bottom:1px solid var(--line-strong); }
   .nowLine{ position:absolute; top:0; width:2px; background:var(--accent-red); z-index:6; }
-  .nowFlag{
-    position:absolute; top:-1px; transform:translate(-50%,-100%); background:var(--accent-red); color:#fff;
-    font-family:var(--font-mono); font-size:9.5px; padding:2px 6px; border-radius:4px; white-space:nowrap;
-    font-weight:700;
-  }
+  .nowFlag{ position:absolute; top:-1px; transform:translate(-50%,-100%); background:var(--accent-red); color:#fff;
+    font-family:var(--font-mono); font-size:9.5px; padding:2px 6px; border-radius:4px; white-space:nowrap; font-weight:700; }
 
-  .bar{
-    position:absolute; display:flex; border-radius:3px 9px 9px 3px;
-    box-shadow:0 1px 3px rgba(0,0,0,.4);
-    cursor:grab; overflow:visible; z-index:10; user-select:none;
-    transition: box-shadow .15s ease, top .12s ease;
-    border:1.5px dashed var(--text-faint);
-  }
+  .bar{ position:absolute; display:flex; border-radius:3px 9px 9px 3px; box-shadow:0 1px 3px rgba(0,0,0,.4);
+    cursor:grab; overflow:visible; z-index:10; user-select:none; transition: box-shadow .15s ease, top .12s ease;
+    border:1.5px dashed var(--text-faint); }
   .bar.fixed{ border:2px solid var(--accent-white); box-shadow:0 0 0 1px rgba(244,247,252,.25), 0 1px 4px rgba(0,0,0,.5); }
   .bar:hover{ box-shadow:0 0 0 1px rgba(255,255,255,.3), 0 2px 6px rgba(0,0,0,.5); z-index:15; }
-  .bar.selected{ box-shadow:0 0 0 2px #5EE6D0, 0 2px 8px rgba(0,0,0,.5); z-index:16; }
+  .bar.selected{ box-shadow:0 0 0 2px var(--accent-teal), 0 2px 8px rgba(0,0,0,.5); z-index:16; }
   .bar.dragging{ cursor:grabbing; z-index:50; opacity:.92; }
   .bar.shake{ animation:shake .32s ease; }
   @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
@@ -149,42 +133,42 @@
   .seg-wait{ filter:brightness(.62) saturate(.85); }
   .seg-work{ background-image:repeating-linear-gradient(45deg, rgba(255,255,255,.16) 0 5px, transparent 5px 10px); }
 
-  .barLabel{
-    position:absolute; left:8px; top:50%; transform:translateY(-50%); font-size:11px; font-weight:700;
-    color:#0B1220; text-shadow:0 1px 0 rgba(255,255,255,.25); white-space:nowrap; pointer-events:none;
-    z-index:2; mix-blend-mode:normal;
-  }
-  .segCaption{
-    position:absolute; bottom:2px; left:0; right:0; text-align:center; font-size:9px; font-weight:700;
-    color:rgba(11,18,32,.75); pointer-events:none; white-space:nowrap; overflow:hidden;
-  }
+  .barLabel{ position:absolute; left:8px; top:50%; transform:translateY(-50%); font-size:11px; font-weight:700;
+    color:#0B1220; text-shadow:0 1px 0 rgba(255,255,255,.25); white-space:nowrap; pointer-events:none; z-index:2; }
+  .segCaption{ position:absolute; bottom:2px; left:0; right:0; text-align:center; font-size:9px; font-weight:700;
+    color:rgba(11,18,32,.75); pointer-events:none; white-space:nowrap; overflow:hidden; }
 
-  .handle{
-    position:absolute; top:0; width:10px; height:100%; cursor:ew-resize; z-index:20;
-    opacity:0; transition:opacity .12s ease;
-  }
+  .handle{ position:absolute; top:0; width:10px; height:100%; cursor:ew-resize; z-index:20; opacity:0; transition:opacity .12s ease; }
   .bar:hover .handle{ opacity:1; }
-  .handle::after{
-    content:""; position:absolute; left:50%; top:15%; bottom:15%; width:2px; transform:translateX(-50%);
-    background:rgba(255,255,255,.85); border-radius:2px;
-  }
+  .handle::after{ content:""; position:absolute; left:50%; top:15%; bottom:15%; width:2px; transform:translateX(-50%);
+    background:rgba(255,255,255,.85); border-radius:2px; }
 
-  .lockTag{
-    position:absolute; left:6px; top:-9px; font-size:9.5px; font-weight:800; border-radius:20px;
-    padding:2px 8px; cursor:pointer; z-index:21; font-family:var(--font-sans); border:none;
-    display:flex; align-items:center; gap:3px; letter-spacing:.02em;
-  }
+  .lockTag{ position:absolute; left:6px; top:-9px; font-size:9.5px; font-weight:800; border-radius:20px; padding:2px 8px;
+    cursor:pointer; z-index:21; font-family:var(--font-sans); border:none; display:flex; align-items:center; gap:3px; }
   .lockTag.on{ background:var(--accent-white); color:#0B1220; }
   .lockTag.off{ background:#16233A; color:var(--text-muted); border:1px dashed var(--text-faint); }
   .lockTag:hover{ filter:brightness(1.08); }
 
+  .commentTag{ position:absolute; right:4px; bottom:-9px; font-size:9.5px; font-weight:700; border-radius:20px;
+    padding:2px 7px; z-index:21; background:#182746; color:#BFD3F5; border:1px solid var(--line-med); pointer-events:none; }
+
+  /* ---------- Hover tooltip ---------- */
+  #hoverTip{ position:fixed; z-index:500; background:#0A1220; border:1px solid var(--line-med); border-radius:8px;
+    padding:10px 12px; font-size:11.5px; box-shadow:0 10px 30px rgba(0,0,0,.55); pointer-events:none; display:none;
+    min-width:210px; }
+  #hoverTip .tipHead{ display:flex; align-items:center; gap:7px; margin-bottom:6px; }
+  #hoverTip .tipDot{ width:11px; height:11px; border-radius:50%; }
+  #hoverTip .tipName{ font-weight:800; font-size:12.5px; }
+  #hoverTip .tipSub{ color:var(--text-muted); font-size:10.5px; margin-bottom:6px; }
+  #hoverTip .tipRow{ display:flex; justify-content:space-between; gap:14px; font-family:var(--font-mono); font-size:11px;
+    padding:1.5px 0; color:var(--text); }
+  #hoverTip .tipRow span:first-child{ color:var(--text-faint); font-family:var(--font-sans); }
+  #hoverTip .tipStatus{ margin-top:6px; font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; display:inline-block; }
+
   /* ---------- Detail panel ---------- */
-  #panel{
-    position:fixed; top:0; right:0; bottom:0; width:320px; background:var(--bg-panel);
-    border-left:1px solid var(--line-strong); transform:translateX(100%);
-    transition:transform .22s ease; z-index:100; display:flex; flex-direction:column;
-    box-shadow:-8px 0 24px rgba(0,0,0,.35);
-  }
+  #panel{ position:fixed; top:0; right:0; bottom:0; width:340px; background:var(--bg-panel); border-left:1px solid var(--line-strong);
+    transform:translateX(100%); transition:transform .22s ease; z-index:150; display:flex; flex-direction:column;
+    box-shadow:-8px 0 24px rgba(0,0,0,.35); }
   #panel.open{ transform:translateX(0); }
   .panelHead{ padding:16px 16px 12px; border-bottom:1px solid var(--line-soft); display:flex; align-items:center; gap:10px; }
   .shipDot{ width:14px; height:14px; border-radius:50%; flex:0 0 auto; box-shadow:0 0 0 2px rgba(255,255,255,.15); }
@@ -194,30 +178,35 @@
   .panelBody{ padding:14px 16px; overflow-y:auto; flex:1; }
   .field{ margin-bottom:16px; }
   .fieldLabel{ font-size:10.5px; color:var(--text-faint); letter-spacing:.06em; margin-bottom:6px; text-transform:uppercase; font-family:var(--font-mono); }
-  select.portSel{
-    width:100%; background:#0E1728; color:var(--text); border:1px solid var(--line-med); border-radius:6px;
-    padding:7px 8px; font-size:13px; font-family:var(--font-sans);
-  }
+  select.portSel{ width:100%; background:#0E1728; color:var(--text); border:1px solid var(--line-med); border-radius:6px;
+    padding:7px 8px; font-size:13px; font-family:var(--font-sans); }
   .timeRow{ display:flex; align-items:center; gap:8px; margin-bottom:9px; }
   .timeRow .tlabel{ width:64px; font-size:12px; color:var(--text-muted); flex:0 0 auto; }
-  .timeRow .tval{ flex:1; font-family:var(--font-mono); font-size:12.5px; background:#0E1728; border:1px solid var(--line-soft);
-    border-radius:6px; padding:6px 8px; text-align:center; }
-  .stepBtn{
-    width:24px; height:24px; border-radius:6px; border:1px solid var(--line-med); background:#182746; color:var(--text);
-    cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center; flex:0 0 auto;
-  }
+  .timeRow .tval{ flex:1; font-family:var(--font-mono); font-size:12px; background:#0E1728; border:1px solid var(--line-soft);
+    border-radius:6px; padding:6px 6px; text-align:center; }
+  .stepBtn{ width:24px; height:24px; border-radius:6px; border:1px solid var(--line-med); background:#182746; color:var(--text);
+    cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
   .stepBtn:hover{ background:#213155; }
   .stepBtn:disabled{ opacity:.3; cursor:not-allowed; }
   .typeBadge{ display:inline-block; font-size:10.5px; padding:2px 8px; border-radius:20px; background:#182746; color:#9FB3D9; margin-bottom:4px; }
-  .fixBtn{
-    width:100%; padding:10px; border-radius:8px; border:1px solid var(--line-med); cursor:pointer;
-    font-size:13px; font-weight:700; font-family:var(--font-sans); margin-top:6px;
-  }
+  .fixBtn{ width:100%; padding:10px; border-radius:8px; border:1px solid var(--line-med); cursor:pointer; font-size:13px;
+    font-weight:700; font-family:var(--font-sans); margin-top:6px; }
   .fixBtn.toFix{ background:var(--accent-white); color:#0B1220; border-color:var(--accent-white); }
   .fixBtn.toRelease{ background:transparent; color:var(--text-muted); }
   .hint{ font-size:11px; color:var(--text-faint); margin-top:8px; line-height:1.6; }
 
-  /* scrollbar */
+  .commentList{ max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+  .commentItem{ background:#0E1728; border:1px solid var(--line-soft); border-radius:8px; padding:7px 9px; }
+  .commentItem .cTime{ font-family:var(--font-mono); font-size:9.5px; color:var(--text-faint); margin-bottom:3px; }
+  .commentItem .cText{ font-size:12px; color:var(--text); line-height:1.5; white-space:pre-wrap; word-break:break-word; }
+  .commentEmpty{ font-size:11.5px; color:var(--text-faint); padding:6px 2px; }
+  .commentInputRow{ display:flex; gap:6px; align-items:flex-end; }
+  .commentInputRow textarea{ flex:1; resize:vertical; min-height:44px; background:#0E1728; color:var(--text);
+    border:1px solid var(--line-med); border-radius:6px; padding:7px 8px; font-size:12px; font-family:var(--font-sans); }
+  .addBtn{ background:var(--accent-teal); color:#0B1220; border:none; border-radius:6px; padding:8px 12px; font-size:12px;
+    font-weight:700; cursor:pointer; flex:0 0 auto; }
+  .addBtn:hover{ filter:brightness(1.06); }
+
   #ganttScroll::-webkit-scrollbar{ height:11px; width:11px; }
   #ganttScroll::-webkit-scrollbar-track{ background:var(--bg-app); }
   #ganttScroll::-webkit-scrollbar-thumb{ background:#26365A; border-radius:6px; border:2px solid var(--bg-app); }
@@ -229,21 +218,35 @@
 <body>
 <div id="app">
   <header>
-    <div class="titleRow">
-      <span class="eyebrow">PORT OPERATIONS CONSOLE</span>
-    </div>
+    <span class="eyebrow">PORT OPERATIONS CONSOLE</span>
     <h1>配船計画ガントチャート（デモ）</h1>
     <div class="subline">
-      横軸=日時、縦軸=積揚港（港A〜D）。各便は「入港 → 荷役開始 → 荷役終了 → 出港」の4時刻で構成されます。バーはドラッグして時刻や寄港地を調整でき、確定した便は白枠で固定されます。
+      横軸=日時（1ヶ月・画面幅で約1週間が1画面に収まります）、縦軸=積揚港（全100港・地域別）。バーはドラッグで移動、端のハンドルで各時刻を調整、船にマウスを重ねると時刻の詳細が表示されます。
     </div>
     <div class="toolbar">
       <div class="grp">
         <button class="tbtn" id="zoomOut" title="縮小">－</button>
-        <span class="zoomLabel" id="zoomLabel">55px/h</span>
+        <span class="zoomLabel" id="zoomLabel">--px/h</span>
         <button class="tbtn" id="zoomIn" title="拡大">＋</button>
       </div>
       <div class="grp">
+        <button class="tbtn" id="weekReset">📅 週表示にリセット</button>
+      </div>
+      <div class="grp">
         <button class="tbtn" id="gotoNow">⏱ 現在時刻へ</button>
+      </div>
+      <div class="grp" id="filterGrp">
+        <button class="tbtn" id="filterBtn">🗺 地域フィルター <span id="filterCount">(10/10)</span></button>
+        <div class="filterPopover" id="filterPopover">
+          <div class="filterHead">
+            <span>表示する地域</span>
+            <div class="filterActions">
+              <button id="selAll">全選択</button>
+              <button id="selNone">全解除</button>
+            </div>
+          </div>
+          <div id="regionList"></div>
+        </div>
       </div>
       <div class="grp">
         <button class="tbtn" id="resetBtn">⟲ デモデータをリセット</button>
@@ -273,6 +276,8 @@
   </div>
 </div>
 
+<div id="hoverTip"></div>
+
 <div id="panel">
   <div class="panelHead">
     <div class="shipDot" id="pDot"></div>
@@ -283,42 +288,34 @@
     <span class="typeBadge" id="pType">—</span>
     <div class="field">
       <div class="fieldLabel">寄港地</div>
-      <select class="portSel" id="pPort">
-        <option value="A">港 A</option>
-        <option value="B">港 B</option>
-        <option value="C">港 C</option>
-        <option value="D">港 D</option>
-      </select>
+      <select class="portSel" id="pPort"></select>
     </div>
     <div class="field">
       <div class="fieldLabel">時刻（30分単位で調整）</div>
       <div class="timeRow" data-field="arrive">
-        <div class="tlabel">入港</div>
-        <button class="stepBtn" data-dir="-1">－</button>
-        <div class="tval">--</div>
-        <button class="stepBtn" data-dir="1">＋</button>
+        <div class="tlabel">入港</div><button class="stepBtn" data-dir="-1">－</button><div class="tval">--</div><button class="stepBtn" data-dir="1">＋</button>
       </div>
       <div class="timeRow" data-field="workStart">
-        <div class="tlabel" id="lblWorkStart">開始</div>
-        <button class="stepBtn" data-dir="-1">－</button>
-        <div class="tval">--</div>
-        <button class="stepBtn" data-dir="1">＋</button>
+        <div class="tlabel" id="lblWorkStart">開始</div><button class="stepBtn" data-dir="-1">－</button><div class="tval">--</div><button class="stepBtn" data-dir="1">＋</button>
       </div>
       <div class="timeRow" data-field="workEnd">
-        <div class="tlabel" id="lblWorkEnd">終了</div>
-        <button class="stepBtn" data-dir="-1">－</button>
-        <div class="tval">--</div>
-        <button class="stepBtn" data-dir="1">＋</button>
+        <div class="tlabel" id="lblWorkEnd">終了</div><button class="stepBtn" data-dir="-1">－</button><div class="tval">--</div><button class="stepBtn" data-dir="1">＋</button>
       </div>
       <div class="timeRow" data-field="depart">
-        <div class="tlabel">出港</div>
-        <button class="stepBtn" data-dir="-1">－</button>
-        <div class="tval">--</div>
-        <button class="stepBtn" data-dir="1">＋</button>
+        <div class="tlabel">出港</div><button class="stepBtn" data-dir="-1">－</button><div class="tval">--</div><button class="stepBtn" data-dir="1">＋</button>
       </div>
     </div>
     <button class="fixBtn" id="pFixBtn"></button>
     <div class="hint" id="pHint"></div>
+
+    <div class="field" style="margin-top:18px;">
+      <div class="fieldLabel">コメント履歴</div>
+      <div class="commentList" id="commentList"></div>
+      <div class="commentInputRow">
+        <textarea id="commentInput" placeholder="申し送り事項を入力…"></textarea>
+        <button class="addBtn" id="commentAddBtn">追加</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -327,84 +324,129 @@
   "use strict";
 
   /* ================= constants ================= */
-  var PORTS = ["A","B","C","D"];
   var DAY_MIN = 1440;
-  var TOTAL_DAYS = 5; // Mon-Fri
+  var TOTAL_DAYS = 30; // 1 month
   var TOTAL_MIN = TOTAL_DAYS*DAY_MIN;
-  var BASE_DATE = new Date(2026,7,24); // 2026-08-24 (Mon)
-  var NOW_MIN = 2*DAY_MIN + 9*60 + 30; // Wed 09:30 (demo "now")
+  var BASE_DATE = new Date(2026,7,1); // 2026-08-01
+  var NOW_MIN = 25*DAY_MIN + 9*60 + 30; // demo "now" a bit into the month
 
-  var LEFT_COL_WIDTH = 84;
+  var LEFT_COL_WIDTH = 96;
   var RULER_HEIGHT = 40;
-  var LANE_H = 56;
-  var LANE_PAD = 10;
-  var BAR_HEIGHT = LANE_H - 16;
+  var LANE_H = 44;
+  var LANE_PAD = 8;
+  var BAR_HEIGHT = LANE_H - 14;
+  var DIVIDER_H = 24;
 
-  var ZOOM_LEVELS = [26, 38, 55, 78, 105];
-  var zoomIdx = 2;
+  var zoomMultiplier = 1;
+  var ZOOM_MIN = 0.35, ZOOM_MAX = 4;
 
-  var SHIP_COLORS = {
-    sky:     "#38BDF8",
-    amber:   "#FBBF24",
-    emerald: "#34D399",
-    rose:    "#FB7185",
-    violet:  "#A78BFA",
-    orange:  "#FB923C"
-  };
-
-  function dh(day, hour, min){ return day*DAY_MIN + hour*60 + (min||0); }
   function pad(n){ return (n<10?"0":"")+n; }
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-  function pxPerHour(){ return ZOOM_LEVELS[zoomIdx]; }
+  function dh(day,hour,min){ return day*DAY_MIN + hour*60 + (min||0); }
+
+  function baselinePxPerHour(){
+    var avail = Math.max(320, els.scroll.clientWidth - LEFT_COL_WIDTH);
+    return avail / (7*24);
+  }
+  function pxPerHour(){ return baselinePxPerHour()*zoomMultiplier; }
   function pxPerMin(){ return pxPerHour()/60; }
 
-  function fmtHM(min){
-    var day = Math.floor(min/DAY_MIN), rem = min - day*DAY_MIN;
-    return pad(Math.floor(rem/60)) + ":" + pad(rem%60);
-  }
+  function fmtHM(min){ var day=Math.floor(min/DAY_MIN), rem=min-day*DAY_MIN; return pad(Math.floor(rem/60))+":"+pad(rem%60); }
   function fmtFull(min){
     var day = Math.floor(min/DAY_MIN);
-    var date = new Date(BASE_DATE.getTime());
-    date.setDate(date.getDate()+day);
+    var date = new Date(BASE_DATE.getTime()); date.setDate(date.getDate()+day);
     var dow = ["日","月","火","水","木","金","土"][date.getDay()];
     return (date.getMonth()+1)+"/"+date.getDate()+"("+dow+") "+fmtHM(min);
   }
+  function fmtRealDateTime(ts){
+    var d = new Date(ts);
+    return (d.getMonth()+1)+"/"+d.getDate()+" "+pad(d.getHours())+":"+pad(d.getMinutes());
+  }
+  function escapeHtml(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
 
-  /* ================= demo data ================= */
+  /* ================= PRNG ================= */
+  function mulberry32(seed){
+    return function(){
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed>>>15, 1 | seed);
+      t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t;
+      return ((t ^ t>>>14) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ================= ports (100, 10 regions) ================= */
+  var REGIONS = [
+    {name:"北海道", color:"#7DD3FC"},
+    {name:"東北",   color:"#A5B4FC"},
+    {name:"関東",   color:"#5EE6D0"},
+    {name:"中部",   color:"#FDBA74"},
+    {name:"近畿",   color:"#FCA5A5"},
+    {name:"中国",   color:"#C4B5FD"},
+    {name:"四国",   color:"#6EE7B7"},
+    {name:"九州",   color:"#FDE68A"},
+    {name:"沖縄",   color:"#F9A8D4"},
+    {name:"海外",   color:"#94A3B8"}
+  ];
+  var PORTS_ALL = [];
+  REGIONS.forEach(function(r){
+    for(var i=1;i<=10;i++){ PORTS_ALL.push({ id:r.name+i, label:r.name+i, region:r.name, color:r.color }); }
+  });
+  var selectedRegions = new Set(REGIONS.map(function(r){ return r.name; }));
+
+  /* ================= ships (procedural) ================= */
+  var NAME_ROOTS = ["弁天","白鷺","蒼龍","紅葉","疾風","黒潮","若潮","陽炎","飛鳥","満潮","朝凪","黎明","蒼海","旭","瑞穂",
+    "八幡","金剛","不知火","天翔","青嵐","早鞆","潮騒","朱雀","玄武","白虎","青龍","天龍","海王","龍神","恵比寿"];
+  var PALETTE = ["#38BDF8","#FBBF24","#34D399","#FB7185","#A78BFA","#FB923C","#22D3EE","#F472B6",
+    "#84CC16","#60A5FA","#F59E0B","#4ADE80","#E879F9","#FCA5A5","#93C5FD","#FDE047"];
+
   function makeInitialShips(){
-    return [
-      { id:"s1", name:"弁天丸", color:SHIP_COLORS.sky, fixed:true, calls:[
-        { port:"A", type:"load",   arrive:dh(0,6),  workStart:dh(0,8),  workEnd:dh(0,14), depart:dh(0,15) },
-        { port:"C", type:"unload", arrive:dh(1,4),  workStart:dh(1,6),  workEnd:dh(1,10), depart:dh(1,11) }
-      ]},
-      { id:"s2", name:"白鷺丸", color:SHIP_COLORS.amber, fixed:false, calls:[
-        { port:"A", type:"load",   arrive:dh(0,9),  workStart:dh(0,11), workEnd:dh(0,18), depart:dh(0,19) },
-        { port:"B", type:"unload", arrive:dh(1,10), workStart:dh(1,12), workEnd:dh(1,16), depart:dh(1,17) }
-      ]},
-      { id:"s3", name:"蒼龍丸", color:SHIP_COLORS.emerald, fixed:true, calls:[
-        { port:"B", type:"load",   arrive:dh(0,14), workStart:dh(0,16), workEnd:dh(0,22), depart:dh(0,23) },
-        { port:"D", type:"unload", arrive:dh(2,2),  workStart:dh(2,4),  workEnd:dh(2,9),  depart:dh(2,10) }
-      ]},
-      { id:"s4", name:"紅葉丸", color:SHIP_COLORS.rose, fixed:false, calls:[
-        { port:"C", type:"load",   arrive:dh(0,20), workStart:dh(0,22), workEnd:dh(1,3),  depart:dh(1,4) },
-        { port:"A", type:"unload", arrive:dh(2,6),  workStart:dh(2,8),  workEnd:dh(2,13), depart:dh(2,14) }
-      ]},
-      { id:"s5", name:"疾風丸", color:SHIP_COLORS.violet, fixed:false, calls:[
-        { port:"D", type:"load",   arrive:dh(1,1),  workStart:dh(1,3),  workEnd:dh(1,9),  depart:dh(1,10) },
-        { port:"B", type:"unload", arrive:dh(2,8),  workStart:dh(2,10), workEnd:dh(2,15), depart:dh(2,16) }
-      ]},
-      { id:"s6", name:"黒潮丸", color:SHIP_COLORS.orange, fixed:false, calls:[
-        { port:"A", type:"load",   arrive:dh(1,7),  workStart:dh(1,9),  workEnd:dh(1,15), depart:dh(1,16) },
-        { port:"C", type:"unload", arrive:dh(2,12), workStart:dh(2,14), workEnd:dh(2,19), depart:dh(2,20) }
-      ]}
-    ];
+    var rng = mulberry32(20260827);
+    var ships = [];
+    var count = 42;
+    for(var i=0;i<count;i++){
+      var suffixNum = Math.floor(i/NAME_ROOTS.length);
+      var name = NAME_ROOTS[i % NAME_ROOTS.length] + "丸" + (suffixNum>0 ? (suffixNum+1) : "");
+      var color = PALETTE[i % PALETTE.length];
+      var p1 = PORTS_ALL[Math.floor(rng()*PORTS_ALL.length)];
+      var p2;
+      do { p2 = PORTS_ALL[Math.floor(rng()*PORTS_ALL.length)]; } while(p2.id===p1.id);
+
+      var startDay = Math.floor(rng()*21);
+      var arrive1 = startDay*DAY_MIN + Math.floor(rng()*20)*60;
+      var wait1 = 60+Math.floor(rng()*4)*30;
+      var workStart1 = arrive1+wait1;
+      var workDur1 = 240+Math.floor(rng()*10)*60;
+      var workEnd1 = workStart1+workDur1;
+      var wait1b = 30+Math.floor(rng()*3)*30;
+      var depart1 = workEnd1+wait1b;
+
+      var transit = (10+Math.floor(rng()*30))*60;
+      var arrive2 = depart1+transit;
+      var wait2 = 60+Math.floor(rng()*4)*30;
+      var workStart2 = arrive2+wait2;
+      var workDur2 = 240+Math.floor(rng()*10)*60;
+      var workEnd2 = workStart2+workDur2;
+      var wait2b = 30+Math.floor(rng()*3)*30;
+      var depart2 = workEnd2+wait2b;
+
+      ships.push({
+        id:"s"+i, name:name, color:color, fixed: rng()<0.18, comments:[],
+        calls:[
+          {port:p1.id, type:"load",   arrive:arrive1, workStart:workStart1, workEnd:workEnd1, depart:depart1},
+          {port:p2.id, type:"unload", arrive:arrive2, workStart:workStart2, workEnd:workEnd2, depart:depart2}
+        ]
+      });
+    }
+    return ships;
   }
   var ships = makeInitialShips();
 
-  var selectedKey = null; // "shipId:callIndex"
-  var drag = null; // {type, key, shipId, callIndex, field, orig:{...}, startX, startY, moved, locked}
-  var domRefs = {}; // key -> {barEl, portRowElAtBuild}
-  var portRowEls = {}; // port -> element (for hit testing)
+  var selectedKey = null;
+  var drag = null;
+  var domRefs = {};
+  var portRowEls = {};
 
   var els = {
     scroll: document.getElementById("ganttScroll"),
@@ -413,45 +455,50 @@
     contentCol: document.getElementById("contentCol"),
     corner: document.getElementById("corner"),
     zoomLabel: document.getElementById("zoomLabel"),
-    panel: document.getElementById("panel")
+    panel: document.getElementById("panel"),
+    hoverTip: document.getElementById("hoverTip")
   };
 
+  function visiblePorts(){
+    return PORTS_ALL.filter(function(p){ return selectedRegions.has(p.region); });
+  }
+
   /* ================= lane layout ================= */
-  function computeLayout(){
+  function computeLayout(ports){
     var flat = [];
     ships.forEach(function(ship){
       ship.calls.forEach(function(call, idx){
         flat.push({ key: ship.id+":"+idx, shipId: ship.id, callIndex: idx, ship: ship, call: call });
       });
     });
+    var portSet = {}; ports.forEach(function(p){ portSet[p.id]=true; });
+    var byPort = {}; ports.forEach(function(p){ byPort[p.id]=[]; });
+    flat.forEach(function(item){ if(portSet[item.call.port]) byPort[item.call.port].push(item); });
 
-    var byPort = {}; PORTS.forEach(function(p){ byPort[p] = []; });
-    flat.forEach(function(item){ byPort[item.call.port].push(item); });
-
-    var laneOf = {}; // key -> lane index
-    var rowHeights = {};
-    PORTS.forEach(function(p){
-      var items = byPort[p].slice().sort(function(a,b){ return a.call.arrive - b.call.arrive; });
+    var laneOf = {}; var rowHeights = {};
+    ports.forEach(function(p){
+      var items = byPort[p.id].slice().sort(function(a,b){ return a.call.arrive-b.call.arrive; });
       var laneEnds = [];
       items.forEach(function(item){
-        var placed = false;
+        var placed=false;
         for(var i=0;i<laneEnds.length;i++){
           if(laneEnds[i] <= item.call.arrive){ laneOf[item.key]=i; laneEnds[i]=item.call.depart; placed=true; break; }
         }
         if(!placed){ laneOf[item.key]=laneEnds.length; laneEnds.push(item.call.depart); }
       });
-      var laneCount = Math.max(1, laneEnds.length);
-      rowHeights[p] = laneCount*LANE_H + LANE_PAD*2;
+      rowHeights[p.id] = Math.max(1,laneEnds.length)*LANE_H + LANE_PAD*2;
     });
-
-    return { flat: flat, byPort: byPort, laneOf: laneOf, rowHeights: rowHeights };
+    return { byPort: byPort, laneOf: laneOf, rowHeights: rowHeights };
   }
 
   /* ================= rendering ================= */
   function render(){
-    var layout = computeLayout();
+    var ports = visiblePorts();
+    var layout = computeLayout(ports);
     var timelineWidth = TOTAL_DAYS*24*pxPerHour();
-    els.zoomLabel.textContent = pxPerHour()+"px/h";
+    els.zoomLabel.textContent = pxPerHour().toFixed(1)+"px/h";
+    document.getElementById("filterCount").textContent = "("+selectedRegions.size+"/"+REGIONS.length+")";
+    els.corner.textContent = "港湾 ("+ports.length+"/100)";
 
     document.getElementById("canvas").style.width = (LEFT_COL_WIDTH+timelineWidth)+"px";
     els.corner.style.width = LEFT_COL_WIDTH+"px";
@@ -462,330 +509,316 @@
     els.contentCol.style.width = timelineWidth+"px";
 
     buildRuler(timelineWidth);
-    buildLabelsAndContent(layout, timelineWidth);
+    buildLabelsAndContent(ports, layout, timelineWidth);
     updatePanel();
   }
 
   function buildRuler(timelineWidth){
     els.ruler.innerHTML = "";
     var totalHours = TOTAL_DAYS*24;
+    var pph = pxPerHour();
     for(var h=0; h<=totalHours; h++){
-      var x = h*pxPerHour();
       var isDay = (h % 24 === 0);
       var isSix = (h % 6 === 0);
+      if(!isDay && !isSix && pph < 15) continue;
+      var x = h*pph;
       var tick = document.createElement("div");
       tick.className = "tick" + (isDay?" strong":(isSix?" med":""));
       tick.style.left = x+"px";
       els.ruler.appendChild(tick);
-      if(isSix && !isDay){
+      if(isSix && !isDay && pph >= 12){
         var lbl = document.createElement("div");
-        lbl.className = "tickLabel";
-        lbl.style.left = x+"px";
-        lbl.textContent = pad(h%24)+":00";
+        lbl.className = "tickLabel"; lbl.style.left = x+"px"; lbl.textContent = pad(h%24)+":00";
         els.ruler.appendChild(lbl);
       }
       if(isDay){
         var day = h/24;
-        var date = new Date(BASE_DATE.getTime());
-        date.setDate(date.getDate()+day);
+        var date = new Date(BASE_DATE.getTime()); date.setDate(date.getDate()+day);
         var dow = ["日","月","火","水","木","金","土"][date.getDay()];
         var dl = document.createElement("div");
-        dl.className = "dayLabel";
-        dl.style.left = x+"px";
+        dl.className = "dayLabel"; dl.style.left = x+"px";
         dl.textContent = (date.getMonth()+1)+"/"+date.getDate()+"("+dow+")";
         els.ruler.appendChild(dl);
       }
     }
   }
 
-  function buildLabelsAndContent(layout, timelineWidth){
+  function buildLabelsAndContent(ports, layout, timelineWidth){
     els.labelsCol.innerHTML = "";
     els.contentCol.innerHTML = "";
     portRowEls = {};
 
     var totalHeight = 0;
-    PORTS.forEach(function(p){ totalHeight += layout.rowHeights[p]; });
+    var rows = []; // {type:'divider'|'port', region?, port?, height}
+    var prevRegion = null;
+    ports.forEach(function(p){
+      if(p.region !== prevRegion){ rows.push({type:"divider", region:p.region}); totalHeight += DIVIDER_H; prevRegion = p.region; }
+      rows.push({type:"port", port:p});
+      totalHeight += layout.rowHeights[p.id];
+    });
     els.contentCol.style.height = totalHeight+"px";
 
-    // gridlines
     var totalHours = TOTAL_DAYS*24;
+    var pph = pxPerHour();
     for(var h=0; h<=totalHours; h++){
-      var isDay = (h % 24 === 0);
-      var isSix = (h % 6 === 0);
+      var isDay=(h%24===0), isSix=(h%6===0);
+      if(!isDay && !isSix && pph<15) continue;
       var gl = document.createElement("div");
-      gl.className = "gridline" + (isDay?" strong":(isSix?" med":""));
-      gl.style.left = (h*pxPerHour())+"px";
-      gl.style.height = totalHeight+"px";
+      gl.className = "gridline"+(isDay?" strong":(isSix?" med":""));
+      gl.style.left=(h*pph)+"px"; gl.style.height=totalHeight+"px";
       els.contentCol.appendChild(gl);
     }
 
-    // port rows (backgrounds + labels)
     var cumTop = 0;
-    PORTS.forEach(function(p, pi){
-      var rowH = layout.rowHeights[p];
+    var regionMap = {}; REGIONS.forEach(function(r){ regionMap[r.name]=r; });
+    var rowIndex = 0;
+    rows.forEach(function(row){
+      if(row.type === "divider"){
+        var rcol = regionMap[row.region].color;
+        var dl = document.createElement("div");
+        dl.className = "regionDivider"; dl.style.height = DIVIDER_H+"px";
+        dl.innerHTML = '<span class="rd-dot" style="background:'+rcol+'"></span>'+row.region;
+        els.labelsCol.appendChild(dl);
+
+        var dc = document.createElement("div");
+        dc.className = "regionDividerContent";
+        dc.style.position = "absolute"; dc.style.left="0"; dc.style.right="0";
+        dc.style.top = cumTop+"px"; dc.style.height = DIVIDER_H+"px";
+        els.contentCol.appendChild(dc);
+
+        cumTop += DIVIDER_H;
+        return;
+      }
+      var p = row.port;
+      var rowH = layout.rowHeights[p.id];
+      var alt = rowIndex % 2 === 0;
 
       var label = document.createElement("div");
-      label.className = "portLabel";
-      label.style.height = rowH+"px";
-      label.style.background = (pi%2===0) ? "var(--bg-row-a)" : "var(--bg-row-b)";
-      label.innerHTML = '<div class="letter">'+p+'</div><div class="cap">港</div>';
+      label.className = "portLabel"; label.style.height = rowH+"px";
+      label.style.background = alt ? "var(--bg-row-a)" : "var(--bg-row-b)";
+      label.innerHTML = '<span class="stripe" style="background:'+p.color+'"></span><span class="plabel">'+p.label+'</span>';
       els.labelsCol.appendChild(label);
 
       var rowBg = document.createElement("div");
-      rowBg.className = "rowBg";
-      rowBg.style.top = cumTop+"px";
-      rowBg.style.height = rowH+"px";
-      rowBg.style.background = (pi%2===0) ? "var(--bg-row-a)" : "var(--bg-row-b)";
-      rowBg.dataset.port = p;
+      rowBg.className = "rowBg"; rowBg.style.top = cumTop+"px"; rowBg.style.height = rowH+"px";
+      rowBg.style.background = alt ? "var(--bg-row-a)" : "var(--bg-row-b)";
       els.contentCol.appendChild(rowBg);
-      portRowEls[p] = rowBg;
+      portRowEls[p.id] = rowBg;
 
       cumTop += rowH;
+      rowIndex++;
     });
 
-    // now line
     if(NOW_MIN >= 0 && NOW_MIN <= totalHours*60){
       var nl = document.createElement("div");
-      nl.className = "nowLine";
-      nl.style.left = (NOW_MIN*pxPerMin())+"px";
-      nl.style.height = totalHeight+"px";
-      var flag = document.createElement("div");
-      flag.className = "nowFlag";
-      flag.textContent = "現在（デモ）";
-      nl.appendChild(flag);
-      els.contentCol.appendChild(nl);
+      nl.className = "nowLine"; nl.style.left = (NOW_MIN*pxPerMin())+"px"; nl.style.height = totalHeight+"px";
+      var flag = document.createElement("div"); flag.className="nowFlag"; flag.textContent="現在（デモ）";
+      nl.appendChild(flag); els.contentCol.appendChild(nl);
     }
 
     // bars
-    cumTop = 0;
     var portTop = {};
-    PORTS.forEach(function(p){ portTop[p] = cumTop; cumTop += layout.rowHeights[p]; });
+    var top2 = 0;
+    rows.forEach(function(row){
+      if(row.type==="divider"){ top2 += DIVIDER_H; return; }
+      portTop[row.port.id] = top2; top2 += layout.rowHeights[row.port.id];
+    });
 
     domRefs = {};
-    layout.flat.forEach(function(item){
-      var ship = item.ship, call = item.call, key = item.key;
-      var lane = layout.laneOf[key];
-      var top = portTop[call.port] + LANE_PAD + lane*LANE_H + (LANE_H-BAR_HEIGHT)/2;
-      var left = call.arrive*pxPerMin();
-      var width = Math.max(6, (call.depart-call.arrive)*pxPerMin());
+    ports.forEach(function(p){
+      layout.byPort[p.id].forEach(function(item){
+        var ship = item.ship, call = item.call, key = item.key;
+        var lane = layout.laneOf[key];
+        var top = portTop[p.id] + LANE_PAD + lane*LANE_H + (LANE_H-BAR_HEIGHT)/2;
+        var left = call.arrive*pxPerMin();
+        var width = Math.max(6, (call.depart-call.arrive)*pxPerMin());
 
-      var bar = document.createElement("div");
-      bar.className = "bar" + (ship.fixed?" fixed":"") + (key===selectedKey?" selected":"");
-      bar.style.top = top+"px";
-      bar.style.left = left+"px";
-      bar.style.width = width+"px";
-      bar.style.height = BAR_HEIGHT+"px";
-      bar.style.background = ship.color;
-      bar.title = ship.name+" ／ "+portCallLabel(call)+"\n入港 "+fmtFull(call.arrive)+"\n"+
-                  (call.type==="load"?"積込開始 ":"荷役開始 ")+fmtFull(call.workStart)+"\n"+
-                  (call.type==="load"?"積込終了 ":"荷役終了 ")+fmtFull(call.workEnd)+"\n出港 "+fmtFull(call.depart);
+        var bar = document.createElement("div");
+        bar.className = "bar" + (ship.fixed?" fixed":"") + (key===selectedKey?" selected":"");
+        bar.style.top = top+"px"; bar.style.left = left+"px"; bar.style.width = width+"px"; bar.style.height = BAR_HEIGHT+"px";
+        bar.style.background = ship.color;
 
-      var w1 = (call.workStart-call.arrive)*pxPerMin();
-      var w2 = (call.workEnd-call.workStart)*pxPerMin();
-      var w3 = (call.depart-call.workEnd)*pxPerMin();
+        var w1 = (call.workStart-call.arrive)*pxPerMin();
+        var w2 = (call.workEnd-call.workStart)*pxPerMin();
+        var w3 = (call.depart-call.workEnd)*pxPerMin();
 
-      var seg1 = document.createElement("div");
-      seg1.className = "seg seg-wait"; seg1.style.width = w1+"px"; seg1.style.background = ship.color;
-      var seg2 = document.createElement("div");
-      seg2.className = "seg seg-work"; seg2.style.width = w2+"px"; seg2.style.background = ship.color;
-      var cap = document.createElement("div");
-      cap.className = "segCaption";
-      cap.textContent = w2 > 34 ? (call.type==="load"?"積込":"荷役") : "";
-      seg2.appendChild(cap);
-      var seg3 = document.createElement("div");
-      seg3.className = "seg seg-wait"; seg3.style.width = w3+"px"; seg3.style.background = ship.color;
+        var seg1=document.createElement("div"); seg1.className="seg seg-wait"; seg1.style.width=w1+"px"; seg1.style.background=ship.color;
+        var seg2=document.createElement("div"); seg2.className="seg seg-work"; seg2.style.width=w2+"px"; seg2.style.background=ship.color;
+        var cap=document.createElement("div"); cap.className="segCaption"; cap.textContent = w2>34 ? (call.type==="load"?"積込":"荷役") : "";
+        seg2.appendChild(cap);
+        var seg3=document.createElement("div"); seg3.className="seg seg-wait"; seg3.style.width=w3+"px"; seg3.style.background=ship.color;
+        bar.appendChild(seg1); bar.appendChild(seg2); bar.appendChild(seg3);
 
-      bar.appendChild(seg1); bar.appendChild(seg2); bar.appendChild(seg3);
+        var label = document.createElement("div"); label.className="barLabel"; label.textContent = width>46 ? ship.name : "";
+        bar.appendChild(label);
 
-      var label = document.createElement("div");
-      label.className = "barLabel";
-      label.textContent = width > 46 ? ship.name : "";
-      bar.appendChild(label);
+        [["arrive",0],["workStart",w1],["workEnd",w1+w2],["depart",w1+w2+w3]].forEach(function(pair){
+          var field=pair[0], offset=pair[1];
+          var h = document.createElement("div"); h.className="handle";
+          h.style.left = clamp(offset-5,0,Math.max(0,width-10))+"px";
+          h.addEventListener("pointerdown", function(e){ onHandleDown(e, ship.id, item.callIndex, field); });
+          bar.appendChild(h);
+        });
 
-      // handles
-      [["arrive",0],["workStart",w1],["workEnd",w1+w2],["depart",w1+w2+w3]].forEach(function(pair){
-        var field = pair[0], offset = pair[1];
-        var h = document.createElement("div");
-        h.className = "handle";
-        h.style.left = clamp(offset-5, 0, Math.max(0,width-10))+"px";
-        h.addEventListener("pointerdown", function(e){ onHandleDown(e, ship.id, item.callIndex, field); });
-        bar.appendChild(h);
+        var tag = document.createElement("button");
+        tag.className = "lockTag " + (ship.fixed?"on":"off");
+        tag.textContent = ship.fixed ? "🔒 確定" : "🔓 仮";
+        tag.addEventListener("pointerdown", function(e){ e.stopPropagation(); });
+        tag.addEventListener("click", function(e){ e.stopPropagation(); ship.fixed=!ship.fixed; render(); });
+        bar.appendChild(tag);
+
+        if(ship.comments.length>0){
+          var ctag = document.createElement("div");
+          ctag.className = "commentTag"; ctag.textContent = "💬"+ship.comments.length;
+          bar.appendChild(ctag);
+        }
+
+        bar.addEventListener("pointerdown", function(e){ onBarDown(e, ship.id, item.callIndex); });
+        bar.addEventListener("pointerenter", function(e){ if(!drag) showTip(e, ship, call, p); });
+        bar.addEventListener("pointermove", function(e){ if(!drag) moveTip(e); });
+        bar.addEventListener("pointerleave", hideTip);
+
+        els.contentCol.appendChild(bar);
+        domRefs[key] = { barEl: bar };
       });
-
-      // lock tag
-      var tag = document.createElement("button");
-      tag.className = "lockTag " + (ship.fixed?"on":"off");
-      tag.textContent = ship.fixed ? "🔒 確定" : "🔓 仮";
-      tag.addEventListener("pointerdown", function(e){ e.stopPropagation(); });
-      tag.addEventListener("click", function(e){
-        e.stopPropagation();
-        ship.fixed = !ship.fixed;
-        render();
-      });
-      bar.appendChild(tag);
-
-      bar.addEventListener("pointerdown", function(e){ onBarDown(e, ship.id, item.callIndex); });
-
-      els.contentCol.appendChild(bar);
-      domRefs[key] = { barEl: bar };
     });
   }
 
-  function portCallLabel(call){
-    return (call.type==="load" ? "積地" : "揚地") + " " + call.port;
+  function portCallLabel(call, port){
+    var label = port ? port.label : call.port;
+    return (call.type==="load" ? "積地 " : "揚地 ") + label;
   }
 
+  /* ================= hover tooltip ================= */
+  function showTip(e, ship, call, port){
+    var statusOn = ship.fixed;
+    els.hoverTip.innerHTML =
+      '<div class="tipHead"><span class="tipDot" style="background:'+ship.color+'"></span><span class="tipName">'+escapeHtml(ship.name)+'</span></div>'+
+      '<div class="tipSub">'+escapeHtml(portCallLabel(call, port))+'（'+(call.type==="load"?"積込":"荷役")+'）</div>'+
+      '<div class="tipRow"><span>入港</span><span>'+fmtFull(call.arrive)+'</span></div>'+
+      '<div class="tipRow"><span>'+(call.type==="load"?"積込開始":"荷役開始")+'</span><span>'+fmtFull(call.workStart)+'</span></div>'+
+      '<div class="tipRow"><span>'+(call.type==="load"?"積込終了":"荷役終了")+'</span><span>'+fmtFull(call.workEnd)+'</span></div>'+
+      '<div class="tipRow"><span>出港</span><span>'+fmtFull(call.depart)+'</span></div>'+
+      '<div class="tipStatus" style="'+(statusOn?"background:var(--accent-white);color:#0B1220;":"border:1px dashed var(--text-faint);color:var(--text-muted);")+'">'+(statusOn?"確定済み":"仮スケジュール")+'</div>';
+    els.hoverTip.style.display = "block";
+    moveTip(e);
+  }
+  function moveTip(e){
+    var pad = 16;
+    var w = els.hoverTip.offsetWidth, h = els.hoverTip.offsetHeight;
+    var x = e.clientX + pad, y = e.clientY + pad;
+    if(x + w > window.innerWidth - 8) x = e.clientX - w - pad;
+    if(y + h > window.innerHeight - 8) y = e.clientY - h - pad;
+    els.hoverTip.style.left = Math.max(4,x)+"px";
+    els.hoverTip.style.top = Math.max(4,y)+"px";
+  }
+  function hideTip(){ els.hoverTip.style.display = "none"; }
+
   /* ================= drag logic ================= */
-  var rafPending = false, lastEvent = null;
+  var rafPending=false, lastEvent=null;
 
   function onBarDown(e, shipId, callIndex){
-    e.preventDefault();
-    var ship = getShip(shipId);
-    var call = ship.calls[callIndex];
-    var key = shipId+":"+callIndex;
-    drag = {
-      type:"move", key:key, shipId:shipId, callIndex:callIndex,
+    e.preventDefault(); hideTip();
+    var ship = getShip(shipId); var call = ship.calls[callIndex]; var key = shipId+":"+callIndex;
+    drag = { type:"move", key:key, shipId:shipId, callIndex:callIndex,
       orig:{ port:call.port, arrive:call.arrive, workStart:call.workStart, workEnd:call.workEnd, depart:call.depart },
-      startX:e.clientX, startY:e.clientY, moved:false, locked:ship.fixed
-    };
+      startX:e.clientX, startY:e.clientY, moved:false, locked:ship.fixed };
     document.body.classList.add("dragging-active");
     domRefs[key] && domRefs[key].barEl.classList.add("dragging");
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
   }
-
   function onHandleDown(e, shipId, callIndex, field){
-    e.stopPropagation(); e.preventDefault();
+    e.stopPropagation(); e.preventDefault(); hideTip();
     var ship = getShip(shipId);
     if(ship.fixed){ flashLocked(shipId+":"+callIndex); return; }
-    var call = ship.calls[callIndex];
-    var key = shipId+":"+callIndex;
-    drag = {
-      type:"resize", field:field, key:key, shipId:shipId, callIndex:callIndex,
+    var call = ship.calls[callIndex]; var key = shipId+":"+callIndex;
+    drag = { type:"resize", field:field, key:key, shipId:shipId, callIndex:callIndex,
       orig:{ port:call.port, arrive:call.arrive, workStart:call.workStart, workEnd:call.workEnd, depart:call.depart },
-      startX:e.clientX, moved:false, locked:false
-    };
+      startX:e.clientX, moved:false, locked:false };
     document.body.classList.add("dragging-active");
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
   }
-
   function onMove(e){
     if(!drag) return;
     lastEvent = e;
-    if(!rafPending){
-      rafPending = true;
-      requestAnimationFrame(function(){ rafPending=false; if(drag && lastEvent) processDrag(lastEvent); });
-    }
+    if(!rafPending){ rafPending=true; requestAnimationFrame(function(){ rafPending=false; if(drag && lastEvent) processDrag(lastEvent); }); }
   }
-
   function processDrag(e){
     var dxTotal = e.clientX - drag.startX;
     var dyTotal = drag.type==="move" ? (e.clientY - drag.startY) : 0;
-    if(Math.abs(dxTotal) > 5 || Math.abs(dyTotal) > 5) drag.moved = true;
+    if(Math.abs(dxTotal)>5 || Math.abs(dyTotal)>5) drag.moved = true;
+    if(drag.locked) return;
 
-    if(drag.locked){ return; } // click-detection only; no mutation for fixed ships
-
-    var ship = getShip(drag.shipId);
-    var call = ship.calls[drag.callIndex];
+    var ship = getShip(drag.shipId); var call = ship.calls[drag.callIndex];
     var deltaMin = Math.round((dxTotal/pxPerMin())/5)*5;
 
-    if(drag.type === "resize"){
-      var MIN_WORK = 30, MIN_GAP = 15;
-      var v = drag.orig[drag.field] + deltaMin;
-      if(drag.field === "arrive"){
-        v = clamp(v, 0, call.workStart - MIN_GAP); call.arrive = v;
-      } else if(drag.field === "workStart"){
-        v = clamp(v, call.arrive, call.workEnd - MIN_WORK); call.workStart = v;
-      } else if(drag.field === "workEnd"){
-        v = clamp(v, call.workStart + MIN_WORK, call.depart - MIN_GAP); call.workEnd = v;
-      } else if(drag.field === "depart"){
-        v = clamp(v, call.workEnd + MIN_GAP, TOTAL_MIN); call.depart = v;
-      }
-    } else if(drag.type === "move"){
-      var newArrive = Math.max(0, drag.orig.arrive + deltaMin);
-      var shift = newArrive - drag.orig.arrive;
-      call.arrive = drag.orig.arrive + shift;
-      call.workStart = drag.orig.workStart + shift;
-      call.workEnd = drag.orig.workEnd + shift;
-      call.depart = drag.orig.depart + shift;
-
+    if(drag.type==="resize"){
+      var MIN_WORK=30, MIN_GAP=15;
+      var v = drag.orig[drag.field]+deltaMin;
+      if(drag.field==="arrive"){ v=clamp(v,0,call.workStart-MIN_GAP); call.arrive=v; }
+      else if(drag.field==="workStart"){ v=clamp(v,call.arrive,call.workEnd-MIN_WORK); call.workStart=v; }
+      else if(drag.field==="workEnd"){ v=clamp(v,call.workStart+MIN_WORK,call.depart-MIN_GAP); call.workEnd=v; }
+      else if(drag.field==="depart"){ v=clamp(v,call.workEnd+MIN_GAP,TOTAL_MIN); call.depart=v; }
+    } else if(drag.type==="move"){
+      var newArrive = Math.max(0, drag.orig.arrive+deltaMin);
+      var shift = newArrive-drag.orig.arrive;
+      call.arrive = drag.orig.arrive+shift; call.workStart = drag.orig.workStart+shift;
+      call.workEnd = drag.orig.workEnd+shift; call.depart = drag.orig.depart+shift;
       var targetPort = hitTestPort(e.clientY);
       if(targetPort) call.port = targetPort;
     }
     render();
   }
-
   function onUp(e){
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
     document.body.classList.remove("dragging-active");
     if(!drag) return;
-
     var d = drag; drag = null;
-    var ship = getShip(d.shipId);
-    var call = ship.calls[d.callIndex];
+    var ship = getShip(d.shipId); var call = ship.calls[d.callIndex];
 
     if(d.locked){
-      if(!d.moved){ selectedKey = d.key; render(); }
-      else { flashLocked(d.key); }
+      if(!d.moved){ selectedKey = d.key; render(); } else { flashLocked(d.key); }
       return;
     }
-
     if(!d.moved){
-      // treat as click -> restore exact original values, then select
-      call.port = d.orig.port; call.arrive = d.orig.arrive; call.workStart = d.orig.workStart;
-      call.workEnd = d.orig.workEnd; call.depart = d.orig.depart;
-      selectedKey = d.key;
-      render();
-      return;
+      call.port=d.orig.port; call.arrive=d.orig.arrive; call.workStart=d.orig.workStart; call.workEnd=d.orig.workEnd; call.depart=d.orig.depart;
+      selectedKey = d.key; render(); return;
     }
-
-    if(d.type === "move"){
-      // check for swap candidate in the same port
-      var best = null, bestOverlap = 0;
+    if(d.type==="move"){
+      var best=null, bestOverlap=0;
       ships.forEach(function(other){
-        if(other.id === d.shipId || other.fixed) return;
+        if(other.id===d.shipId || other.fixed) return;
         other.calls.forEach(function(oc, oi){
           if(oc.port !== call.port) return;
           var inter = Math.min(call.depart, oc.depart) - Math.max(call.arrive, oc.arrive);
-          if(inter <= 0) return;
+          if(inter<=0) return;
           var frac = inter / Math.min(call.depart-call.arrive, oc.depart-oc.arrive);
-          if(frac > bestOverlap){ bestOverlap = frac; best = { ship: other, idx: oi, call: oc }; }
+          if(frac>bestOverlap){ bestOverlap=frac; best={ship:other, idx:oi, call:oc}; }
         });
       });
-      if(best && bestOverlap > 0.35){
-        var tmp = { port: best.call.port, arrive: best.call.arrive, workStart: best.call.workStart, workEnd: best.call.workEnd, depart: best.call.depart };
-        best.call.port = call.port; best.call.arrive = call.arrive; best.call.workStart = call.workStart;
-        best.call.workEnd = call.workEnd; best.call.depart = call.depart;
-        call.port = tmp.port; call.arrive = tmp.arrive; call.workStart = tmp.workStart;
-        call.workEnd = tmp.workEnd; call.depart = tmp.depart;
+      if(best && bestOverlap>0.35){
+        var tmp = { port:best.call.port, arrive:best.call.arrive, workStart:best.call.workStart, workEnd:best.call.workEnd, depart:best.call.depart };
+        best.call.port=call.port; best.call.arrive=call.arrive; best.call.workStart=call.workStart; best.call.workEnd=call.workEnd; best.call.depart=call.depart;
+        call.port=tmp.port; call.arrive=tmp.arrive; call.workStart=tmp.workStart; call.workEnd=tmp.workEnd; call.depart=tmp.depart;
       }
     }
-    selectedKey = d.key;
-    render();
+    selectedKey = d.key; render();
   }
-
   function hitTestPort(clientY){
     for(var p in portRowEls){
       var r = portRowEls[p].getBoundingClientRect();
-      if(clientY >= r.top && clientY <= r.bottom) return p;
+      if(clientY>=r.top && clientY<=r.bottom) return p;
     }
     return null;
   }
-
   function flashLocked(key){
-    var ref = domRefs[key];
-    if(!ref) return;
-    ref.barEl.classList.remove("shake");
-    void ref.barEl.offsetWidth;
-    ref.barEl.classList.add("shake");
+    var ref = domRefs[key]; if(!ref) return;
+    ref.barEl.classList.remove("shake"); void ref.barEl.offsetWidth; ref.barEl.classList.add("shake");
   }
-
-  function getShip(id){
-    for(var i=0;i<ships.length;i++) if(ships[i].id===id) return ships[i];
-    return null;
-  }
+  function getShip(id){ for(var i=0;i<ships.length;i++) if(ships[i].id===id) return ships[i]; return null; }
 
   /* ================= detail panel ================= */
   function updatePanel(){
@@ -796,61 +829,62 @@
     var idx = parseInt(parts[1],10);
     var call = ship.calls[idx];
     if(!call){ selectedKey=null; els.panel.classList.remove("open"); return; }
+    var port = PORTS_ALL.filter(function(p){ return p.id===call.port; })[0];
 
     els.panel.classList.add("open");
     document.getElementById("pDot").style.background = ship.color;
     document.getElementById("pTitle").textContent = ship.name;
-    document.getElementById("pType").textContent = portCallLabel(call) + (call.type==="load" ? "（積込）" : "（荷役）");
+    document.getElementById("pType").textContent = portCallLabel(call, port) + (call.type==="load" ? "（積込）" : "（荷役）");
     document.getElementById("lblWorkStart").textContent = call.type==="load" ? "積込開始" : "荷役開始";
     document.getElementById("lblWorkEnd").textContent = call.type==="load" ? "積込終了" : "荷役終了";
 
     var portSel = document.getElementById("pPort");
+    portSel.innerHTML = PORTS_ALL.map(function(p){ return '<option value="'+p.id+'">'+p.region+' ／ '+p.label+'</option>'; }).join("");
     portSel.value = call.port;
     portSel.disabled = ship.fixed;
 
     ["arrive","workStart","workEnd","depart"].forEach(function(field){
       var row = document.querySelector('.timeRow[data-field="'+field+'"]');
       row.querySelector(".tval").textContent = fmtFull(call[field]);
-      var btns = row.querySelectorAll(".stepBtn");
-      btns.forEach(function(b){ b.disabled = ship.fixed; });
+      row.querySelectorAll(".stepBtn").forEach(function(b){ b.disabled = ship.fixed; });
     });
 
     var fixBtn = document.getElementById("pFixBtn");
     fixBtn.textContent = ship.fixed ? "🔓 仮に戻して編集する" : "🔒 この便を確定する";
     fixBtn.className = "fixBtn " + (ship.fixed ? "toRelease" : "toFix");
-
     document.getElementById("pHint").textContent = ship.fixed
       ? "確定中の便はドラッグ・編集ができません。解除すると再編集できます。"
       : "ガントチャート上のバーもドラッグで移動・端のハンドルで時刻調整ができます。";
+
+    var listEl = document.getElementById("commentList");
+    if(ship.comments.length===0){
+      listEl.innerHTML = '<div class="commentEmpty">まだコメントはありません。</div>';
+    } else {
+      listEl.innerHTML = ship.comments.slice().reverse().map(function(c){
+        return '<div class="commentItem"><div class="cTime">'+fmtRealDateTime(c.ts)+'</div><div class="cText">'+escapeHtml(c.text)+'</div></div>';
+      }).join("");
+    }
   }
 
   function setFieldClamped(call, field, deltaMin){
-    var MIN_WORK = 30, MIN_GAP = 15;
-    if(field === "arrive"){
-      call.arrive = clamp(call.arrive+deltaMin, 0, call.workStart-MIN_GAP);
-    } else if(field === "workStart"){
-      call.workStart = clamp(call.workStart+deltaMin, call.arrive, call.workEnd-MIN_WORK);
-    } else if(field === "workEnd"){
-      call.workEnd = clamp(call.workEnd+deltaMin, call.workStart+MIN_WORK, call.depart-MIN_GAP);
-    } else if(field === "depart"){
-      call.depart = clamp(call.depart+deltaMin, call.workEnd+MIN_GAP, TOTAL_MIN);
-    }
+    var MIN_WORK=30, MIN_GAP=15;
+    if(field==="arrive"){ call.arrive = clamp(call.arrive+deltaMin, 0, call.workStart-MIN_GAP); }
+    else if(field==="workStart"){ call.workStart = clamp(call.workStart+deltaMin, call.arrive, call.workEnd-MIN_WORK); }
+    else if(field==="workEnd"){ call.workEnd = clamp(call.workEnd+deltaMin, call.workStart+MIN_WORK, call.depart-MIN_GAP); }
+    else if(field==="depart"){ call.depart = clamp(call.depart+deltaMin, call.workEnd+MIN_GAP, TOTAL_MIN); }
   }
 
   document.getElementById("pPort").addEventListener("change", function(e){
     if(!selectedKey) return;
-    var parts = selectedKey.split(":");
-    var ship = getShip(parts[0]);
+    var parts = selectedKey.split(":"); var ship = getShip(parts[0]);
     if(ship.fixed) return;
     ship.calls[parseInt(parts[1],10)].port = e.target.value;
     render();
   });
-
   document.querySelectorAll(".stepBtn").forEach(function(btn){
     btn.addEventListener("click", function(){
       if(!selectedKey) return;
-      var parts = selectedKey.split(":");
-      var ship = getShip(parts[0]);
+      var parts = selectedKey.split(":"); var ship = getShip(parts[0]);
       if(ship.fixed) return;
       var call = ship.calls[parseInt(parts[1],10)];
       var field = btn.closest(".timeRow").dataset.field;
@@ -859,34 +893,75 @@
       render();
     });
   });
-
   document.getElementById("pFixBtn").addEventListener("click", function(){
     if(!selectedKey) return;
     var ship = getShip(selectedKey.split(":")[0]);
-    ship.fixed = !ship.fixed;
+    ship.fixed = !ship.fixed; render();
+  });
+  document.getElementById("pClose").addEventListener("click", function(){ selectedKey=null; render(); });
+
+  document.getElementById("commentAddBtn").addEventListener("click", function(){
+    if(!selectedKey) return;
+    var ship = getShip(selectedKey.split(":")[0]);
+    var input = document.getElementById("commentInput");
+    var val = input.value.trim();
+    if(!val) return;
+    ship.comments.push({ text:val, ts:Date.now() });
+    input.value = "";
     render();
   });
 
-  document.getElementById("pClose").addEventListener("click", function(){
-    selectedKey = null; render();
+  /* ================= region filter popover ================= */
+  var regionListEl = document.getElementById("regionList");
+  function buildRegionList(){
+    regionListEl.innerHTML = "";
+    REGIONS.forEach(function(r){
+      var count = PORTS_ALL.filter(function(p){ return p.region===r.name; }).length;
+      var row = document.createElement("label");
+      row.className = "regionRow";
+      row.innerHTML = '<input type="checkbox" '+(selectedRegions.has(r.name)?"checked":"")+' />'+
+        '<span class="regionDot" style="background:'+r.color+'"></span>'+
+        '<span class="rname">'+r.name+'</span><span class="rcount">'+count+'港</span>';
+      row.querySelector("input").addEventListener("change", function(e){
+        if(e.target.checked) selectedRegions.add(r.name); else selectedRegions.delete(r.name);
+        render();
+      });
+      regionListEl.appendChild(row);
+    });
+  }
+  buildRegionList();
+
+  var filterBtn = document.getElementById("filterBtn");
+  var filterPopover = document.getElementById("filterPopover");
+  filterBtn.addEventListener("click", function(e){
+    e.stopPropagation(); filterPopover.classList.toggle("open");
+  });
+  document.addEventListener("click", function(e){
+    if(!filterPopover.contains(e.target) && e.target!==filterBtn){ filterPopover.classList.remove("open"); }
+  });
+  document.getElementById("selAll").addEventListener("click", function(){
+    REGIONS.forEach(function(r){ selectedRegions.add(r.name); }); buildRegionList(); render();
+  });
+  document.getElementById("selNone").addEventListener("click", function(){
+    selectedRegions.clear(); buildRegionList(); render();
   });
 
   /* ================= toolbar ================= */
-  document.getElementById("zoomIn").addEventListener("click", function(){
-    zoomIdx = Math.min(ZOOM_LEVELS.length-1, zoomIdx+1); render();
-  });
-  document.getElementById("zoomOut").addEventListener("click", function(){
-    zoomIdx = Math.max(0, zoomIdx-1); render();
-  });
+  document.getElementById("zoomIn").addEventListener("click", function(){ zoomMultiplier = clamp(zoomMultiplier*1.3, ZOOM_MIN, ZOOM_MAX); render(); });
+  document.getElementById("zoomOut").addEventListener("click", function(){ zoomMultiplier = clamp(zoomMultiplier/1.3, ZOOM_MIN, ZOOM_MAX); render(); });
+  document.getElementById("weekReset").addEventListener("click", function(){ zoomMultiplier = 1; render(); });
   document.getElementById("gotoNow").addEventListener("click", function(){
     render();
     var targetLeft = NOW_MIN*pxPerMin() - (els.scroll.clientWidth-LEFT_COL_WIDTH)/2;
     els.scroll.scrollTo({ left: Math.max(0,targetLeft), top:0, behavior:"smooth" });
   });
   document.getElementById("resetBtn").addEventListener("click", function(){
-    ships = makeInitialShips();
-    selectedKey = null;
-    render();
+    ships = makeInitialShips(); selectedKey = null; render();
+  });
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function(){
+    clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 120);
   });
 
   /* ================= init ================= */
