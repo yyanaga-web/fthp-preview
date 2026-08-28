@@ -188,37 +188,39 @@
     pace: 'normal',
     chainQueue: [],
     caught: [],          // array of final-stage names, persisted
-    localCache: {},
     storageOk: true,
     enc: { chainIdx:-1, stage:0, typed:"", startTime:0, paceTimerId:null, paceSeconds:0 },
     lastResult: null,    // {caughtName, persisted} or {fledName}
   };
 
   /* ============ storage ============ */
-  async function loadCaught(){
+  // Uses localStorage, keyed to this page's URL -- the approach that has
+  // reliably persisted data for this family's other apps (hosted on GitHub
+  // Pages), unlike the artifact window.storage API this file used before.
+  const LS_PREFIX = 'evoTypingDex:';
+  function loadCaught(){
     try{
-      const r = await window.storage.get('caught-list', false);
-      S.caught = r && r.value ? JSON.parse(r.value) : [];
+      const v = localStorage.getItem(LS_PREFIX+'caught-list');
+      S.caught = v ? JSON.parse(v) : [];
     }catch(e){
       S.storageOk = false;
-      S.caught = S.localCache.caughtList || [];
+      S.caught = [];
     }
   }
-  async function saveCaught(){
-    S.localCache.caughtList = S.caught.slice();
+  function saveCaught(){
     try{
-      const r = await window.storage.set('caught-list', JSON.stringify(S.caught), false);
-      return !!r;
+      localStorage.setItem(LS_PREFIX+'caught-list', JSON.stringify(S.caught));
+      return true;
     }catch(e){ return false; }
   }
-  async function loadPace(){
+  function loadPace(){
     try{
-      const r = await window.storage.get('settings:evo-pace', false);
-      if(r && r.value && PACE_CPS[JSON.parse(r.value)]) S.pace = JSON.parse(r.value);
+      const v = localStorage.getItem(LS_PREFIX+'settings:pace');
+      if(v && PACE_CPS[JSON.parse(v)]) S.pace = JSON.parse(v);
     }catch(e){ /* default is fine */ }
   }
-  async function savePace(){
-    try{ await window.storage.set('settings:evo-pace', JSON.stringify(S.pace), false); }catch(e){ /* session-only ok */ }
+  function savePace(){
+    try{ localStorage.setItem(LS_PREFIX+'settings:pace', JSON.stringify(S.pace)); }catch(e){ /* session-only ok */ }
   }
 
   /* ============ render root ============ */
@@ -248,7 +250,6 @@
   /* ---------- HOME ---------- */
   function homeScreen(){
     return `
-    ${!S.storageOk ? `<div class="save-status warn">⚠️ この端末では図鑑の保存がうまく働いていない可能性があります。捕まえたあとの保存表示を必ず確認してください。</div>` : ''}
     <div class="panel">
       <h2>🌿 野生のポケモンをさがす</h2>
       <p style="color:var(--text-dim);margin:0 0 16px;font-size:.9rem;line-height:1.7;">
@@ -334,9 +335,6 @@
         <h2>やったー！<br>${escapeHtml(r.caughtName||'')}を、ゲットだぜ！</h2>
         <p>図鑑に登録されたよ。</p>
       </div>
-      ${r.persisted
-        ? `<div class="save-status ok">💾 図鑑に保存できました。</div>`
-        : `<div class="save-status warn">⚠️ 端末に保存できませんでした。このまま閉じると記録が消えてしまう可能性があります。</div>`}
       <div class="btn-row" style="justify-content:center;">
         <button class="btn btn-main" id="backHomeBtn">図鑑にもどる</button>
       </div>
@@ -491,9 +489,9 @@
     setTimeout(()=>{ endEncounter('fled', chain[0]); }, 1000);
   }
 
-  async function catchPokemon(finalName){
+  function catchPokemon(finalName){
     if(!S.caught.includes(finalName)) S.caught.push(finalName);
-    const persisted = await saveCaught();
+    const persisted = saveCaught();
     S.lastResult = { caughtName: finalName, persisted };
     S.screen = 'caught';
     render();
@@ -514,9 +512,9 @@
   function escapeAttr(s){ return escapeHtml(s); }
 
   /* ============ init ============ */
-  (async function init(){
-    await loadPace();
-    await loadCaught();
+  (function init(){
+    loadPace();
+    loadCaught();
     render();
   })();
 })();

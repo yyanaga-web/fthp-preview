@@ -242,6 +242,11 @@
     padding:14px;margin-bottom:16px;background:rgba(208,67,43,.08);
     border:1px dashed var(--vermillion-dark);border-radius:12px;
   }
+  .save-status{
+    border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:.85rem;line-height:1.7;
+  }
+  .save-status.ok{background:rgba(79,143,109,.12);border:1px solid var(--jade);color:#bfe3cf;}
+  .save-status.warn{background:rgba(208,67,43,.1);border:1px solid var(--vermillion);color:#f3c9c0;}
 
   /* ---------- history modal ---------- */
   .modal-overlay{
@@ -455,7 +460,6 @@
     calYear: new Date().getFullYear(),
     entryDates: [],       // list of "YYYY-MM-DD" with saved diary
     entryCount: 0,
-    localCache: {},       // in-session fallback cache, keyed by date, used if persistent storage is unavailable
     storageOk: true,
     pace: 'normal',
     sentenceQueue: [], // shuffled leftover indices for "no repeats until the pool cycles"
@@ -472,50 +476,49 @@
   }
 
   /* ============ storage helpers ============ */
-  // Persistent storage (window.storage) can throw on a brand-new artifact before
-  // anything has ever been saved (e.g. list() on an empty namespace). That is an
-  // expected, recoverable condition -- not a real failure -- so we don't log it
-  // at all, and we always keep an in-memory fallback (S.localCache) so the app
-  // stays fully usable for the current session even if persistence itself is
-  // unavailable in this environment.
-  async function loadEntryList(){
+  // Uses localStorage, keyed to this page's origin/URL, which is what has
+  // reliably persisted data in this family's other apps (hosted on GitHub
+  // Pages). Kept synchronous and simple -- no server round trip, so it works
+  // the same whether online or offline, as long as this file is opened from
+  // the same URL each time.
+  const LS_PREFIX = 'typingDojo:';
+  function loadEntryList(){
     try{
-      const res = await window.storage.list('diary:', false);
-      const keys = (res && Array.isArray(res.keys)) ? res.keys : [];
-      const fromStorage = keys.map(k => k.replace('diary:',''));
-      const fromCache = Object.keys(S.localCache);
-      S.entryDates = Array.from(new Set([...fromStorage, ...fromCache])).sort();
+      const dates = [];
+      for(let i=0;i<localStorage.length;i++){
+        const key = localStorage.key(i);
+        if(key && key.startsWith(LS_PREFIX+'diary:')) dates.push(key.slice((LS_PREFIX+'diary:').length));
+      }
+      S.entryDates = dates.sort();
       S.entryCount = S.entryDates.length;
     }catch(e){
       S.storageOk = false;
-      S.entryDates = Object.keys(S.localCache).sort();
-      S.entryCount = S.entryDates.length;
+      S.entryDates = [];
+      S.entryCount = 0;
     }
   }
-  async function saveEntry(dateStr, data){
-    S.localCache[dateStr] = data; // always keep a working copy for this session
+  function saveEntry(dateStr, data){
     try{
-      const r = await window.storage.set('diary:'+dateStr, JSON.stringify(data), false);
-      return !!r;
+      localStorage.setItem(LS_PREFIX+'diary:'+dateStr, JSON.stringify(data));
+      return true;
     }catch(e){
       return false;
     }
   }
-  async function getEntry(dateStr){
+  function getEntry(dateStr){
     try{
-      const r = await window.storage.get('diary:'+dateStr, false);
-      if(r) return JSON.parse(r.value);
-    }catch(e){ /* fall through to cache */ }
-    return S.localCache[dateStr] || null;
+      const v = localStorage.getItem(LS_PREFIX+'diary:'+dateStr);
+      return v ? JSON.parse(v) : null;
+    }catch(e){ return null; }
   }
-  async function loadSettings(){
+  function loadSettings(){
     try{
-      const r = await window.storage.get('settings:pace', false);
-      if(r && r.value && PACE_CPS[JSON.parse(r.value)]) S.pace = JSON.parse(r.value);
+      const v = localStorage.getItem(LS_PREFIX+'settings:pace');
+      if(v && PACE_CPS[JSON.parse(v)]) S.pace = JSON.parse(v);
     }catch(e){ /* keep default pace for this session */ }
   }
-  async function savePace(){
-    try{ await window.storage.set('settings:pace', JSON.stringify(S.pace), false); }catch(e){ /* session-only is fine */ }
+  function savePace(){
+    try{ localStorage.setItem(LS_PREFIX+'settings:pace', JSON.stringify(S.pace)); }catch(e){ /* session-only is fine */ }
   }
 
   /* ============ Claude API content evaluation ============ */
@@ -599,6 +602,7 @@ ${text}
   function homeScreen(){
     const doneToday = S.entryDates.includes(todayStr());
     return `
+    ${!S.storageOk ? `<div class="save-status warn">⚠️ この端末では日記の保存がうまく働いていない可能性があります。今日の分を書いたら、結果画面の保存表示を必ず確認してください。</div>` : ''}
     <div class="panel">
       <h2>🥋 今日の修行</h2>
       <p style="color:var(--text-dim);margin:0 0 16px;font-size:.9rem;line-height:1.7;">
@@ -843,6 +847,12 @@ ${text}
         <p style="margin-top:8px;">${escapeHtml(r.comment)}</p>
       </div>
       ${r.newStamp ? `<div class="stamp-award"><span class="hanko" style="position:static;transform:rotate(-8deg);">修</span><span>道場印をゲット！</span></div>` : ''}
+      ${r.persisted
+        ? `<div class="save-status ok">💾 保存できました。あとで見返せます。</div>`
+        : `<div class="save-status warn">⚠️ 端末に保存できませんでした。このまま閉じると今日の日記は消えてしまいます。念のため下からコピーしておいてください。
+             <div class="modal-diary-text" style="margin-top:10px;">${escapeHtml(S.diary.text || '')}</div>
+             <button class="btn btn-ghost" id="copyDiaryBtn" style="margin-top:8px;">本文をコピーする</button>
+           </div>`}
       <div class="btn-row">
         <button class="btn btn-main" id="backHomeBtn">道場にもどる</button>
       </div>
@@ -869,7 +879,7 @@ ${text}
   async function openModal(dateStr){
     S.modalDate = dateStr;
     render();
-    const entry = await getEntry(dateStr);
+    const entry = getEntry(dateStr);
     const body = document.getElementById('modalBody');
     if(!body) return;
     if(!entry){ body.innerHTML = `<p class="empty-note">データが見つからなかった。</p>`; return; }
@@ -940,7 +950,18 @@ ${text}
     if(submitDiaryBtn) submitDiaryBtn.onclick = () => finishDiary(false);
 
     const backHomeBtn = document.getElementById('backHomeBtn');
-    if(backHomeBtn) backHomeBtn.onclick = async () => { S.screen='home'; await loadEntryList(); render(); };
+    if(backHomeBtn) backHomeBtn.onclick = () => { S.screen='home'; loadEntryList(); render(); };
+    const copyDiaryBtn = document.getElementById('copyDiaryBtn');
+    if(copyDiaryBtn){
+      copyDiaryBtn.onclick = async () => {
+        try{
+          await navigator.clipboard.writeText(S.diary.text || '');
+          copyDiaryBtn.textContent = 'コピーしました！';
+        }catch(e){
+          copyDiaryBtn.textContent = 'コピーできませんでした。上の文章を長押しで選択してください';
+        }
+      };
+    }
 
     const modalClose = document.getElementById('modalClose');
     const modalOverlay = document.getElementById('modalOverlay');
@@ -1100,14 +1121,15 @@ ${text}
       score: aiResult.score, praise: aiResult.praise, tip: aiResult.tip, comment: aiResult.comment,
       savedAt: new Date().toISOString()
     };
-    await saveEntry(todayStr(), entryData);
-    await loadEntryList();
+    const persisted = saveEntry(todayStr(), entryData);
+    loadEntryList();
 
     S.result = {
       charCount, typoEstimate, warmupAccuracy, volumeTier,
       score: aiResult.score, praise: aiResult.praise, tip: aiResult.tip, comment: aiResult.comment,
       aiFailed: !!aiResult.aiFailed,
-      newStamp: !alreadyStamped
+      newStamp: !alreadyStamped,
+      persisted
     };
     render();
   }
@@ -1119,9 +1141,9 @@ ${text}
   function escapeAttr(s){ return escapeHtml(s); }
 
   /* ============ init ============ */
-  (async function init(){
-    await loadSettings();
-    await loadEntryList();
+  (function init(){
+    loadSettings();
+    loadEntryList();
     render();
   })();
 })();
