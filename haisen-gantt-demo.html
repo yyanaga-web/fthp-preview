@@ -120,7 +120,7 @@
     font-family:var(--font-mono); font-size:9.5px; padding:2px 6px; border-radius:4px; white-space:nowrap; font-weight:700; }
 
   .bar{ position:absolute; display:flex; border-radius:3px 9px 9px 3px; box-shadow:0 1px 3px rgba(0,0,0,.4);
-    cursor:grab; overflow:visible; z-index:10; user-select:none; transition: box-shadow .15s ease, top .12s ease;
+    cursor:grab; overflow:visible; z-index:10; user-select:none; transition: box-shadow .15s ease;
     border:1.5px dashed var(--text-faint); }
   .bar.fixed{ border:2px solid var(--accent-white); box-shadow:0 0 0 1px rgba(244,247,252,.25), 0 1px 4px rgba(0,0,0,.5); }
   .bar:hover{ box-shadow:0 0 0 1px rgba(255,255,255,.3), 0 2px 6px rgba(0,0,0,.5); z-index:15; }
@@ -151,6 +151,13 @@
 
   .commentTag{ position:absolute; right:4px; bottom:-9px; font-size:9.5px; font-weight:700; border-radius:20px;
     padding:2px 7px; z-index:21; background:#182746; color:#BFD3F5; border:1px solid var(--line-med); pointer-events:none; }
+
+  .bar.warnBar{ box-shadow:0 0 0 2px var(--accent-red), 0 2px 8px rgba(239,87,87,.45); }
+  .bar.warnBar.selected{ box-shadow:0 0 0 2px var(--accent-red), 0 0 0 4px var(--accent-teal); }
+  .warnTag{ position:absolute; right:4px; top:-9px; font-size:9.5px; font-weight:800; border-radius:20px; padding:2px 7px;
+    z-index:22; background:var(--accent-red); color:#fff; pointer-events:none; }
+  .warnEmpty{ font-size:12px; color:var(--text-muted); background:var(--bg-panel-alt); border:1px solid var(--line-soft);
+    border-radius:10px; padding:12px 14px; }
 
   /* ---------- Hover tooltip ---------- */
   #hoverTip{ position:fixed; z-index:500; background:#0A1220; border:1px solid var(--line-med); border-radius:8px;
@@ -213,6 +220,79 @@
   #ganttScroll::-webkit-scrollbar-thumb:hover{ background:#334879; }
 
   body.dragging-active{ cursor:grabbing !important; user-select:none; }
+
+  /* ---------- KPI dashboard ---------- */
+  #kpiOverlay{ position:fixed; inset:0; background:rgba(4,8,16,.66); z-index:400; display:none;
+    align-items:center; justify-content:center; padding:26px; }
+  #kpiOverlay.open{ display:flex; }
+  #kpiModal{ width:min(1120px,100%); max-height:100%; overflow-y:auto; background:var(--bg-panel);
+    border:1px solid var(--line-med); border-radius:14px; box-shadow:0 20px 60px rgba(0,0,0,.55); padding:22px 26px 28px; }
+  .kpiHead{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:18px;
+    padding-bottom:16px; border-bottom:1px solid var(--line-soft); }
+  .kpiHead h2{ font-size:18px; margin:2px 0 6px; }
+  .kpiSub{ font-size:11px; color:var(--text-faint); max-width:820px; line-height:1.7; }
+  .kpiTargets{ display:flex; gap:22px; flex-wrap:wrap; background:var(--bg-panel-alt); border:1px solid var(--line-soft);
+    border-radius:10px; padding:12px 16px; margin-bottom:20px; }
+  .targetField{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-muted); }
+  .targetField input{ width:76px; background:#0E1728; color:var(--text); border:1px solid var(--line-med); border-radius:6px;
+    padding:6px 8px; font-family:var(--font-mono); font-size:13px; text-align:right; }
+
+  .kpiCards{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:26px; }
+  .statCard{ background:var(--bg-panel-alt); border:1px solid var(--line-soft); border-radius:10px; padding:14px 15px; }
+  .statCard .scTitle{ font-size:10.5px; color:var(--text-faint); letter-spacing:.05em; margin-bottom:8px; font-family:var(--font-mono); }
+  .statCard .scValue{ font-size:22px; font-weight:800; font-family:var(--font-mono); }
+  .statCard .scSub{ font-size:11px; color:var(--text-muted); margin-top:6px; }
+  .kpiBadge{ display:inline-block; font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px; margin-top:8px; }
+  .kpiBadge.good{ background:#173327; color:#4ADE80; }
+  .kpiBadge.warn{ background:#33291A; color:#FBBF24; }
+  .kpiBadge.over{ background:#331A1D; color:#FB7185; }
+
+  .kpiSection{ margin-bottom:28px; }
+  .kpiSection h3{ font-size:13px; margin:0 0 12px; color:var(--text); font-weight:700; }
+
+  .chartRow{ display:flex; gap:6px; align-items:flex-end; background:var(--bg-panel-alt); border:1px solid var(--line-soft);
+    border-radius:10px; padding:18px 14px 12px; }
+  .chartGroup{ flex:1; display:flex; flex-direction:column; align-items:center; }
+  .chartBars{ display:flex; align-items:flex-end; gap:5px; height:150px; }
+  .chartBar{ width:20px; border-radius:3px 3px 0 0; position:relative; }
+  .cb-wait{ background:#FBBF24; }
+  .cb-transit{ background:#38BDF8; }
+  .chartValLabel{ font-size:9px; color:var(--text-muted); font-family:var(--font-mono); text-align:center; margin-bottom:3px; white-space:nowrap; }
+  .chartWkLabel{ font-size:10.5px; color:var(--text-muted); margin-top:8px; }
+  .chartLegend{ display:flex; gap:16px; justify-content:center; margin-top:10px; font-size:11px; color:var(--text-muted); }
+  .chartLegend span{ display:inline-flex; align-items:center; gap:5px; }
+  .chartLegend i{ width:12px; height:8px; border-radius:2px; display:inline-block; }
+
+  .burnupGrid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .burnupTitle{ font-size:11.5px; color:var(--text-muted); margin-bottom:8px; font-weight:700; }
+  .burnupChart{ position:relative; height:180px; background:var(--bg-panel-alt); border:1px solid var(--line-soft);
+    border-radius:10px; display:flex; align-items:flex-end; justify-content:space-around; padding:14px 10px 34px; }
+  .burnupTargetLine{ position:absolute; left:8px; right:8px; border-top:1px dashed var(--text-faint); }
+  .burnupTargetLabel{ position:absolute; right:10px; transform:translateY(-100%); font-size:9.5px; color:var(--text-faint);
+    font-family:var(--font-mono); }
+  .burnupCol{ display:flex; flex-direction:column; align-items:center; width:64px; z-index:1; }
+  .burnupBar{ width:26px; border-radius:3px 3px 0 0; }
+  .burnupVal{ font-size:10px; font-family:var(--font-mono); margin-bottom:4px; text-align:center; }
+  .burnupLabel{ position:absolute; bottom:8px; font-size:10px; color:var(--text-muted); text-align:center; width:64px; }
+
+  .shipTableWrap{ max-height:320px; overflow-y:auto; border:1px solid var(--line-soft); border-radius:10px; }
+  table.shipTable{ width:100%; border-collapse:collapse; font-size:12px; }
+  table.shipTable thead th{ position:sticky; top:0; background:#111C30; text-align:right; padding:9px 12px;
+    font-size:10.5px; color:var(--text-faint); border-bottom:1px solid var(--line-med); cursor:pointer; white-space:nowrap; }
+  table.shipTable thead th:first-child{ text-align:left; cursor:default; }
+  table.shipTable thead th:hover{ color:var(--text); }
+  table.shipTable tbody td{ padding:8px 12px; text-align:right; border-bottom:1px solid var(--line-soft); font-family:var(--font-mono); }
+  table.shipTable tbody td:first-child{ text-align:left; font-family:var(--font-sans); display:flex; align-items:center; gap:8px; }
+  table.shipTable tbody tr:hover{ background:#152238; }
+  .miniDot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+  .stateChip{ font-size:9.5px; padding:2px 7px; border-radius:20px; font-weight:700; }
+  .stateChip.fixed{ background:var(--accent-white); color:#0B1220; }
+  .stateChip.tent{ border:1px dashed var(--text-faint); color:var(--text-muted); }
+
+  @media (max-width:760px){
+    .kpiCards{ grid-template-columns:repeat(2,1fr); }
+    .burnupGrid{ grid-template-columns:1fr; }
+  }
 </style>
 </head>
 <body>
@@ -251,11 +331,15 @@
       <div class="grp">
         <button class="tbtn" id="resetBtn">⟲ デモデータをリセット</button>
       </div>
+      <div class="grp">
+        <button class="tbtn" id="kpiBtn">📊 KPIダッシュボード</button>
+      </div>
       <div class="legend">
         <div class="legItem"><span class="swatch sw-wait"></span>待機（回航・着岸待ち）</div>
         <div class="legItem"><span class="swatch sw-work"></span>荷役中（積込／取卸）</div>
         <div class="legItem"><span class="tag-demo tag-fixed-demo">確定</span>編集不可</div>
         <div class="legItem"><span class="tag-demo tag-tent-demo">仮</span>ドラッグ／編集可</div>
+        <div class="legItem"><span class="tag-demo" style="background:var(--accent-red);color:#fff;">⚠ 20h超</span>滞船時間ワーニング</div>
       </div>
     </div>
   </header>
@@ -314,6 +398,64 @@
       <div class="commentInputRow">
         <textarea id="commentInput" placeholder="申し送り事項を入力…"></textarea>
         <button class="addBtn" id="commentAddBtn">追加</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="kpiOverlay">
+  <div id="kpiModal">
+    <div class="kpiHead">
+      <div>
+        <span class="eyebrow">EFFICIENCY KPI</span>
+        <h2>配船効率 KPIダッシュボード</h2>
+        <div class="kpiSub">滞船時間＝入港〜出港のうち荷役以外の待機時間の合計（少ないほど良い、1便あたり20h超はワーニング対象）／空船回航時間＝揚地を出港してから次の積地に入港するまでの、船が空荷で航海する時間（少ないほど良い）。累積グラフは月初(0h)を起点に、隔週チェックポイントごとの積み上げを表示しています。</div>
+      </div>
+      <button class="closeBtn" id="kpiClose">×</button>
+    </div>
+
+    <div class="kpiTargets">
+      <div class="targetField"><span>滞船時間 月間目標</span><input type="number" id="targetWait" min="0" step="10" /><span>時間</span></div>
+      <div class="targetField"><span>空船回航時間 月間目標</span><input type="number" id="targetTransit" min="0" step="10" /><span>時間</span></div>
+    </div>
+
+    <div class="kpiCards" id="kpiCards"></div>
+
+    <div class="kpiSection">
+      <h3>⚠️ 滞船時間ワーニング一覧</h3>
+      <div id="warnListWrap"></div>
+    </div>
+
+    <div class="kpiSection">
+      <h3>週別内訳（第1〜5週）</h3>
+      <div class="chartRow" id="weeklyChart"></div>
+      <div class="chartLegend">
+        <span><i style="background:#FBBF24"></i>滞船時間</span>
+        <span><i style="background:#38BDF8"></i>空船回航時間</span>
+      </div>
+    </div>
+
+    <div class="kpiSection">
+      <h3>月目標に対する累積状況（隔週チェックポイント）</h3>
+      <div class="burnupGrid">
+        <div><div class="burnupTitle">滞船時間 累積</div><div id="burnupWait"></div></div>
+        <div><div class="burnupTitle">空船回航時間 累積</div><div id="burnupTransit"></div></div>
+      </div>
+    </div>
+
+    <div class="kpiSection">
+      <h3>船舶別内訳（列見出しクリックで並び替え）</h3>
+      <div class="shipTableWrap">
+        <table class="shipTable" id="shipTable">
+          <thead><tr>
+            <th>船名</th>
+            <th data-sort="wait">滞船時間(h)</th>
+            <th data-sort="transit">空船回航時間(h)</th>
+            <th data-sort="inport">在港合計(h)</th>
+            <th>状態</th>
+          </tr></thead>
+          <tbody id="shipTableBody"></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -393,7 +535,7 @@
   REGIONS.forEach(function(r){
     for(var i=1;i<=10;i++){ PORTS_ALL.push({ id:r.name+i, label:r.name+i, region:r.name, color:r.color }); }
   });
-  var selectedRegions = new Set(REGIONS.map(function(r){ return r.name; }));
+  var selectedRegions = new Set(["関東","近畿","中部"]); // start light; use the region filter to show more
 
   /* ================= ships (procedural) ================= */
   var NAME_ROOTS = ["弁天","白鷺","蒼龍","紅葉","疾風","黒潮","若潮","陽炎","飛鳥","満潮","朝凪","黎明","蒼海","旭","瑞穂",
@@ -405,6 +547,11 @@
     var rng = mulberry32(20260827);
     var ships = [];
     var count = 42;
+    function pickWait(base, spanSteps, outlierChance){
+      var w = base + Math.floor(rng()*spanSteps)*30;
+      if(rng() < outlierChance){ w += (15+Math.floor(rng()*10))*60; } // occasional 15-25h outlier dwell
+      return w;
+    }
     for(var i=0;i<count;i++){
       var suffixNum = Math.floor(i/NAME_ROOTS.length);
       var name = NAME_ROOTS[i % NAME_ROOTS.length] + "丸" + (suffixNum>0 ? (suffixNum+1) : "");
@@ -412,30 +559,42 @@
       var p1 = PORTS_ALL[Math.floor(rng()*PORTS_ALL.length)];
       var p2;
       do { p2 = PORTS_ALL[Math.floor(rng()*PORTS_ALL.length)]; } while(p2.id===p1.id);
+      var p3;
+      do { p3 = PORTS_ALL[Math.floor(rng()*PORTS_ALL.length)]; } while(p3.id===p2.id);
 
-      var startDay = Math.floor(rng()*21);
+      var startDay = Math.floor(rng()*19);
       var arrive1 = startDay*DAY_MIN + Math.floor(rng()*20)*60;
-      var wait1 = 60+Math.floor(rng()*4)*30;
+      var wait1 = pickWait(60,4,0.07);
       var workStart1 = arrive1+wait1;
       var workDur1 = 240+Math.floor(rng()*10)*60;
       var workEnd1 = workStart1+workDur1;
-      var wait1b = 30+Math.floor(rng()*3)*30;
+      var wait1b = pickWait(30,3,0.05);
       var depart1 = workEnd1+wait1b;
 
-      var transit = (10+Math.floor(rng()*30))*60;
-      var arrive2 = depart1+transit;
-      var wait2 = 60+Math.floor(rng()*4)*30;
+      var ladenTransit = (10+Math.floor(rng()*30))*60; // laden voyage: load port -> unload port
+      var arrive2 = depart1+ladenTransit;
+      var wait2 = pickWait(60,4,0.07);
       var workStart2 = arrive2+wait2;
       var workDur2 = 240+Math.floor(rng()*10)*60;
       var workEnd2 = workStart2+workDur2;
-      var wait2b = 30+Math.floor(rng()*3)*30;
+      var wait2b = pickWait(30,3,0.05);
       var depart2 = workEnd2+wait2b;
+
+      var emptyTransit = (8+Math.floor(rng()*23))*60; // ballast voyage: unload port -> next load port (empty)
+      var arrive3 = depart2+emptyTransit;
+      var wait3 = pickWait(60,4,0.07);
+      var workStart3 = arrive3+wait3;
+      var workDur3 = 240+Math.floor(rng()*10)*60;
+      var workEnd3 = workStart3+workDur3;
+      var wait3b = pickWait(30,3,0.05);
+      var depart3 = workEnd3+wait3b;
 
       ships.push({
         id:"s"+i, name:name, color:color, fixed: rng()<0.18, comments:[],
         calls:[
           {port:p1.id, type:"load",   arrive:arrive1, workStart:workStart1, workEnd:workEnd1, depart:depart1},
-          {port:p2.id, type:"unload", arrive:arrive2, workStart:workStart2, workEnd:workEnd2, depart:depart2}
+          {port:p2.id, type:"unload", arrive:arrive2, workStart:workStart2, workEnd:workEnd2, depart:depart2},
+          {port:p3.id, type:"load",   arrive:arrive3, workStart:workStart3, workEnd:workEnd3, depart:depart3}
         ]
       });
     }
@@ -652,13 +811,15 @@
         var label = document.createElement("div"); label.className="barLabel"; label.textContent = width>46 ? ship.name : "";
         bar.appendChild(label);
 
-        [["arrive",0],["workStart",w1],["workEnd",w1+w2],["depart",w1+w2+w3]].forEach(function(pair){
-          var field=pair[0], offset=pair[1];
-          var h = document.createElement("div"); h.className="handle";
-          h.style.left = clamp(offset-5,0,Math.max(0,width-10))+"px";
-          h.addEventListener("pointerdown", function(e){ onHandleDown(e, ship.id, item.callIndex, field); });
-          bar.appendChild(h);
-        });
+        if(width >= 24){
+          [["arrive",0],["workStart",w1],["workEnd",w1+w2],["depart",w1+w2+w3]].forEach(function(pair){
+            var field=pair[0], offset=pair[1];
+            var h = document.createElement("div"); h.className="handle";
+            h.style.left = clamp(offset-5,0,Math.max(0,width-10))+"px";
+            h.addEventListener("pointerdown", function(e){ onHandleDown(e, ship.id, item.callIndex, field); });
+            bar.appendChild(h);
+          });
+        }
 
         var tag = document.createElement("button");
         tag.className = "lockTag " + (ship.fixed?"on":"off");
@@ -671,6 +832,13 @@
           var ctag = document.createElement("div");
           ctag.className = "commentTag"; ctag.textContent = "💬"+ship.comments.length;
           bar.appendChild(ctag);
+        }
+
+        if(isWarnCall(call)){
+          bar.classList.add("warnBar");
+          var wtag = document.createElement("div");
+          wtag.className = "warnTag"; wtag.textContent = "⚠ "+callWaitHours(call).toFixed(0)+"h";
+          bar.appendChild(wtag);
         }
 
         bar.addEventListener("pointerdown", function(e){ onBarDown(e, ship.id, item.callIndex); });
@@ -692,6 +860,7 @@
   /* ================= hover tooltip ================= */
   function showTip(e, ship, call, port){
     var statusOn = ship.fixed;
+    var warn = isWarnCall(call);
     els.hoverTip.innerHTML =
       '<div class="tipHead"><span class="tipDot" style="background:'+ship.color+'"></span><span class="tipName">'+escapeHtml(ship.name)+'</span></div>'+
       '<div class="tipSub">'+escapeHtml(portCallLabel(call, port))+'（'+(call.type==="load"?"積込":"荷役")+'）</div>'+
@@ -699,7 +868,9 @@
       '<div class="tipRow"><span>'+(call.type==="load"?"積込開始":"荷役開始")+'</span><span>'+fmtFull(call.workStart)+'</span></div>'+
       '<div class="tipRow"><span>'+(call.type==="load"?"積込終了":"荷役終了")+'</span><span>'+fmtFull(call.workEnd)+'</span></div>'+
       '<div class="tipRow"><span>出港</span><span>'+fmtFull(call.depart)+'</span></div>'+
-      '<div class="tipStatus" style="'+(statusOn?"background:var(--accent-white);color:#0B1220;":"border:1px dashed var(--text-faint);color:var(--text-muted);")+'">'+(statusOn?"確定済み":"仮スケジュール")+'</div>';
+      '<div class="tipRow"><span>滞船時間</span><span style="'+(warn?"color:#FB7185;font-weight:700;":"")+'">'+callWaitHours(call).toFixed(1)+'h'+(warn?" ⚠":"")+'</span></div>'+
+      '<div class="tipStatus" style="'+(statusOn?"background:var(--accent-white);color:#0B1220;":"border:1px dashed var(--text-faint);color:var(--text-muted);")+'">'+(statusOn?"確定済み":"仮スケジュール")+'</div>'+
+      (warn?'<div class="tipStatus" style="margin-left:6px;background:var(--accent-red);color:#fff;">滞船'+WARN_WAIT_HOURS+'h超</div>':'');
     els.hoverTip.style.display = "block";
     moveTip(e);
   }
@@ -957,11 +1128,243 @@
   });
   document.getElementById("resetBtn").addEventListener("click", function(){
     ships = makeInitialShips(); selectedKey = null; render();
+    if(kpiOverlay.classList.contains("open")) renderKpi();
   });
 
   var resizeTimer = null;
   window.addEventListener("resize", function(){
     clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 120);
+  });
+
+  /* ================= KPI dashboard ================= */
+  var WEEK_COUNT = 5; // weeks 0-4 across a 30-day month (week4 is a 2-day partial week)
+  var CHECKPOINTS = [
+    { label:"月初",         day:-1 },
+    { label:"2週目末(14日)", day:13 },
+    { label:"4週目末(28日)", day:27 },
+    { label:"月末(30日)",   day:29 }
+  ];
+  var WARN_WAIT_HOURS = 20; // 滞船時間が1便あたりこの時間を超えたらワーニング
+
+  function callWaitMin(call){ return (call.workStart-call.arrive)+(call.depart-call.workEnd); }
+  function callWaitHours(call){ return callWaitMin(call)/60; }
+  function callInPortMin(call){ return call.depart-call.arrive; }
+  function isWarnCall(call){ return callWaitHours(call) > WARN_WAIT_HOURS; }
+
+  // 空船回航＝揚地(unload)出港 → 次の積地(load)入港までの、船が空の状態で航海する区間
+  function shipEmptyTransitSegments(ship){
+    var segs = [];
+    for(var i=0;i<ship.calls.length-1;i++){
+      var a = ship.calls[i], b = ship.calls[i+1];
+      if(a.type==="unload" && b.type==="load"){ segs.push({ startMin:a.depart, durMin: b.arrive-a.depart }); }
+    }
+    return segs;
+  }
+  function shipEmptyTransitMin(ship){ return shipEmptyTransitSegments(ship).reduce(function(s,x){ return s+x.durMin; }, 0); }
+
+  function dayOf(min){ return Math.floor(min/DAY_MIN); }
+  function weekIndexOfDay(day){ return Math.min(WEEK_COUNT-1, Math.max(0,Math.floor(day/7))); }
+
+  function computeWeekly(){
+    var weeks = []; for(var i=0;i<WEEK_COUNT;i++) weeks.push({ index:i, waitMin:0, transitMin:0 });
+    ships.forEach(function(ship){
+      ship.calls.forEach(function(call){ weeks[weekIndexOfDay(dayOf(call.arrive))].waitMin += callWaitMin(call); });
+      shipEmptyTransitSegments(ship).forEach(function(seg){ weeks[weekIndexOfDay(dayOf(seg.startMin))].transitMin += seg.durMin; });
+    });
+    return weeks;
+  }
+  function computeMonthlyActualMin(){
+    var waitMin=0, transitMin=0;
+    ships.forEach(function(ship){
+      ship.calls.forEach(function(call){ waitMin += callWaitMin(call); });
+      transitMin += shipEmptyTransitMin(ship);
+    });
+    return { waitMin:waitMin, transitMin:transitMin };
+  }
+  function computeCumulativeThroughDay(dayInclusive){
+    var thresholdMin = (dayInclusive+1)*DAY_MIN;
+    var waitMin=0, transitMin=0;
+    ships.forEach(function(ship){
+      ship.calls.forEach(function(call){ if(call.arrive < thresholdMin) waitMin += callWaitMin(call); });
+      shipEmptyTransitSegments(ship).forEach(function(seg){ if(seg.startMin < thresholdMin) transitMin += seg.durMin; });
+    });
+    return { waitMin:waitMin, transitMin:transitMin };
+  }
+  function computeWarnList(){
+    var out = [];
+    ships.forEach(function(ship){
+      ship.calls.forEach(function(call, idx){
+        if(isWarnCall(call)){
+          var port = PORTS_ALL.filter(function(p){ return p.id===call.port; })[0];
+          out.push({ ship:ship, call:call, idx:idx, port:port, hours:callWaitHours(call) });
+        }
+      });
+    });
+    out.sort(function(a,b){ return b.hours-a.hours; });
+    return out;
+  }
+
+  var monthlyAtStartup = computeMonthlyActualMin();
+  var kpiTargets = {
+    wait: Math.max(10, Math.ceil((monthlyAtStartup.waitMin/60)*1.15/10)*10),
+    transit: Math.max(50, Math.ceil((monthlyAtStartup.transitMin/60)*1.1/50)*50)
+  };
+
+  function badgeFor(pct){ if(pct<=85) return "good"; if(pct<=100) return "warn"; return "over"; }
+  function h1(min){ return (min/60).toFixed(1); }
+
+  var kpiOverlay = document.getElementById("kpiOverlay");
+  var shipSort = { key:"wait", dir:-1 };
+
+  function renderKpi(){
+    var targetWaitH = kpiTargets.wait, targetTransitH = kpiTargets.transit;
+    document.getElementById("targetWait").value = targetWaitH;
+    document.getElementById("targetTransit").value = targetTransitH;
+
+    var monthly = computeMonthlyActualMin();
+    var waitH = monthly.waitMin/60, transitH = monthly.transitMin/60;
+    var waitPct = Math.round(waitH/targetWaitH*100);
+    var transitPct = Math.round(transitH/targetTransitH*100);
+    var callCount = ships.length*3;
+    var avgWaitPerCall = waitH/callCount;
+    var warnList = computeWarnList();
+
+    var cardsEl = document.getElementById("kpiCards");
+    cardsEl.innerHTML =
+      statCard("月間滞船時間 合計", waitH.toFixed(1)+" h", "目標 "+targetWaitH+" h", badgeFor(waitPct), waitPct+"% 消化") +
+      statCard("月間空船回航時間 合計", transitH.toFixed(1)+" h", "目標 "+targetTransitH+" h", badgeFor(transitPct), transitPct+"% 消化") +
+      statCard("便あたり平均滞船時間", avgWaitPerCall.toFixed(2)+" h/便", callCount+" 便（全船）", null, null) +
+      statCard("滞船ワーニング（"+WARN_WAIT_HOURS+"h超）", warnList.length+" 件", "全"+callCount+"便中", warnList.length>0?"over":"good", warnList.length>0?"要確認":"問題なし");
+
+    renderWeeklyChart();
+    renderBurnup("burnupWait", CHECKPOINTS.map(function(cp){ return { label:cp.label, value:computeCumulativeThroughDay(cp.day).waitMin/60 }; }), targetWaitH, "#FBBF24");
+    renderBurnup("burnupTransit", CHECKPOINTS.map(function(cp){ return { label:cp.label, value:computeCumulativeThroughDay(cp.day).transitMin/60 }; }), targetTransitH, "#38BDF8");
+    renderWarnList(warnList);
+    renderShipTable();
+  }
+
+  function statCard(title, value, sub, badgeClass, badgeText){
+    return '<div class="statCard"><div class="scTitle">'+title+'</div><div class="scValue">'+value+'</div>'+
+      '<div class="scSub">'+sub+'</div>'+
+      (badgeClass ? '<div class="kpiBadge '+badgeClass+'">'+badgeText+'</div>' : '') + '</div>';
+  }
+
+  function renderWeeklyChart(){
+    var weeks = computeWeekly();
+    var maxVal = 1;
+    weeks.forEach(function(w){ maxVal = Math.max(maxVal, w.waitMin/60, w.transitMin/60); });
+    maxVal *= 1.15;
+    var el = document.getElementById("weeklyChart");
+    el.innerHTML = "";
+    weeks.forEach(function(w, i){
+      var waitH2 = w.waitMin/60, transitH2 = w.transitMin/60;
+      var group = document.createElement("div"); group.className="chartGroup";
+      var bars = document.createElement("div"); bars.className="chartBars";
+
+      var col1 = document.createElement("div"); col1.style.display="flex"; col1.style.flexDirection="column"; col1.style.alignItems="center"; col1.style.justifyContent="flex-end";
+      var lbl1 = document.createElement("div"); lbl1.className="chartValLabel"; lbl1.textContent = waitH2.toFixed(1);
+      var bar1 = document.createElement("div"); bar1.className="chartBar cb-wait"; bar1.style.height=Math.max(2,(waitH2/maxVal)*150)+"px";
+      col1.appendChild(lbl1); col1.appendChild(bar1);
+
+      var col2 = document.createElement("div"); col2.style.display="flex"; col2.style.flexDirection="column"; col2.style.alignItems="center"; col2.style.justifyContent="flex-end";
+      var lbl2 = document.createElement("div"); lbl2.className="chartValLabel"; lbl2.textContent = transitH2.toFixed(1);
+      var bar2 = document.createElement("div"); bar2.className="chartBar cb-transit"; bar2.style.height=Math.max(2,(transitH2/maxVal)*150)+"px";
+      col2.appendChild(lbl2); col2.appendChild(bar2);
+
+      bars.appendChild(col1); bars.appendChild(col2);
+      var wkLabel = document.createElement("div"); wkLabel.className="chartWkLabel";
+      wkLabel.textContent = "第"+(i+1)+"週" + (i===WEEK_COUNT-1 ? "(一部)" : "");
+      group.appendChild(bars); group.appendChild(wkLabel);
+      el.appendChild(group);
+    });
+  }
+
+  function renderBurnup(containerId, points, target, colorHex){
+    var el = document.getElementById(containerId);
+    el.innerHTML = "";
+    var last = points[points.length-1].value;
+    var maxScale = Math.max(target*1.2, last*1.1, 1);
+    var chart = document.createElement("div"); chart.className = "burnupChart";
+
+    var tgLine = document.createElement("div"); tgLine.className = "burnupTargetLine";
+    tgLine.style.bottom = (target/maxScale*(180-48))+34+"px";
+    chart.appendChild(tgLine);
+    var tgLabel = document.createElement("div"); tgLabel.className = "burnupTargetLabel";
+    tgLabel.style.bottom = (target/maxScale*(180-48))+36+"px";
+    tgLabel.textContent = "目標 "+target+"h";
+    chart.appendChild(tgLabel);
+
+    points.forEach(function(p){
+      var pct = Math.round(p.value/target*100);
+      var col = document.createElement("div"); col.className = "burnupCol";
+      var val = document.createElement("div"); val.className = "burnupVal"; val.textContent = p.value.toFixed(1)+"h ("+pct+"%)";
+      var bar = document.createElement("div"); bar.className = "burnupBar";
+      bar.style.height = Math.max(2,(p.value/maxScale)*(180-48))+"px";
+      bar.style.background = colorHex;
+      var badge = document.createElement("div"); badge.className = "kpiBadge "+badgeFor(pct); badge.style.marginTop="4px";
+      badge.textContent = pct<=85?"順調":pct<=100?"注意":"超過";
+      col.appendChild(val); col.appendChild(bar); col.appendChild(badge);
+      var lbl = document.createElement("div"); lbl.className="burnupLabel"; lbl.textContent = p.label;
+      col.appendChild(lbl);
+      chart.appendChild(col);
+    });
+    el.appendChild(chart);
+  }
+
+  function renderWarnList(warnList){
+    var el = document.getElementById("warnListWrap");
+    if(warnList.length===0){
+      el.innerHTML = '<div class="warnEmpty">現在、滞船時間が'+WARN_WAIT_HOURS+'時間を超えている便はありません。</div>';
+      return;
+    }
+    el.innerHTML = '<table class="shipTable"><thead><tr><th>船名</th><th>寄港地</th><th>区分</th><th>滞船時間(h)</th><th>状態</th></tr></thead><tbody>'+
+      warnList.map(function(w){
+        return '<tr><td><span class="miniDot" style="background:'+w.ship.color+'"></span>'+escapeHtml(w.ship.name)+'</td>'+
+          '<td>'+(w.port?w.port.region+' '+w.port.label:w.call.port)+'</td>'+
+          '<td>'+(w.call.type==="load"?"積込":"荷役")+'</td>'+
+          '<td><span style="color:#FB7185;font-weight:700;">'+w.hours.toFixed(1)+'</span></td>'+
+          '<td><span class="stateChip '+(w.ship.fixed?"fixed":"tent")+'">'+(w.ship.fixed?"確定":"仮")+'</span></td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  function renderShipTable(){
+    var rows = ships.map(function(ship){
+      var waitMin = ship.calls.reduce(function(sum,c){ return sum+callWaitMin(c); }, 0);
+      var inPortMin = ship.calls.reduce(function(sum,c){ return sum+callInPortMin(c); }, 0);
+      var hasWarn = ship.calls.some(isWarnCall);
+      return { ship:ship, waitH:waitMin/60, transitH:shipEmptyTransitMin(ship)/60, inportH:inPortMin/60, hasWarn:hasWarn };
+    });
+    rows.sort(function(a,b){
+      var ka = shipSort.key==="wait"?a.waitH:shipSort.key==="transit"?a.transitH:a.inportH;
+      var kb = shipSort.key==="wait"?b.waitH:shipSort.key==="transit"?b.transitH:b.inportH;
+      return (ka-kb)*shipSort.dir;
+    });
+    var body = document.getElementById("shipTableBody");
+    body.innerHTML = rows.map(function(r){
+      return '<tr><td><span class="miniDot" style="background:'+r.ship.color+'"></span>'+escapeHtml(r.ship.name)+
+        (r.hasWarn?' <span title="滞船'+WARN_WAIT_HOURS+'h超あり">⚠️</span>':'')+'</td>'+
+        '<td>'+r.waitH.toFixed(1)+'</td><td>'+r.transitH.toFixed(1)+'</td><td>'+r.inportH.toFixed(1)+'</td>'+
+        '<td><span class="stateChip '+(r.ship.fixed?"fixed":"tent")+'">'+(r.ship.fixed?"確定":"仮")+'</span></td></tr>';
+    }).join("");
+  }
+
+  document.querySelectorAll('#shipTable thead th[data-sort]').forEach(function(th){
+    th.addEventListener("click", function(){
+      var key = th.dataset.sort;
+      if(shipSort.key===key){ shipSort.dir *= -1; } else { shipSort = { key:key, dir:-1 }; }
+      renderShipTable();
+    });
+  });
+
+  document.getElementById("kpiBtn").addEventListener("click", function(){ kpiOverlay.classList.add("open"); renderKpi(); });
+  document.getElementById("kpiClose").addEventListener("click", function(){ kpiOverlay.classList.remove("open"); });
+  kpiOverlay.addEventListener("click", function(e){ if(e.target===kpiOverlay) kpiOverlay.classList.remove("open"); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape" && kpiOverlay.classList.contains("open")) kpiOverlay.classList.remove("open"); });
+  document.getElementById("targetWait").addEventListener("change", function(e){
+    kpiTargets.wait = Math.max(1, parseFloat(e.target.value)||1); renderKpi();
+  });
+  document.getElementById("targetTransit").addEventListener("change", function(e){
+    kpiTargets.transit = Math.max(1, parseFloat(e.target.value)||1); renderKpi();
   });
 
   /* ================= init ================= */
